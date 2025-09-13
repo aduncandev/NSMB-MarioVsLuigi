@@ -3459,6 +3459,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   playerElements: {fileID: 2058053739306675502}
   inputType: 1
   display: {fileID: 7084224354480453437}
@@ -5255,6 +5257,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   playerElements: {fileID: 2058053739306675502}
   inputType: 5
   display: {fileID: 7309064810101460862}
@@ -11567,6 +11571,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   playerElements: {fileID: 2058053739306675502}
   inputType: 6
   display: {fileID: 8947250497995652351}
@@ -15212,6 +15218,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   playerElements: {fileID: 2058053739306675502}
   inputType: 7
   display: {fileID: 6423858333021708214}
@@ -16932,6 +16940,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   playerElements: {fileID: 2058053739306675502}
   inputType: 0
   display: {fileID: 5173477325071737550}
@@ -17458,6 +17468,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   playerElements: {fileID: 2058053739306675502}
   inputType: 4
   display: {fileID: 9014143349123438645}
@@ -18047,6 +18059,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   playerElements: {fileID: 2058053739306675502}
   inputType: 3
   display: {fileID: 5429302253143391614}
@@ -18140,6 +18154,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5245c252ab1a2d54a90ca6604ea21386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Updater: {fileID: 0}
+  UseFindUpdater: 1
   playerElements: {fileID: 2058053739306675502}
   inputType: 2
   display: {fileID: 3197744446609318044}

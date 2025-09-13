@@ -6276,6 +6276,19 @@
             Represents native memory allocations and is used in many places across the engine.
             </summary>
         </member>
+        <member name="M:Photon.Deterministic.Native.Allocator.TrackAlloc(System.Void*)">
+            <summary>
+            Tracks the allocation.
+            </summary>
+            <param name="ptr">The allocated memory.</param>
+        </member>
+        <member name="M:Photon.Deterministic.Native.Allocator.TrackFree(System.Void*)">
+            <summary>
+            Tracks the free operation.
+            </summary>
+            <param name="ptr">The memory to free.</param>
+            <exception cref="T:System.Exception">Is raised when the allocation was unknown.</exception>
+        </member>
         <member name="M:Photon.Deterministic.Native.Allocator.Dispose">
             <summary>
             Disposes the allocator and logs memory leaks in debug mode.

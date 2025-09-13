@@ -7,10 +7,10 @@
   "targets": {
     ".NETStandard,Version=v2.1": {},
     ".NETStandard,Version=v2.1/": {
-      "Quantum.Engine/3.0.7.1808-UnityRelease": {
+      "Quantum.Engine/3.0.7.1808-UnityDebug": {
         "dependencies": {
           "JetBrains.Annotations": "2024.3.0",
-          "Quantum.Deterministic": "3.0.7.1808-UnityRelease"
+          "Quantum.Deterministic": "3.0.7.1808-UnityDebug"
         },
         "runtime": {
           "Quantum.Engine.dll": {}
@@ -24,21 +24,21 @@
           }
         }
       },
-      "Quantum.Deterministic/3.0.7.1808-UnityRelease": {
+      "Quantum.Deterministic/3.0.7.1808-UnityDebug": {
         "dependencies": {
-          "Quantum.Log": "3.0.7.1808-UnityRelease"
+          "Quantum.Log": "3.0.7.1808-UnityDebug"
         },
         "runtime": {
           "Quantum.Deterministic.dll": {
-            "assemblyVersion": "3.0.7.1808",
+            "assemblyVersion": "3.0.7.1808-UnityDebug",
             "fileVersion": "3.0.7.1808"
           }
         }
       },
-      "Quantum.Log/3.0.7.1808-UnityRelease": {
+      "Quantum.Log/3.0.7.1808-UnityDebug": {
         "runtime": {
           "Quantum.Log.dll": {
-            "assemblyVersion": "3.0.7.1808",
+            "assemblyVersion": "3.0.7.1808-UnityDebug",
             "fileVersion": "3.0.7.1808"
           }
         }
@@ -46,7 +46,7 @@
     }
   },
   "libraries": {
-    "Quantum.Engine/3.0.7.1808-UnityRelease": {
+    "Quantum.Engine/3.0.7.1808-UnityDebug": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -58,12 +58,12 @@
       "path": "jetbrains.annotations/2024.3.0",
       "hashPath": "jetbrains.annotations.2024.3.0.nupkg.sha512"
     },
-    "Quantum.Deterministic/3.0.7.1808-UnityRelease": {
+    "Quantum.Deterministic/3.0.7.1808-UnityDebug": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Quantum.Log/3.0.7.1808-UnityRelease": {
+    "Quantum.Log/3.0.7.1808-UnityDebug": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

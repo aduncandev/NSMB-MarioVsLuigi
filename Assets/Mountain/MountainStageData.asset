@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MountainStageData
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Maps/Mountain/MountainStageData
+    Path: Mountain/MountainStageData
     Guid:
       Value: 307320990314420170
   ShowAuthorAndComposer: 1
@@ -8720,6 +8720,14 @@ MonoBehaviour:
     Flags: 0
   BigStarSpawnpoints:
   - X:
+      RawValue: 0
+    Y:
+      RawValue: 65536
+  - X:
+      RawValue: 393216
+    Y:
+      RawValue: 65536
+  - X:
       RawValue: -458752
     Y:
       RawValue: 360448
@@ -8728,26 +8736,18 @@ MonoBehaviour:
     Y:
       RawValue: 163840
   - X:
-      RawValue: -131072
-    Y:
-      RawValue: 360448
-  - X:
-      RawValue: 393216
-    Y:
-      RawValue: 196608
-  - X:
-      RawValue: 393216
-    Y:
-      RawValue: 65536
-  - X:
-      RawValue: 0
-    Y:
-      RawValue: 65536
-  - X:
-      RawValue: 0
-    Y:
-      RawValue: 196608
-  - X:
       RawValue: -294912
     Y:
       RawValue: 819200
+  - X:
+      RawValue: 393216
+    Y:
+      RawValue: 196608
+  - X:
+      RawValue: 0
+    Y:
+      RawValue: 196608
+  - X:
+      RawValue: -131072
+    Y:
+      RawValue: 360448

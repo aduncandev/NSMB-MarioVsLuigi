@@ -455,7 +455,7 @@ namespace Quantum {
             KnockbackTick = f.Number;
 
             bool forceWeak = false;
-            if (freezable->IsFrozen(f)) {
+            if (freezable->IsFrozen(f) && strength != KnockbackStrength.Normal) {
                 forceWeak = true;
                 KnockbackTick -= 25;
             }

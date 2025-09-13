@@ -19,12 +19,16 @@ namespace Quantum {
             } else {
                 f.Events.GameStateChanged(f.Global->GameState);
             }
+
+
+            // wouldn't exist if codegen didn't run.
+            f.Global->Test = 0;
         }
 
         public override void Update(Frame f) {
             // Tick RNG
             _ = f.RNG->Next();
-            
+
             // Parse lobby commands
             var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
             for (int i = 0; i < f.MaxPlayerCount; i++) {

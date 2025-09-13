@@ -50,11 +50,11 @@ namespace NSMB.Utilities {
             }
         }
 
-        public static string SecondsToMinuteSeconds(int number) {
+        public static string SecondsToMinuteSeconds(int secondsInput) {
             StringBuilder builder = new StringBuilder();
-            int seconds = number % 60;
-            int minutes = number / 60;
-            int hours = minutes / 60;
+            int seconds = secondsInput % 60;
+            int minutes = (secondsInput / 60) % 60;
+            int hours = secondsInput / 60 / 60;
 
             if (hours > 0) {
                 builder.Append(hours).Append(':')

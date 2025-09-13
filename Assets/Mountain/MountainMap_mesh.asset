@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MountainMap_mesh
   m_EditorClassIdentifier: 
   Identifier:
-    Path: QuantumUser/Resources/AssetObjects/Maps/Mountain/MountainMap_mesh
+    Path: Mountain/MountainMap_mesh
     Guid:
       Value: 275037684207054827
   Data: 0000000000000000

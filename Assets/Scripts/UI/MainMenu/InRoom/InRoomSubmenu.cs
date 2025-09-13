@@ -343,6 +343,10 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             } else {
                 startGameButton.interactable = f.Global->GameStartFrames == 0;
             }
+
+            if (e.Game.PlayerIsLocal(e.Player)) {
+                UpdateStartButton(e.Game, f);
+            }
         }
 
         private void OnCountdownTick(EventCountdownTick e) {

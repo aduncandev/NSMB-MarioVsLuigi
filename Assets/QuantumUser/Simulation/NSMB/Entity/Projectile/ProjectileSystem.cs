@@ -1,4 +1,5 @@
 using Photon.Deterministic;
+using Quantum.Collections;
 
 namespace Quantum {
     public unsafe class ProjectileSystem : SystemMainThreadEntityFilter<Projectile, ProjectileSystem.Filter>, ISignalOnProjectileHitEntity {
@@ -8,6 +9,10 @@ namespace Quantum {
             public Projectile* Projectile;
             public PhysicsObject* PhysicsObject;
             public PhysicsCollider2D* PhysicsCollider;
+        }
+
+        public override void OnInit(Frame f) {
+            f.Context.Interactions.Register<Projectile, Projectile>(f, OnProjectileProjectileInteraction);
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
@@ -66,6 +71,25 @@ namespace Quantum {
                 physicsObject->Velocity.Y = asset.BounceStrength + boost;
                 physicsObject->IsTouchingGround = false;
                 projectile->HasBounced = true;
+            }
+        }
+
+        private void OnProjectileProjectileInteraction(Frame f, EntityRef projectileEntityA, EntityRef projectileEntityB) {
+            var projectileA = f.Unsafe.GetPointer<Projectile>(projectileEntityA);
+            var projectileB = f.Unsafe.GetPointer<Projectile>(projectileEntityB);
+
+            if (projectileA->Owner == projectileB->Owner) {
+                return;
+            }
+
+            var projectileAssetA = f.FindAsset(projectileA->Asset);
+            var projectileAssetB = f.FindAsset(projectileB->Asset);
+
+            if ((projectileAssetA.Effect == ProjectileEffectType.Fire && projectileAssetB.Effect == ProjectileEffectType.Freeze)
+                || (projectileAssetB.Effect == ProjectileEffectType.Fire && projectileAssetA.Effect == ProjectileEffectType.Freeze)) {
+                // Fireball collided with Iceball. Destroy both.
+                Destroy(f, projectileEntityA, projectileAssetA.DestroyParticleEffect);
+                Destroy(f, projectileEntityB, projectileAssetB.DestroyParticleEffect);
             }
         }
 

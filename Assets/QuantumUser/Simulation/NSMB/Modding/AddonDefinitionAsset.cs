@@ -1,7 +1,7 @@
 namespace Quantum {
     public class AddonDefinitionAsset : AssetObject {
 
-        public string ModIdentifier = "Example";
+        public string ModName = "Mod Name", ModCreator = "Mod Creator";
 
     }
 }
