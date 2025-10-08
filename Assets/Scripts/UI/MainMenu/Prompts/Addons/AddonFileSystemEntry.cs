@@ -1,10 +1,12 @@
+using NSMB.Utilities.Extensions;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
-    public class AddonFileSystemEntry : MonoBehaviour {
+    public class AddonFileSystemEntry : MonoBehaviour, ISelectHandler {
 
         //---Static Variables
         private static readonly Dictionary<AddonsSubmenu.ScannedPath.AddonType, string> SpriteNames = new() {
@@ -13,11 +15,15 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
             { AddonsSubmenu.ScannedPath.AddonType.NonAddonFile, "<sprite name=unknown_file>" },
         };
 
+        //---Properties
+        public AddonsSubmenu.ScannedPath Path => scannedPath;
+
         //---Public Variables
         public Button button;
 
         //---Serialized Variables
         [SerializeField] private TMP_Text text;
+        [SerializeField] private SelectablePromptLabel promptLabel;
 
         //---Private Variables
         private AddonsSubmenu parent;
@@ -36,6 +42,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 text.text = sprite + text.text;
             }
 
+            promptLabel.translationKey = text.text;
             gameObject.SetActive(true);
         }
 
@@ -53,6 +60,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 }
                 break;
             }
+        }
+
+        public void OnSelect(BaseEventData eventData) {
+            parent.scrollRect.verticalNormalizedPosition = parent.scrollRect.ScrollToCenter((RectTransform) transform, false);
         }
     }
 }

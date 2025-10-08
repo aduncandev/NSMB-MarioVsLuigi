@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -92,6 +93,7 @@ namespace NSMB.Addons {
                 File.WriteAllText(
                     addonDefPath,
                     JsonConvert.SerializeObject(new AddonDefinition {
+                        Guid = Guid.NewGuid(),
                         Name = addonName,
                         Author = author,
                         Version = version,
