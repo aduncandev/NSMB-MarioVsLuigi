@@ -9,12 +9,10 @@ using SFB;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -30,9 +28,10 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
         //---Static Variables
         public static ReplayListManager Instance { get; private set; }
-        public static string ReplayDirectory => Path.Combine(Application.persistentDataPath, "replays");
-        public static string TempDirectory => Path.Combine(ReplayDirectory, "temp");
-        public static string FavoriteDirectory => Path.Combine(ReplayDirectory, "favorite");
+        public static string ReplayDirectory { get; private set; } 
+        public static string TempDirectory { get; private set; }
+        public static string SavedDirectory { get; private set; }
+        public static string FavoriteDirectory { get; private set; }
 
         //---Properties
         public ReplayListEntry Selected { get; set; }
@@ -99,11 +98,15 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #endif
             Instance = this;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            
+            ReplayDirectory = Path.Combine(Application.persistentDataPath, "replays");
+            TempDirectory = Path.Combine(ReplayDirectory, "temp");
+            SavedDirectory = Path.Combine(ReplayDirectory, "saved");
+            FavoriteDirectory = Path.Combine(ReplayDirectory, "favorite");
 
-            string tempPath = Path.Combine(ReplayDirectory, "temp");
-            Directory.CreateDirectory(tempPath);
-            Directory.CreateDirectory(Path.Combine(ReplayDirectory, "favorite"));
-            Directory.CreateDirectory(Path.Combine(ReplayDirectory, "saved"));
+            Directory.CreateDirectory(TempDirectory);
+            Directory.CreateDirectory(FavoriteDirectory);
+            Directory.CreateDirectory(SavedDirectory);
 
             _ = FindReplays();
         }
@@ -145,9 +148,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             Canvas.ForceUpdateCanvases();
 
 #if !TODO || UNITY_WEBGL
-            FindReplays();
+            _ = FindReplays();
 #endif
-            SortReplays();
+            //SortReplays();
             OnScrollRectScrolled(default);
             OnLanguageChanged(GlobalController.Instance.translationManager);
         }
@@ -327,64 +330,66 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         private async Awaitable FindReplays() {
-            await Awaitable.MainThreadAsync();
-            noReplaysText.text = "";
-            loadingIcon.SetActive(true);
-            hiddenReplaysText.gameObject.SetActive(false);
+            try {
+                await Awaitable.MainThreadAsync();
+                noReplaysText.text = "";
+                loadingIcon.SetActive(true);
+                hiddenReplaysText.gameObject.SetActive(false);
 
-            if (languageChangedSinceLastOpen) {
-                // Update to fix a bug where the names are invalid after a language switch.
+                if (languageChangedSinceLastOpen) {
+                    // Update to fix a bug where the names are invalid after a language switch.
+                    foreach (var createdReplays in replays) {
+                        createdReplays.UpdateText();
+                    }
+                    languageChangedSinceLastOpen = false;
+                }
+
+                await Awaitable.BackgroundThreadAsync();
+
+                List<BinaryReplayFile> newReplays = new();
+                foreach (var filepath in Directory.EnumerateFiles(ReplayDirectory, "*.mvlreplay", SearchOption.AllDirectories)) {
+                    if (loadedReplayPaths.Contains(filepath)) {
+                        continue;
+                    }
+
+                    if (BinaryReplayFile.TryLoadNewFromFile(filepath, false, out BinaryReplayFile replay) == ReplayParseResult.Success) {
+                        newReplays.Add(replay);
+                        loadedReplayPaths.Add(filepath);
+                    }
+                }
+
+                await Awaitable.MainThreadAsync();
+                foreach (var replay in newReplays) {
+                    ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);
+                    newReplayEntry.Initialize(this, replay);
+                    newReplayEntry.UpdateText();
+                    newReplayEntry.name = newReplayEntry.ReplayFile.Header.GetDisplayName();
+                    newReplayEntry.gameObject.SetActive(true);
+                    replays.Add(newReplayEntry);
+
+                    if (newReplayEntry.IsTemporary) {
+                        temporaryReplays.Add(newReplayEntry);
+                    }
+
+                    if (isActiveAndEnabled) {
+                        newReplayEntry.gameObject.SetActive(true);
+                        canvas.EventSystem.SetSelectedGameObject(newReplayEntry.gameObject);
+                        scrollRect.verticalNormalizedPosition = 1;
+                    }
+                }
+
+                // Update a second time to fix the "Temporary" label.
                 foreach (var createdReplays in replays) {
                     createdReplays.UpdateText();
                 }
-                languageChangedSinceLastOpen = false;
-            }
 
-            await Awaitable.BackgroundThreadAsync();
-
-            List<BinaryReplayFile> newReplays = new();
-            foreach (var filepath in Directory.EnumerateFiles(ReplayDirectory, "*.mvlreplay", SearchOption.AllDirectories)) {
-                if (loadedReplayPaths.Contains(filepath)) {
-                    continue;
+                await FilterReplays();
+                SortReplays();
+                if (replays.Count == 0) {
+                    noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation(Settings.Instance.GeneralReplaysEnabled ? "ui.extras.replays.none" : "ui.extras.replays.disabled");
                 }
-
-                if (BinaryReplayFile.TryLoadNewFromFile(filepath, false, out BinaryReplayFile replay) == ReplayParseResult.Success) {
-                    newReplays.Add(replay);
-                    loadedReplayPaths.Add(filepath);
-                }
-            }
-
-            await Awaitable.MainThreadAsync();
-            foreach (var replay in newReplays) {
-                ReplayListEntry newReplayEntry = Instantiate(replayTemplate, replayTemplate.transform.parent);
-                newReplayEntry.Initialize(this, replay);
-                newReplayEntry.UpdateText();
-                newReplayEntry.name = newReplayEntry.ReplayFile.Header.GetDisplayName();
-                newReplayEntry.gameObject.SetActive(true);
-                replays.Add(newReplayEntry);
-
-                if (newReplayEntry.IsTemporary) {
-                    temporaryReplays.Add(newReplayEntry);
-                }
-
-                if (isActiveAndEnabled) {
-                    newReplayEntry.gameObject.SetActive(true);
-                    canvas.EventSystem.SetSelectedGameObject(newReplayEntry.gameObject);
-                    scrollRect.verticalNormalizedPosition = 1;
-                }
-            }
-
-            // Update a second time to fix the "Temporary" label.
-            foreach (var createdReplays in replays) {
-                createdReplays.UpdateText();
-            }
-
-            await FilterReplays();
-            SortReplays();
-            if (replays.Count == 0) {
-                noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation(Settings.Instance.GeneralReplaysEnabled ? "ui.extras.replays.none" : "ui.extras.replays.disabled");
-            }
-            loadingIcon.SetActive(false);
+                loadingIcon.SetActive(false);
+            } catch (Exception e) { Debug.Log(e); throw; }
         }
 
         public void OnSortDropdownChanged() {

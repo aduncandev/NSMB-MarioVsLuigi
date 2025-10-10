@@ -3,6 +3,7 @@ using NSMB.UI.Translation;
 using Quantum;
 using Quantum.Prototypes;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace NSMB.Replay {
         public sbyte WinningTeam = -1;
 
         // Addons
-        public string[] AddonKeys = Array.Empty<string>();
+        public List<Guid> AddonGuids = new();
 
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -62,9 +63,9 @@ namespace NSMB.Replay {
             writer.Write(WinningTeam);
 
             // Addons
-            writer.Write(AddonKeys.Length);
-            for (int i = 0; i < AddonKeys.Length; i++) {
-                writer.Write(AddonKeys[i]);
+            writer.Write(AddonGuids.Count);
+            for (int i = 0; i < AddonGuids.Count; i++) {
+                writer.Write(AddonGuids[i].ToByteArray());
             }
 
             return writer.BaseStream.Length;
@@ -104,9 +105,9 @@ namespace NSMB.Replay {
 
                 // Addons
                 if (result.Version >= new GameVersion(2, 1, 0)) {
-                    result.AddonKeys = new string[reader.ReadInt32()];
-                    for (int i = 0; i < result.AddonKeys.Length; i++) {
-                        result.AddonKeys[i] = reader.ReadString();
+                    int guids = reader.ReadInt32();
+                    for (int i = 0; i < guids; i++) {
+                        result.AddonGuids.Add(new Guid(reader.ReadBytes(16)));
                     }
                 }
             } catch {

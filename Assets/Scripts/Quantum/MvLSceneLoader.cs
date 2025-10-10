@@ -98,6 +98,7 @@ namespace NSMB.Quantum {
                 while (!addressablesOp.IsDone) {
                     yield return null;
                 }
+                SceneManager.SetActiveScene(addressablesOp.Result.Scene);
                 currentAddressablesScene = addressablesOp.Result;
                 yield break;
             }

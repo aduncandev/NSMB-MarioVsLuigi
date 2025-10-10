@@ -174,7 +174,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
         public void UpdateState() {
 #if UNITY_EDITOR
-            if (!this || !Application.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode) {
+            if (!this || !Application.isPlaying) {
                 return;
             }
 #endif

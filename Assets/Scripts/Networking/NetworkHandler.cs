@@ -232,17 +232,18 @@ namespace NSMB.Networking {
             }
 
             ref GameRules rules = ref f.Global->Rules;
-            IntegerProperties intProperties = new IntegerProperties {
+            IntegerProperties intProperties = new() {
                 StarRequirement = rules.StarsToWin,
                 CoinRequirement = rules.CoinsForPowerup,
                 Lives = rules.Lives,
                 Timer = rules.TimerMinutes,
             };
-            BooleanProperties boolProperties = new BooleanProperties {
+            BooleanProperties boolProperties = new() {
                 GameStarted = f.Global->GameState != GameState.PreGameRoom,
                 CustomPowerups = rules.CustomPowerupsEnabled,
                 Teams = rules.TeamsEnabled,
                 DrawOnTimeUp = rules.DrawOnTimeUp,
+                AddonsEnabled = GlobalController.Instance.addonManager.LoadedAddons.Count > 0
             };
 
             RuntimePlayer hostData = f.GetPlayerData(host);

@@ -8,6 +8,7 @@ using Quantum.Prototypes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace NSMB.Replay {
@@ -135,40 +136,48 @@ namespace NSMB.Replay {
             string now = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
             string finalFilePath = Path.Combine(replayFolder, $"Replay-{now}.mvlreplay");
             int attempts = 0;
+
             FileStream outputStream = null;
-            do {
-                try {
-                    outputStream = new FileStream(finalFilePath, FileMode.Create);
-                } catch {
-                    // Failed to create file; maybe they have two copies of the game open?
-                    finalFilePath = Path.Combine(replayFolder, $"Replay-{now}-{++attempts}.mvlreplay");
-                }
-            } while (outputStream == null);
+            long writtenBytes;
+            try {
+                do {
+                    try {
+                        outputStream = new FileStream(finalFilePath, FileMode.Create);
+                    } catch {
+                        // Failed to create file; maybe they have two copies of the game open?
+                        finalFilePath = Path.Combine(replayFolder, $"Replay-{now}-{++attempts}.mvlreplay");
+                    }
+                } while (outputStream == null);
 
-            ref GameRules rules = ref f.Global->Rules;
-            BinaryReplayHeader header = new() {
-                Version = BinaryReplayHeader.GetCurrentVersion(),
-                UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
-                InitialFrameNumber = jsonReplay.InitialTick,
-                ReplayLengthInFrames = jsonReplay.LastTick - jsonReplay.InitialTick,
+                ref GameRules rules = ref f.Global->Rules;
+                BinaryReplayHeader header = new() {
+                    Version = BinaryReplayHeader.GetCurrentVersion(),
+                    UnixTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
+                    InitialFrameNumber = jsonReplay.InitialTick,
+                    ReplayLengthInFrames = jsonReplay.LastTick - jsonReplay.InitialTick,
 
-                Rules = new GameRulesPrototype {
-                    Stage = rules.Stage,
-                    Gamemode = rules.Gamemode,
-                    StarsToWin = rules.StarsToWin,
-                    CoinsForPowerup = rules.CoinsForPowerup,
-                    Lives = rules.Lives,
-                    TimerMinutes = rules.TimerMinutes,
-                    CustomPowerupsEnabled = rules.CustomPowerupsEnabled,
-                    TeamsEnabled = rules.TeamsEnabled,
-                },
-                PlayerInformation = playerInformation,
-                WinningTeam = winner,
-            };
+                    Rules = new GameRulesPrototype {
+                        Stage = rules.Stage,
+                        Gamemode = rules.Gamemode,
+                        StarsToWin = rules.StarsToWin,
+                        CoinsForPowerup = rules.CoinsForPowerup,
+                        Lives = rules.Lives,
+                        TimerMinutes = rules.TimerMinutes,
+                        CustomPowerupsEnabled = rules.CustomPowerupsEnabled,
+                        TeamsEnabled = rules.TeamsEnabled,
+                    },
+                    PlayerInformation = playerInformation,
+                    WinningTeam = winner,
+                    AddonGuids = GlobalController.Instance.addonManager.LoadedAddons
+                        .Select(la => la.Definition.Guid)
+                        .ToList()
+                };
 
-            BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, header);
-            long writtenBytes = binaryReplay.WriteToStream(outputStream);
-            outputStream.Dispose();
+                BinaryReplayFile binaryReplay = BinaryReplayFile.FromReplayData(jsonReplay, header);
+                writtenBytes = binaryReplay.WriteToStream(outputStream);
+            } finally {
+                outputStream.Dispose();
+            }
 
             SavedRecordingPath = finalFilePath;
 
@@ -197,6 +206,10 @@ namespace NSMB.Replay {
             }
             if (NetworkHandler.Runner && NetworkHandler.Runner.IsRunning) {
                 await NetworkHandler.Runner.ShutdownAsync();
+            }
+
+            if (!await GlobalController.Instance.addonManager.LoadAllAddons(replay.Header.AddonGuids)) {
+
             }
 
             CurrentReplay = replay;
