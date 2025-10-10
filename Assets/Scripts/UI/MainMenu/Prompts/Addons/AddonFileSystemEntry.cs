@@ -23,6 +23,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text text;
+        [SerializeField] private GameObject enabledText;
         [SerializeField] private SelectablePromptLabel promptLabel;
 
         //---Private Variables
@@ -43,23 +44,43 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
             }
 
             promptLabel.translationKey = text.text;
+            UpdateEnabledState();
             gameObject.SetActive(true);
         }
 
-        public void OnClicked() {
+        public async void OnClicked() {
             switch (scannedPath.Type) {
             case AddonsSubmenu.ScannedPath.AddonType.Folder:
+                if (scannedPath.Name == "..") {
+                    GlobalController.Instance.PlaySound(SoundEffect.UI_Back);
+                } else {
+                    GlobalController.Instance.PlaySound(SoundEffect.UI_Decide);
+                }
                 _ = parent.OpenFolder(scannedPath.Name);
                 break;
             case AddonsSubmenu.ScannedPath.AddonType.AddonFile:
                 var addonManager = GlobalController.Instance.addonManager;
                 if (addonManager.IsAddonLoaded(scannedPath.Addon)) {
-                    _ = addonManager.UnloadAddon(scannedPath.Addon.Definition.Guid);
+                    await addonManager.UnloadAddon(scannedPath.Addon.Definition.Guid);
+                    GlobalController.Instance.PlaySound(SoundEffect.Player_Sound_Powerdown);
                 } else {
-                    _ = addonManager.LoadAddon(scannedPath.Addon);
+                    var loadedAddon = await addonManager.LoadAddon(scannedPath.Addon);
+                    if (loadedAddon != null) {
+                        GlobalController.Instance.PlaySound(SoundEffect.Player_Sound_PowerupCollect);
+                    } else {
+                        GlobalController.Instance.PlaySound(SoundEffect.UI_Error);
+                    }
                 }
+                UpdateEnabledState();
+                break;
+            case AddonsSubmenu.ScannedPath.AddonType.NonAddonFile:
+                GlobalController.Instance.PlaySound(SoundEffect.UI_Error);
                 break;
             }
+        }
+
+        public void UpdateEnabledState() {
+            enabledText.SetActive(scannedPath.Addon != null && GlobalController.Instance.addonManager.IsAddonLoaded(scannedPath.Addon));
         }
 
         public void OnSelect(BaseEventData eventData) {

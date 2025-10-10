@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace NSMB.Quantum {
-    public class MarioVsLuigiEntityViewPool : QuantumEntityViewPool {
+    public class MvLEntityViewPool : QuantumEntityViewPool {
 
         //---Serialized Variables
         [SerializeField] private List<GameObject> PoolablePrefabs;

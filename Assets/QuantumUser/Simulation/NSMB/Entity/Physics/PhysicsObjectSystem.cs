@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using Quantum.Profiling;
 using System;
 
 namespace Quantum {
@@ -9,7 +8,6 @@ namespace Quantum {
 #else
     public unsafe class PhysicsObjectSystem : SystemMainThread, ISignalOnEntityEnterExitLiquid {
 #endif
-
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;

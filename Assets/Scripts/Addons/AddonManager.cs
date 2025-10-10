@@ -284,10 +284,10 @@ namespace NSMB.Addons {
                 Debug.Log($"[Addon] Unloaded asset {assetObject.name} ({assetObject.Guid})");
             }
 
+            LoadedAddons.Remove(addon);
             OnAddonUnloaded?.Invoke(addon);
             addon.AllAssetObjectsHandle.Release();
             addon.CatalogHandle.Release();
-            LoadedAddons.Remove(addon);
         }
 
         public bool IsAddonLoaded(Addon addon) {

@@ -1,4 +1,5 @@
 using NSMB.Addons;
+using NSMB.UI.Translation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
         [SerializeField] private GameObject loadingGraphic;
         [SerializeField] public ScrollRect scrollRect;
         [SerializeField] private AddonFileSystemEntry template;
-        [SerializeField] private TMP_Text folderLabel;
+        [SerializeField] private TMP_Text folderLabel, loadedAddonsText;
 
         //---Private Variables
         private List<AddonFileSystemEntry> entries = new();
@@ -31,7 +32,39 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
 
         public override void Show(bool first) {
             base.Show(first);
-            _ = OpenFolder(".");
+
+            if (first) {
+                currentRelativePath = "";
+                UpdateLoadedAddonsText();
+                TranslationManager.OnLanguageChanged += OnLanguageChanged;
+                AddonManager.OnAddonLoaded += OnAddonLoaded;
+                AddonManager.OnAddonUnloaded += OnAddonUnloaded;
+
+                _ = OpenFolder(".");
+            }
+        }
+
+        public override void Hide(SubmenuHideReason hideReason) {
+            base.Hide(hideReason);
+            if (hideReason == SubmenuHideReason.Closed) {
+                foreach (var entry in entries) {
+                    Destroy(entry.gameObject);
+                }
+                entries.Clear();
+
+                TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+                AddonManager.OnAddonLoaded -= OnAddonLoaded;
+                AddonManager.OnAddonUnloaded -= OnAddonUnloaded;
+            }
+        }
+        
+        public void UpdateLoadedAddonsText() {
+            int addons = GlobalController.Instance.addonManager.LoadedAddons.Count;
+            if (addons == 0) {
+                loadedAddonsText.text = GlobalController.Instance.translationManager.GetTranslation("ui.rooms.create.addons.notenabled");
+            } else {
+                loadedAddonsText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.rooms.create.addons.enabled", "addons", addons.ToString());
+            }
         }
 
         public async Awaitable OpenFolder(string newPath) {
@@ -40,7 +73,12 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
             string fullNewPath = new DirectoryInfo(Path.Combine(AddonManager.LocalFolderPath, currentRelativePath, newPath)).FullName;
             string previousPath = currentPath;
             currentPath = fullNewPath;
-            currentRelativePath = folderLabel.text = Path.GetRelativePath(AddonManager.LocalFolderPath, fullNewPath).Replace(@"\", "/");
+            currentRelativePath = Path.GetRelativePath(AddonManager.LocalFolderPath, fullNewPath).Replace(@"\", "/");
+            if (currentRelativePath == ".") {
+                folderLabel.text = Path.GetFileName(AddonManager.LocalFolderPath) + "/";
+            } else {
+                folderLabel.text = Path.GetFileName(AddonManager.LocalFolderPath) + "/" + currentRelativePath + "/";
+            }
 
             // Prepare paths in background thread
             await Awaitable.BackgroundThreadAsync();
@@ -157,6 +195,19 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 Folder,
                 NonAddonFile,
             }
+        }
+
+
+        private void OnAddonUnloaded(LoadedAddon obj) {
+            UpdateLoadedAddonsText();
+        }
+
+        private void OnAddonLoaded(LoadedAddon obj) {
+            UpdateLoadedAddonsText();
+        }
+
+        private void OnLanguageChanged(TranslationManager obj) {
+            UpdateLoadedAddonsText();
         }
     }
 }

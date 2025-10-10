@@ -53,6 +53,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
 
             StringBuilder symbols = new();
 
+
             if (boolProperties.CustomPowerups) {
                 symbols.Append("<sprite name=room_powerups>");
             }
@@ -74,6 +75,11 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             }
 
             symbols.Append("<sprite name=room_coins>").Append(Utils.GetSymbolString(intProperties.CoinRequirement.ToString(), Utils.smallSymbols));
+
+            if (boolProperties.AddonsEnabled) {
+                symbols.Append("<sprite name=room_addons>");
+            }
+            
             symbolsText.text = symbols.ToString();
 
 
