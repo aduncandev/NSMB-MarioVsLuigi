@@ -1,3 +1,4 @@
+using NSMB.Networking;
 using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Quantum;
@@ -12,6 +13,7 @@ using static NSMB.Utilities.QuantumViewUtils;
 namespace NSMB.UI.Loading {
     public unsafe class LoadingCanvas : MonoBehaviour {
 
+        //---Static Variables
         public static event Action<bool> OnLoadingEnded;
 
         //---Public Variables
@@ -39,6 +41,8 @@ namespace NSMB.UI.Loading {
             QuantumCallback.Subscribe<CallbackGameStarted>(this, OnGameStarted);
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
+
+            NetworkHandler.OnError += OnError;
         }
 
         public void Initialize(QuantumGame game) {
@@ -171,6 +175,10 @@ namespace NSMB.UI.Loading {
 
         public void EndAnimation() {
             gameObject.SetActive(false);
+        }
+
+        private void OnError(string key, bool network) {
+            EndAnimation();
         }
 
         private IEnumerator FadeVolume(float fadeTime, bool fadeIn) {

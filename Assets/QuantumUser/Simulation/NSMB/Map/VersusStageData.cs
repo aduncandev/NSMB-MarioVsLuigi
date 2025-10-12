@@ -77,7 +77,8 @@ public unsafe class VersusStageData : AssetObject {
     }
     
     public StageTileInstance GetTileRelative(Frame f, IntVector2 tile) {
-        if (tile.X < 0 || tile.Y < 0 || tile.X >= TileDimensions.X || tile.Y >= TileDimensions.Y) {
+        tile.X = QuantumUtils.Modulo(tile.X, TileDimensions.X);
+        if (tile.Y < 0 || tile.Y >= TileDimensions.Y) {
             return default;
         }
 

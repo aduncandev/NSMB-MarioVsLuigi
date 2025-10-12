@@ -28,24 +28,27 @@ namespace NSMB.Quantum {
             Settings.Controls.Player.ReserveItem.performed -= OnPowerupAction;
         }
 
-
-#if UNITY_EDITOR || MVL_DEBUG
         public void Update() {
+            var game = QuantumRunner.DefaultGame;
+            if (game == null || game.Configurations.Runtime.IsRealGame) {
+                return;
+            }
+
             foreach (var debug in debugSpawnCommands) {
                 if (UnityEngine.Input.GetKeyDown(debug.KeyCode)) {
-                    QuantumRunner.DefaultGame.SendCommand(new CommandMvLDebugCmd { 
+                    game.SendCommand(new CommandMvLDebugCmd { 
                         CommandId = CommandMvLDebugCmd.DebugCommand.SpawnEntity,
                         SpawnData = debug.Entity,
                     });
                 }
             }
             if (UnityEngine.Input.GetKeyDown(KeyCode.P)) {
-                QuantumRunner.DefaultGame.SendCommand(new CommandMvLDebugCmd {
+                game.SendCommand(new CommandMvLDebugCmd {
                     CommandId = CommandMvLDebugCmd.DebugCommand.KillSelf,
                 });
             }
             if (UnityEngine.Input.GetKeyDown(KeyCode.O)) {
-                QuantumRunner.DefaultGame.SendCommand(new CommandMvLDebugCmd {
+                game.SendCommand(new CommandMvLDebugCmd {
                     CommandId = CommandMvLDebugCmd.DebugCommand.FreezeSelf,
                 });
             }
@@ -56,7 +59,6 @@ namespace NSMB.Quantum {
             public KeyCode KeyCode;
             public AssetRef<EntityPrototype> Entity;
         }
-#endif
 
         public void OnPowerupAction(InputAction.CallbackContext context) {
             if (!playerElements.IsSpectating && !playerElements.PauseMenu.IsPaused) {

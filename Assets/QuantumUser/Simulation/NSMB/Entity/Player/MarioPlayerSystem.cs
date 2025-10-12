@@ -1193,17 +1193,19 @@ namespace Quantum {
                     f.Events.MarioPlayerMegaStart(filter.Entity);
                 } else {
                     // Still growing...
-                    if ((f.Number + filter.Entity.Index) % 4 == 0 && PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, false, stage)) {
-                        // Cancel growing
-                        mario->CurrentPowerupState = PowerupState.Mushroom;
-                        mario->MegaMushroomEndFrames = (byte) (90 - mario->MegaMushroomStartFrames);
-                        mario->MegaMushroomStartFrames = 0;
+                    if ((f.Number + filter.Entity.Index) % 4 == 0) {
+                        if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, false, stage)) {
+                            // Cancel growing
+                            mario->CurrentPowerupState = PowerupState.Mushroom;
+                            mario->MegaMushroomEndFrames = (byte) (90 - mario->MegaMushroomStartFrames);
+                            mario->MegaMushroomStartFrames = 0;
 
-                        physicsObject->IsFrozen = true;
-                        mario->MegaMushroomStationaryEnd = true;
-                        mario->SetReserveItem(f, QuantumUtils.FindPowerupAsset(f, PowerupState.MegaMushroom));
+                            physicsObject->IsFrozen = true;
+                            mario->MegaMushroomStationaryEnd = true;
+                            mario->SetReserveItem(f, QuantumUtils.FindPowerupAsset(f, PowerupState.MegaMushroom));
 
-                        f.Events.MarioPlayerMegaEnd(filter.Entity, true, mario->MegaMushroomEndFrames);
+                            f.Events.MarioPlayerMegaEnd(filter.Entity, true, mario->MegaMushroomEndFrames);
+                        }
                     }
                     return true;
                 }

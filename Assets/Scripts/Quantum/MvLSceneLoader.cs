@@ -73,6 +73,12 @@ namespace NSMB.Quantum {
         }
 
         private IEnumerator LoadMap(Map map) {
+            // Check if the scene already is loaded
+            Scene loadedScene = SceneManager.GetSceneByName(map.Scene);
+            if (loadedScene.IsValid()) {
+                yield break;
+            }
+
             // Handle special MainMenu case.
             if (map == null) {
                 Scene loadedMainMenuScene = SceneManager.GetSceneByName("MainMenu");

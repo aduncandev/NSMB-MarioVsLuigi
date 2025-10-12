@@ -15,8 +15,18 @@ MonoBehaviour:
   m_GroupName: BaseGame
   m_GUID: 4d087ae4c291a7147b2c19263ae6576d
   m_SerializeEntries:
+  - m_GUID: 017d859ae3b5f93419c6b106d9683cf3
+    m_Address: Resources/EntityPrototypes/Enemy/KoopaEntityPrototype.qprototype
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 11d0cb89c67de8241922a37e92a1b4dd
     m_Address: Materials
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 18b78f42b518d4141b1337f61e87b7b4
+    m_Address: Resources/EntityPrototypes/Items/StarmanEntityPrototype.qprototype
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -32,6 +42,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3b58d65b123c6954b8edc77ca3964b95
     m_Address: Assets/Scenes/Levels
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d2ac75e854cf5242b33d3dd6f2cb64a
+    m_Address: Resources/EntityPrototypes/Items/Mega MushroomEntityPrototype.qprototype
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -60,8 +75,23 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d59caf8734d00eb468a7862c8b8dbcf1
+    m_Address: Resources/EntityPrototypes/World/PoisonEntityPrototype.qprototype
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dce119c0e907a0640ab217b5c3f5eb10
     m_Address: Animations
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e4da15272a1b6814eb6debc8db555582
+    m_Address: Resources/EntityPrototypes/Player/PlayerMarioEntityPrototype.qprototype
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ec7f94c7576907a44b50eb692bdf439d
+    m_Address: Resources/EntityPrototypes/Projectile/FireballEntityPrototype.qprototype
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

@@ -208,8 +208,14 @@ namespace NSMB.Replay {
                 await NetworkHandler.Runner.ShutdownAsync();
             }
 
-            if (!await GlobalController.Instance.addonManager.LoadAllAddons(replay.Header.AddonGuids)) {
-
+            var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(replay.Header.AddonGuids);
+            if (loadAddonResult != Addons.AddonManager.LoadAllAddonsResult.Success) {
+                NetworkHandler.ThrowError(
+                    loadAddonResult == Addons.AddonManager.LoadAllAddonsResult.FailureDownloadsDisabled 
+                        ? "ui.error.replay.addons.downloadsdisabled"
+                        : "ui.error.replay.addons.downloadfailed",
+                    false);
+                return;
             }
 
             CurrentReplay = replay;
@@ -245,7 +251,11 @@ namespace NSMB.Replay {
             ReplayFrameCache.Clear();
             ReplayFrameCache.Add(arguments.FrameData);
 
-            NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);
+            try {
+                NetworkHandler.Runner = await QuantumRunner.StartGameAsync(arguments);
+            } catch {
+                NetworkHandler.ThrowError("ui.error.replay.corrupt", false);
+            }
         }
 
         private void OnSimulateFinished(CallbackSimulateFinished e) {

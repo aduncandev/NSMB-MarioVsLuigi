@@ -49,7 +49,7 @@ namespace NSMB.Addons {
 
             foreach (var filepath in Directory.EnumerateFiles(LocalFolderPath, "*" + AddonExtension, new EnumerationOptions { RecurseSubdirectories = true })) {
                 // Find all `.mvladdon` files.
-                var addon = await RegisterAddon(filepath, results);
+                _ = await RegisterAddon(filepath, results);
             }
 
             // Main thread the events
@@ -58,7 +58,7 @@ namespace NSMB.Addons {
             OnAvailableAddonListLoaded?.Invoke();
         }
 
-        public async Task<bool> LoadAllAddons(List<Guid> requestedAddons) {
+        public async Task<LoadAllAddonsResult> LoadAllAddons(List<Guid> requestedAddons) {
             // Unload *ALL* addons. this is important as the order MATTERS.
             foreach (var addon in LoadedAddons.ToList()) {
                 await UnloadAddon(addon);
@@ -74,30 +74,41 @@ namespace NSMB.Addons {
                 }
             }
 
-            List<Guid> failedDownloads = new();
-            foreach (var guid in tryDownloading) {
-                var downloadedAddon = await DownloadAddon(guid);
-                if (downloadedAddon == null) {
-                    failedDownloads.Add(guid);
-                    continue;
+            if (tryDownloading.Count > 0) {
+                if (!Settings.Instance.generalAddonDownloads) {
+                    return LoadAllAddonsResult.FailureDownloadsDisabled;
                 }
-                var loadedAddon = await LoadAddon(downloadedAddon);
-                if (loadedAddon == null) {
-                    // Failed.
-                    failedDownloads.Add(guid);
-                    continue;
+
+                List<Guid> failedDownloads = new();
+                foreach (var guid in tryDownloading) {
+                    var downloadedAddon = await DownloadAddon(guid);
+                    if (downloadedAddon == null) {
+                        failedDownloads.Add(guid);
+                        continue;
+                    }
+                    var loadedAddon = await LoadAddon(downloadedAddon);
+                    if (loadedAddon == null) {
+                        // Failed.
+                        failedDownloads.Add(guid);
+                        continue;
+                    }
                 }
-            }
-            
-            if (failedDownloads.Count > 0) {
-                return false;
+                if (failedDownloads.Count > 0) {
+                    return LoadAllAddonsResult.Failure;
+                }
             }
 
             // Good to go.
-            return true;
+            return LoadAllAddonsResult.Success;
         }
 
-        public async Task<LoadedAddon> LoadAddon(Guid addonGuid, bool downloadIfUnavailable = false) {
+        public enum LoadAllAddonsResult {
+            Success,
+            Failure,
+            FailureDownloadsDisabled,
+        }
+
+        public async Task<LoadedAddon> LoadAddon(Guid addonGuid) {
             var availableAddon = _availableAddons.FirstOrDefault(addon => addon.Definition.Guid == addonGuid);
             if (availableAddon != null) {
                 // Great! We already have this one.
@@ -133,7 +144,6 @@ namespace NSMB.Addons {
                 if (!Directory.Exists(pathToFolder)) {
                     using ZipArchive zipped = ZipFile.OpenRead(addon.Filepath);
                     zipped.ExtractToDirectory(pathToFolder);
-                    Debug.Log(pathToFolder);
                 }
             } catch (Exception e) {
                 Debug.LogError($"[Addon] Failed to load addon {addonDef.FullName} ({addonDef.Guid}), failed to extract to temp directory: \"{pathToFolder}\" ({e.Message})");
@@ -200,6 +210,11 @@ namespace NSMB.Addons {
 
         public async Awaitable<Addon> DownloadAddon(Guid addonGuid) {
             await Awaitable.MainThreadAsync();
+
+            if (!Settings.Instance.generalAddonDownloads) {
+                Debug.Log($"[Addon] Automatic downloads are disabled! Skipping download for {addonGuid}");
+                return null;
+            }
 
             string targetFileUrl = CombineUrl(RemoteRepoUrl, addonGuid + AddonExtension);
             Debug.Log($"[Addon] Attempting to download addon {addonGuid} from remote source ({targetFileUrl})");

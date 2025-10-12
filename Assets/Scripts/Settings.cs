@@ -213,7 +213,7 @@ namespace NSMB {
         public AssetRef<CharacterAsset> generalCharacter;
         public AssetRef<PaletteSet> generalPalette;
         public int generalMaxTempReplays;
-        public bool generalScoreboardAlways, generalChatFiltering, generalUseNicknameColor;
+        public bool generalScoreboardAlways, generalChatFiltering, generalAddonDownloads, generalUseNicknameColor;
 
         public bool graphicsNametags;
 
@@ -249,6 +249,7 @@ namespace NSMB {
             PlayerPrefs.SetInt("General_ScoreboardAlwaysVisible", generalScoreboardAlways ? 1 : 0);
             PlayerPrefs.SetInt("General_DisableChat", GeneralDisableChat ? 1 : 0);
             PlayerPrefs.SetInt("General_ChatFilter", generalChatFiltering ? 1 : 0);
+            PlayerPrefs.SetInt("General_AddonDownloads", generalAddonDownloads ? 1 : 0);
             PlayerPrefs.SetString("General_Character", generalCharacter.Id.ToString());
             PlayerPrefs.SetString("General_Palette", generalPalette.Id.ToString());
             PlayerPrefs.SetString("General_Locale", GeneralLocale);
@@ -329,6 +330,7 @@ namespace NSMB {
             generalScoreboardAlways = PlayerPrefs.GetInt("ScoreboardAlwaysVisible", 1) != 0;
             GeneralDisableChat = false;
             generalChatFiltering = PlayerPrefs.GetInt("ChatFilter", 1) != 0;
+            generalAddonDownloads = true;
             generalCharacter = Utils.IndexIntoArrayOrFirstElement(QuantumViewUtils.Characters, PlayerPrefs.GetInt("Character", 0));
             generalPalette = Utils.IndexIntoArrayOrFirstElement(QuantumViewUtils.Palettes, PlayerPrefs.GetInt("Skin", 0));
             GeneralLocale = "en-US";
@@ -382,6 +384,7 @@ namespace NSMB {
             TryGetSetting("General_ScoreboardAlwaysVisible", ref generalScoreboardAlways);
             TryGetSetting<bool>("General_DisableChat", nameof(GeneralDisableChat));
             TryGetSetting("General_ChatFilter", ref generalChatFiltering);
+            TryGetSetting("General_AddonDownloads", ref generalAddonDownloads);
             int generalCharacterOld = 0;
             if (TryGetSetting("General_Character", ref generalCharacterOld)) {
                 generalCharacter = Utils.IndexIntoArrayOrFirstElement(QuantumViewUtils.Characters, generalCharacterOld);
@@ -438,6 +441,7 @@ namespace NSMB {
             TryGetSetting("General_ScoreboardAlwaysVisible", ref generalScoreboardAlways);
             TryGetSetting<bool>("General_DisableChat", nameof(GeneralDisableChat));
             TryGetSetting("General_ChatFilter", ref generalChatFiltering);
+            TryGetSetting("General_AddonDownloads", ref generalAddonDownloads);
             TryGetSetting("General_Character", ref generalCharacter);
             TryGetSetting("General_Palette", ref generalPalette);
             TryGetSetting<string>("General_Locale", nameof(GeneralLocale));

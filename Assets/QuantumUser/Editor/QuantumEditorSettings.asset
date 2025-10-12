@@ -666,3 +666,12 @@ MonoBehaviour:
       type: 2}
     Guid:
       Value: 486368553116312805
+  - Asset: {fileID: 2694837283125328506, guid: 867baf17aa0ee1e4e9be7100da879be4, type: 2}
+    Guid:
+      Value: 312897576616567062
+  - Asset: {fileID: 8754196668251597401, guid: c1041fafdfb22ec42a6a18265a174dbf, type: 2}
+    Guid:
+      Value: 992319222110298687
+  - Asset: {fileID: 394071908346233292, guid: d2b95f77be4dd07469b4b682311c92e8, type: 2}
+    Guid:
+      Value: 1888204441934947870

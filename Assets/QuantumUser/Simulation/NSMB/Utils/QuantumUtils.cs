@@ -87,9 +87,11 @@ public static unsafe class QuantumUtils {
         return UnityTileToRelativeTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), unityTile);
     }
 
-    public static IntVector2 UnityTileToRelativeTile(VersusStageData stage, IntVector2 unityTile, bool extend = true) {
+    public static IntVector2 UnityTileToRelativeTile(VersusStageData stage, IntVector2 unityTile, bool extend = true, bool wrap = true) {
         int x = unityTile.X - stage.TileOrigin.X;
-        x = (x % stage.TileDimensions.X + stage.TileDimensions.X) % stage.TileDimensions.X; // Wrapping
+        if (wrap) {
+            x = Modulo(x, stage.TileDimensions.X); // Wrapping
+        }
         int y = unityTile.Y - stage.TileOrigin.Y;
         if (extend && stage.ExtendCeilingHitboxes) {
             y = Math.Min(y, stage.TileDimensions.Y - 1);
@@ -97,12 +99,12 @@ public static unsafe class QuantumUtils {
         return new IntVector2(x, y);
     }
 
-    public static IntVector2 WorldToRelativeTile(Frame f, FPVector2 worldPos, bool extend = true) {
-        return WorldToRelativeTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), worldPos, extend);
+    public static IntVector2 WorldToRelativeTile(Frame f, FPVector2 worldPos, bool extend = true, bool wrap = true) {
+        return WorldToRelativeTile(f.FindAsset<VersusStageData>(f.Map.UserAsset), worldPos, extend, wrap);
     }
 
-    public static IntVector2 WorldToRelativeTile(VersusStageData stage, FPVector2 worldPos, bool extend = true) {
-        return UnityTileToRelativeTile(stage, WorldToUnityTile(stage, worldPos), extend);
+    public static IntVector2 WorldToRelativeTile(VersusStageData stage, FPVector2 worldPos, bool extend = true, bool wrap = true) {
+        return UnityTileToRelativeTile(stage, WorldToUnityTile(stage, worldPos), extend, wrap);
     }
 
     public static FPVector2 UnityTileToWorld(Frame f, IntVector2 unityTile) {
@@ -272,6 +274,14 @@ public static unsafe class QuantumUtils {
 
     public static FP EaseOut(FP x) {
         return 1 - (1 - x) * (1 - x);
+    }
+
+    public static int Modulo(int x, int m) {
+        return ((x % m) + m) % m;
+    }
+
+    public static FP Modulo(FP x, FP m) {
+        return ((x % m) + m) % m;
     }
 
     public static FP SmoothDamp(FP current, FP target, ref FP currentVelocity, FP smoothTime, FP maxSpeed, FP deltaTime) {

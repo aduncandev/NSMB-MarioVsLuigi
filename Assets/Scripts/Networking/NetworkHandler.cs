@@ -63,6 +63,7 @@ namespace NSMB.Networking {
             QuantumEvent.Subscribe<EventHostChanged>(this, OnHostChanged);
             QuantumEvent.Subscribe<EventGameStateChanged>(this, OnGameStateChanged);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
+            QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
             QuantumEvent.Subscribe<EventRulesChanged>(this, OnRulesChanged);
             QuantumEvent.Subscribe<EventPlayerKickedFromRoom>(this, OnPlayerKickedFromRoom);
         }
@@ -281,7 +282,9 @@ namespace NSMB.Networking {
                     Character = Settings.Instance.generalCharacter,
                     Palette = Settings.Instance.generalPalette,
                 });
-            } catch { }
+            } catch {
+                ThrowError("ui.error.corrupt", false);
+            }
         }
 
         public void OnFriendListUpdate(List<FriendInfo> friendList) { }
@@ -324,6 +327,9 @@ namespace NSMB.Networking {
         }
 
         public static void ThrowError(string key, bool network) {
+            if (Runner && Runner.IsRunning) {
+                Runner.Shutdown(ShutdownCause.Error, key);
+            }
             OnError?.Invoke(key, network);
         }
 
@@ -366,7 +372,7 @@ namespace NSMB.Networking {
 
         private IEnumerator AutoDisconnectAfterSeconds(float seconds) {
             yield return new WaitForSecondsRealtime(seconds);
-            Runner.Shutdown(ShutdownCause.SessionError);
+            Runner.Shutdown(ShutdownCause.Error, "Desync");
             ThrowError("A desync was detected in the previous game. The game was automatically aborted.\nPlease send your player.log file in the #technical-support channel within the Mario vs Luigi Online Discord and ping @ipodtouch0218.", false);
         }
 
@@ -376,7 +382,7 @@ namespace NSMB.Networking {
             ThrowError(e.Reason, true);
 
             if (Runner) {
-                Runner.Shutdown(ShutdownCause.SimulationStopped);
+                Runner.Shutdown(ShutdownCause.Error, e.Reason);
             }
         }
 
@@ -437,7 +443,7 @@ namespace NSMB.Networking {
             var bans = f.ResolveList(f.Global->BannedPlayerIds);
             foreach (var ban in bans) {
                 if (ban.UserId == Client.UserId) {
-                    QuantumRunner.Default.Shutdown(ShutdownCause.SessionError);
+                    QuantumRunner.Default.Shutdown(ShutdownCause.Error, "Banned");
                     ThrowError("ui.error.join.banned", true);
                     return;
                 }
@@ -452,7 +458,7 @@ namespace NSMB.Networking {
             Debug.Log($"[Network] Disconnected. Reason: {cause}");
 
             if (Runner) {
-                Runner.Shutdown(ShutdownCause.SimulationStopped);
+                Runner.Shutdown(ShutdownCause.Error, cause.ToString());
             }
             waitingForAddons = false;
         }
@@ -476,12 +482,16 @@ namespace NSMB.Networking {
                 waitingForAddons = false;
                 try {
                     List<Guid> guids = ((string[]) photonEvent.CustomData).Select(Guid.Parse).ToList();
-                    Debug.Log($"[Addon] Got addon list of {guids.Count} addons: {string.Join(",", guids)}");
-                    bool success = await GlobalController.Instance.addonManager.LoadAllAddons(guids);
-                    if (success) {
+                    Debug.Log($"[Addon] Got addon list of {guids.Count} addons: [{string.Join(", ", guids)}]");
+                    var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(guids);
+                    if (loadAddonResult == Addons.AddonManager.LoadAllAddonsResult.Success) {
                         _ = StartQuantum();
                     } else {
-                        Debug.LogError($"[Addon] Failed to activate proper addons! Disconnecting.");
+                        ThrowError(
+                            loadAddonResult == Addons.AddonManager.LoadAllAddonsResult.FailureDownloadsDisabled
+                                ? "ui.error.join.addons.downloadsdisabled"
+                                : "ui.error.join.addons.downloadfailed",
+                            false);
                         Client.Disconnect(DisconnectCauseAddon);
                     }
                 } catch (Exception e) {

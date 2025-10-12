@@ -5,7 +5,7 @@ using Quantum;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace NSMB.Entities.Player {
+namespace NSMB.Entities.CoinItems {
     public class ProjectileAnimator : QuantumEntityViewComponent {
 
         //---Serialized Variables

@@ -1167,8 +1167,10 @@ namespace Quantum {
             var extents = shape.Box.Extents;
 
             FPVector2 origin = position + shape.Centroid;
-            IntVector2 min = QuantumUtils.WorldToRelativeTile(stage, origin - extents, extend: false);
-            IntVector2 max = QuantumUtils.WorldToRelativeTile(stage, origin + extents, extend: false);
+            IntVector2 min = QuantumUtils.WorldToRelativeTile(stage, origin - extents, extend: false, wrap: false);
+            IntVector2 max = QuantumUtils.WorldToRelativeTile(stage, origin + extents, extend: false, wrap: false);
+
+            UnityEngine.Debug.Log(min + " " + max);
 
             int count = 0;
             for (int x = min.X; x <= max.X; x++) {
@@ -1189,15 +1191,17 @@ namespace Quantum {
             return count;
         }
 
-        public static bool TryEject(Frame f, EntityRef entity, VersusStageData stage = null) {
+        public static bool TryEject(Frame f, EntityRef entity, VersusStageData stage = null, Shape2D? shapeNullable = default) {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
             var collider = f.Unsafe.GetPointer<PhysicsCollider2D>(entity);
 
             if (stage == null) {
                 stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             }
+            
+            var shape = shapeNullable ?? collider->Shape;
 
-            if (!BoxInGround(f, transform->Position, collider->Shape, stage: stage, entity: entity)) {
+            if (!BoxInGround(f, transform->Position, shape, stage: stage, entity: entity)) {
                 return true;
             }
 
@@ -1216,7 +1220,7 @@ namespace Quantum {
             while ((dist += distIncrement) < distMax) {
                 for (int i = 0; i < increments; i++) {
                     FPVector2 checkPos = transform->Position + (offsets[i] * dist);
-                    if (BoxInGround(f, checkPos, collider->Shape, stage: stage, entity: entity)) {
+                    if (BoxInGround(f, checkPos, shape, stage: stage, entity: entity)) {
                         continue;
                     }
 

@@ -56,10 +56,9 @@ namespace Quantum {
             );
             systems.Add(new StageSystem());
 
-#if MVL_DEBUG
-            // This HAS to be the last system otherwise it breaks replays.
-            systems.Add(new MvLDebugSystem());
-#endif
+            if (!gameConfig.IsRealGame) {
+                systems.Add(new MvLDebugSystem());
+            }
         }
     }
 }

@@ -45,6 +45,9 @@ namespace NSMB.Sound {
         }
 
         private void PreloadMusic(LoopingMusicData musicData) {
+            if (!musicData) {
+                return;
+            }
             PreloadClip(musicData.clip);
             PreloadClip(musicData.fastClip);
         }
