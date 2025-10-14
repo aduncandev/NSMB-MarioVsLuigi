@@ -4,6 +4,25 @@
 
 Disclaimer: The Quantum SDK 3.1.0 development snapshots are not intended to be used for live games.
 
+### Build 1862 (Oct 11, 2025)
+
+**Bug Fixes**
+
+- Fixed: An issue that could cause an ArgumentException similar to `X cannot be greater than Y` after late-joining
+
+### Build 1861 (Oct 10, 2025)
+
+**Bug Fixes**
+
+- Fixed: An issue in the component block iterator that could cause the exception _blockCount > 0
+
+### Build 1859 (Oct 09, 2025)
+
+**Bug Fixes**
+
+- Fixed: An issue in `QuantumStartUI` that caused multiple builds on the same machine that all used the same user name to not join the same room
+- Fixed: An issue that caused the `QuantumStartUI` to show the popup window when stopping the Editor during connecting
+
 ### Build 1854 (Oct 08, 2025)
 
 **Breaking Changes**
@@ -32,6 +51,6 @@ Disclaimer: The Quantum SDK 3.1.0 development snapshots are not intended to be u
 
 - The default simulation rate was increased from `60 Hz` to `64 Hz` (using powers of two), ensuring that `DeltaTime` has no rounding error and providing greater precision in physics calculations
 - The multi client scripts have been moved out of the SDK package into a `.unitypackage` (`Assets/Photon/Quantum/PackageResources/Quantum-MultiClient`)
-- Exporting replays and savegames via the menu now saves the last save location as a relative path
+- Exporting replays and snapshots via the menu now saves the last save location as a relative path
 - Changed the NavMesh API by renaming `Map.NavMeshLinks` to `Map.NavMeshAssets` and by removing the property `NavMeshAgentConfig.AutomaticTargetCorrection` instead `AutomaticTargetCorrectionRadius` > 0 is checked to test if target correction is enabled
 

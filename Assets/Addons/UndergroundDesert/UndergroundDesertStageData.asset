@@ -4785,7 +4785,7 @@ MonoBehaviour:
     Flags: 0
   - Tile:
       Id:
-        Value: 328240524793459333
+        Value: 2193468179203618015
     Rotation: 65534
     Flags: 1
   - Tile:
@@ -5100,12 +5100,12 @@ MonoBehaviour:
     Flags: 0
   - Tile:
       Id:
-        Value: 328240524793459333
+        Value: 2193468179203618015
     Rotation: 65534
     Flags: 1
   - Tile:
       Id:
-        Value: 295977824907099684
+        Value: 3062554446330913636
     Rotation: 65534
     Flags: 1
   - Tile:
@@ -5415,12 +5415,12 @@ MonoBehaviour:
     Flags: 0
   - Tile:
       Id:
-        Value: 328240524793459333
+        Value: 2193468179203618015
     Rotation: 65534
     Flags: 1
   - Tile:
       Id:
-        Value: 295977824907099684
+        Value: 3062554446330913636
     Rotation: 65534
     Flags: 1
   - Tile:
@@ -5735,7 +5735,7 @@ MonoBehaviour:
     Flags: 0
   - Tile:
       Id:
-        Value: 295977824907099684
+        Value: 3062554446330913636
     Rotation: 65534
     Flags: 1
   - Tile:
@@ -12240,38 +12240,38 @@ MonoBehaviour:
     Flags: 0
   BigStarSpawnpoints:
   - X:
-      RawValue: 458752
+      RawValue: -327680
     Y:
-      RawValue: 458752
+      RawValue: 393216
   - X:
       RawValue: 0
     Y:
       RawValue: 327680
   - X:
-      RawValue: -327680
-    Y:
-      RawValue: 393216
-  - X:
       RawValue: -524288
     Y:
-      RawValue: 491520
+      RawValue: 0
   - X:
       RawValue: -688128
     Y:
       RawValue: 196608
   - X:
-      RawValue: -753664
+      RawValue: 163840
     Y:
-      RawValue: -32768
+      RawValue: -131072
   - X:
       RawValue: -524288
     Y:
-      RawValue: 0
+      RawValue: 491520
+  - X:
+      RawValue: -753664
+    Y:
+      RawValue: -32768
   - X:
       RawValue: -131072
     Y:
       RawValue: -65536
   - X:
-      RawValue: 163840
+      RawValue: 458752
     Y:
-      RawValue: -131072
+      RawValue: 458752

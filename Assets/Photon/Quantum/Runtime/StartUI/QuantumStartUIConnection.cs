@@ -105,7 +105,8 @@ namespace Quantum {
           MaxPlayers = Input.MAX_COUNT,
           RoomName = startParameter.RoomName,
           PluginName = "QuantumPlugin",
-          AuthValues = new AuthenticationValues(startParameter.PlayerName),
+          // Add randomization to make it possible to run multiple builds on one machine, that all used the same name
+          AuthValues = new AuthenticationValues($"{startParameter.PlayerName}({new System.Random().Next(99999999):00000000}"),
           AsyncConfig = new AsyncConfig() {
             TaskFactory = AsyncConfig.CreateUnityTaskFactory(),
             CancellationToken = _linkedCancellationTokenSource.Token,
@@ -142,7 +143,7 @@ namespace Quantum {
       var sessionRunnerArguments = new SessionRunner.Arguments {
         RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
         GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
-        ClientId = startParameter.PlayerName,
+        ClientId = Client?.UserId,
         RuntimeConfig = runtimeConfig,
         SessionConfig = (SessionConfig != null ? SessionConfig.Config : null) ?? QuantumDeterministicSessionConfigAsset.DefaultConfig,
         PlayerCount = Input.MaxCount,
@@ -152,7 +153,14 @@ namespace Quantum {
         RecordingFlags = RecordingFlags,
         InstantReplaySettings = InstantReplayConfig,
         DeltaTimeType = DeltaTimeType,
-        ShutdownCallback = (args) => { if (args.IsError) connectionErrorCallback?.Invoke(args.Message); },
+        ShutdownCallback = (args) => {
+          if (args.IsError) {
+            // Don't bubble up errors when the application has already stopped
+            if (AsyncConfig.Global.IsCancellationRequested == false) {
+              connectionErrorCallback?.Invoke(args.Message);
+            }
+          }
+        },
       };
 
       // Commence and wait for the started local or online Quantum game session

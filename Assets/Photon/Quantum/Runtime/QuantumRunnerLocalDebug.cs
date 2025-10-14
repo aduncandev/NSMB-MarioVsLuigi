@@ -113,6 +113,14 @@ namespace Quantum {
         return;
       }
 
+      var gameMenu = FindFirstObjectByType<QuantumStartUI>();
+      if (gameMenu != null && gameMenu.gameObject.activeSelf) {
+        // If a game menu / start GUI is present, we assume that the game is started from the menu code.
+        // In this case, we don't want to start the simulation here, but rather let the menu scene handle it.
+        enabled = false;
+        return;
+      }
+
       // Subscribe to the game started callback to add players
       QuantumCallback.Subscribe(this, (CallbackGameStarted c) => OnGameStarted(c.Game, c.IsResync), game => game == QuantumRunner.Default.Game);
 

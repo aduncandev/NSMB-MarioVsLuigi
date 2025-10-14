@@ -14,6 +14,7 @@ namespace Quantum {
   using UnityEngine.SceneManagement;
   using UnityEngine.Serialization;
   using System.Linq;
+  using Photon.Realtime;
 
   /// <summary>
   /// A simple menu to utilize the most common Photon connection and game start modes.
@@ -383,6 +384,8 @@ namespace Quantum {
     protected virtual void OnEnable() {
       UI.PlayerNameInput.text = PlayerName;
       UI.StatusText.text = null;
+      UI.PanelGroup.interactable = true;
+
       if (UI.StatusGroup) UI.StatusGroup.SetActive(false);
 
       if (UI.TabInput[(int)Tab.Online]) UI.TabInput[(int)Tab.Online].isOn = true;
@@ -512,11 +515,11 @@ namespace Quantum {
         // Only process and show errors if the menu is still connecting.
         if (CurrentState == State.Starting) {
           Debug.LogException(e);
-#if UNITY_EDITOR
-          if (UnityEditor.EditorApplication.isPlaying == false) {
+          if (AsyncConfig.Global.IsCancellationRequested) {
+            // Any code after await will never run when the tasks are cancelled.
+            // Don't proceed here when the global cancellation is already triggered to avoid UI issues and error logs.
             return;
           }
-#endif
           await ShowPopupAsync(e.Message);
           await ShutdownGameAsync();
         }

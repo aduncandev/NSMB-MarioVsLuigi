@@ -63,6 +63,8 @@ namespace Quantum {
         }
 
         public void SendSignalsTask(FrameThreadSafe f, int start, int count, void* arg) {
+            using var _profiler = HostProfiler.Start("EnemySystem.SendSignalsTask");
+
             despawningEntities.Sort(entityRefComparer);
             foreach (var entity in despawningEntities) {
                 ((Frame) f).Signals.OnEnemyDespawned(entity);

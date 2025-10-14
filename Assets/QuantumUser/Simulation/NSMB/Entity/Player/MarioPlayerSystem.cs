@@ -1,13 +1,12 @@
 using Photon.Deterministic;
 using Quantum.Collections;
-using Quantum.Profiling;
 using System;
 using static IInteractableTile;
 
 namespace Quantum {
     public unsafe class MarioPlayerSystem : SystemMainThreadEntityFilter<MarioPlayer, MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>,
         ISignalOnGameStarting, ISignalOnBobombExplodeEntity, ISignalOnTryLiquidSplash, ISignalOnEntityBumped, ISignalOnBeforeInteraction,
-        ISignalOnPlayerDisconnected, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState, ISignalOnEntityFreeze {
+        ISignalOnPlayerRemoved, ISignalOnIceBlockBroken, ISignalOnStageReset, ISignalOnEntityChangeUnderwaterState, ISignalOnEntityFreeze {
 
         private static readonly FPVector2 DeathUpForce = new FPVector2(0, FP.FromString("6.5"));
         private static readonly FPVector2 DeathUpGravity = new FPVector2(0, FP.FromString("-12.75"));
@@ -2527,7 +2526,7 @@ namespace Quantum {
                 || (mario->MegaMushroomEndFrames > 0 && mario->MegaMushroomStationaryEnd));
         }
 
-        public void OnPlayerDisconnected(Frame f, PlayerRef player) {
+        public void OnPlayerRemoved(Frame f, PlayerRef player) {
             foreach ((var entity, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
                 if (mario->PlayerRef != player) {
                     continue;

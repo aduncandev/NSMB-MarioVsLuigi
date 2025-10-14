@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using Quantum.Collections;
+using Quantum.Core;
 using System;
 
 namespace Quantum {
@@ -123,6 +124,7 @@ namespace Quantum {
             Filter filter = default;
             var loop = f.Unsafe.FilterStruct<Filter>();
             while (loop.Next(&filter)) {
+                using var _profiler3= HostProfiler.Start("PhysicsObjectSystem.UpdateLoop");
                 var physicsObject = filter.PhysicsObject;
                 if (physicsObject->IsFrozen) {
                     continue;
@@ -206,7 +208,10 @@ namespace Quantum {
         }
 #endif
 
-        public void SendEventsTask(FrameThreadSafe f) {
+        public void SendEventsTask(FrameThreadSafe fts) {
+            using var _profiler = HostProfiler.Start("PhysicsObjectSystem.SendEventsTask");
+            Frame f = (Frame) fts;
+
             var filter = f.Filter<PhysicsObject>();
             while (filter.NextUnsafe(out EntityRef entity, out PhysicsObject* physicsObject)) {
                 if (physicsObject->IsFrozen) {
@@ -214,15 +219,17 @@ namespace Quantum {
                 }
 
                 if (!physicsObject->WasTouchingGround && physicsObject->IsTouchingGround) {
-                    ((Frame) f).Events.PhysicsObjectLanded(entity);
+                    f.Events.PhysicsObjectLanded(entity);
                 }
                 if (!physicsObject->WasBeingCrushed && physicsObject->IsBeingCrushed) {
-                    ((Frame) f).Signals.OnEntityCrushed(entity);
+                    f.Signals.OnEntityCrushed(entity);
                 }
             }
         }
 
         private void HandleCeilingCrushers(Frame f, ref Filter filter, QList<PhysicsContact> contacts) {
+            using var _profiler = HostProfiler.Start("PhysicsObjectSystem.HandleCeilingCrushers");
+
             var physicsObject = filter.PhysicsObject;
             if (physicsObject->DisableCollision || !physicsObject->IsBeingCrushed) {
                 return;
@@ -243,6 +250,8 @@ namespace Quantum {
         }
 
         private void MoveWithPlatform(Frame f, ref Filter filter, QList<PhysicsContact> contacts) {
+            using var _profiler = HostProfiler.Start("PhysicsObjectSystem.MoveWithPlatform");
+
             var physicsObject = filter.PhysicsObject;
             EntityRef previousParent = physicsObject->Parent;
             physicsObject->Parent = EntityRef.None;
@@ -277,7 +286,8 @@ namespace Quantum {
         }
 
         public static FPVector2 MoveVertically(Frame f, FPVector2 velocity, ref Filter filter, VersusStageData stage, QList<PhysicsContact>? contacts, out bool hitObject) {
-            
+            using var _profiler = HostProfiler.Start("PhysicsObjectSystem.MoveVertically");
+
             FP velocityY = velocity.Y * f.DeltaTime;
             if (velocityY == 0) {
                 hitObject = false;
@@ -505,7 +515,8 @@ namespace Quantum {
         }
 
         public static FPVector2 MoveHorizontally(Frame f, FPVector2 velocity, ref Filter filter, VersusStageData stage, QList<PhysicsContact>? contacts, out bool hitObject) {
-            
+            using var _profiler = HostProfiler.Start("PhysicsObjectSystem.MoveHorizontally");
+
             FP velocityX = velocity.X * f.DeltaTime;
             if (velocityX == 0) {
                 hitObject = false;
@@ -747,6 +758,7 @@ namespace Quantum {
         }
 
         private void ResolveContacts(Frame f, VersusStageData stage, PhysicsObject* physicsObject, QList<PhysicsContact> contacts) {
+            using var _profiler = HostProfiler.Start("PhysicsObjectSystem.ResolveContacts");
 
             ResetContacts(ref physicsObject->CurrentData);
 
@@ -1169,8 +1181,6 @@ namespace Quantum {
             FPVector2 origin = position + shape.Centroid;
             IntVector2 min = QuantumUtils.WorldToRelativeTile(stage, origin - extents, extend: false, wrap: false);
             IntVector2 max = QuantumUtils.WorldToRelativeTile(stage, origin + extents, extend: false, wrap: false);
-
-            UnityEngine.Debug.Log(min + " " + max);
 
             int count = 0;
             for (int x = min.X; x <= max.X; x++) {

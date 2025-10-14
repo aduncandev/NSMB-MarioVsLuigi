@@ -21118,7 +21118,7 @@ namespace Quantum.Editor {
       var menuPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath("f2cb881c6a9772246bd6e3c119cf6f35"));
       var menu = (GameObject)PrefabUtility.InstantiatePrefab(menuPrefab);
       menu.transform.SetParent(go.transform, false);
-      /*
+
       var menuConnection = menu.AddComponent<QuantumStartUIConnection>();
       PhotonServerSettings.TryGetGlobal(out menuConnection.ServerSettings);
       menuConnection.SessionConfig = QuantumDeterministicSessionConfigAsset.Global;
@@ -21144,7 +21144,6 @@ namespace Quantum.Editor {
           menuConnection.SessionConfig = debugRunner.SessionConfig;
         }
       }
-      */
 
       EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
 
