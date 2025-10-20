@@ -311,7 +311,7 @@
         </member>
         <member name="T:Quantum.Editor.ReplayMenu">
             <summary>
-            Unity menu items to export replays and save games.
+            Unity menu items to export replays and snapshots.
             </summary>
         </member>
         <member name="T:Quantum.Editor.QuantumUnityDBInspector">
@@ -440,6 +440,12 @@
             <param name="saveScene">Save the scene</param>
             <param name="addToBuildSettings">Add the scene to build settings</param>
             <param name="createSceneInfoAsset"></param>
+        </member>
+        <member name="M:Quantum.Editor.QuantumEditorMenuCreateScene.CreateSimpleLocalGameScene(System.String)">
+            <summary>
+            Create a simple local game scene.
+            </summary>
+            <param name="scenePath">Path to the new scene</param>
         </member>
         <member name="M:Quantum.Editor.QuantumEditorMenuCreateScene.CreateSimpleConnectionScene(System.String)">
             <summary>
@@ -715,6 +721,11 @@
         <member name="P:Quantum.Editor.QuantumAssetSourceFactoryContext.AssetPath">
             <summary>
             Asset Unity path.
+            </summary>
+        </member>
+        <member name="P:Quantum.Editor.QuantumAssetSourceFactoryContext.Object">
+            <summary>
+            The object pointed to be <see cref="F:Quantum.Editor.QuantumAssetSourceFactoryContext.InstanceID"/>
             </summary>
         </member>
         <member name="M:Quantum.Editor.QuantumAssetSourceFactoryContext.#ctor(System.String,System.Int32,System.String,System.Boolean)">

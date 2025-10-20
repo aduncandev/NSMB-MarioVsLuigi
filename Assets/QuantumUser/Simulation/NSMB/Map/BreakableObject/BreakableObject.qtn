@@ -1,4 +1,4 @@
-component BreakableObject {
+table component BreakableObject {
 	FP OriginalHeight;
 	FP MinimumHeight;
 	bool IsStompable;

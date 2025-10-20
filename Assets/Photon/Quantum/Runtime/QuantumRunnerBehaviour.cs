@@ -9,7 +9,7 @@ namespace Quantum {
   /// </summary>
   public class QuantumRunnerBehaviour : QuantumMonoBehaviour {
     /// <summary>
-    /// The runner object set during <see cref="QuantumRunnerUnityFactory.CreateRunner(SessionRunner.Arguments)"/>
+    /// The runner object set during <see cref="QuantumRunnerUnityFactory.CreateRunner(SessionRunner.Arguments, string)"/>
     /// </summary>
     [InlineHelp] public QuantumRunner Runner;
 

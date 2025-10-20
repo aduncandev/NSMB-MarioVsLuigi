@@ -1,4 +1,4 @@
-component Koopa {
+table component Koopa {
 	AssetRef<PowerupAsset> SpawnPowerupWhenStomped;
 	bool DontWalkOfLedges;
 	bool IsSpiny;

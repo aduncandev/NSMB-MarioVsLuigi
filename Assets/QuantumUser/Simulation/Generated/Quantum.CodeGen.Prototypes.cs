@@ -215,8 +215,6 @@ namespace Quantum.Prototypes {
     public UInt16 TimeToShoot;
     public FP MinimumShootRadius;
     public FP MaximumShootRadius;
-    public Byte BulletBillCount;
-    public UInt16 TimeToShootFrames;
     partial void MaterializeUser(Frame frame, ref Quantum.BulletBillLauncher result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.BulletBillLauncher component = default;
@@ -228,8 +226,6 @@ namespace Quantum.Prototypes {
         result.TimeToShoot = this.TimeToShoot;
         result.MinimumShootRadius = this.MinimumShootRadius;
         result.MaximumShootRadius = this.MaximumShootRadius;
-        result.BulletBillCount = this.BulletBillCount;
-        result.TimeToShootFrames = this.TimeToShootFrames;
         MaterializeUser(frame, ref result, in context);
     }
   }
@@ -325,6 +321,27 @@ namespace Quantum.Prototypes {
     public void Materialize(Frame frame, ref Quantum.Cullable result, in PrototypeMaterializationContext context = default) {
         result.Offset = this.Offset;
         result.BroadRadius = this.BroadRadius;
+        MaterializeUser(frame, ref result, in context);
+    }
+  }
+  [System.SerializableAttribute()]
+  [Quantum.Prototypes.Prototype(typeof(Quantum.DonutBlock))]
+  public unsafe partial class DonutBlockPrototype : ComponentPrototype<Quantum.DonutBlock> {
+    public UInt16 FramesUntilFall;
+    public UInt16 FramesUntilRespawn;
+    public FP FallSpeed;
+    public FPVector2 Origin;
+    partial void MaterializeUser(Frame frame, ref Quantum.DonutBlock result, in PrototypeMaterializationContext context);
+    public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
+        Quantum.DonutBlock component = default;
+        Materialize((Frame)f, ref component, in context);
+        return f.Set(entity, component) == SetResult.ComponentAdded;
+    }
+    public void Materialize(Frame frame, ref Quantum.DonutBlock result, in PrototypeMaterializationContext context = default) {
+        result.FramesUntilFall = this.FramesUntilFall;
+        result.FramesUntilRespawn = this.FramesUntilRespawn;
+        result.FallSpeed = this.FallSpeed;
+        result.Origin = this.Origin;
         MaterializeUser(frame, ref result, in context);
     }
   }

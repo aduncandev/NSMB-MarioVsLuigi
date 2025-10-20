@@ -1264,27 +1264,8 @@
         </member>
         <member name="T:Quantum.QuantumRunnerLocalSavegame">
             <summary>
-            This script can be used to start a Quantum simulation from a savegame file and is very similar to <see cref="T:Quantum.QuantumRunnerLocalReplay"/>.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumRunnerLocalSavegame.SavegameFile">
-            <summary>
-            The savegame file (<see cref="T:Quantum.ReplayFile"/>).
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumRunnerLocalSavegame.DatabaseFile">
-            <summary>
-            The optional database file.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumRunnerLocalSavegame.InstantReplayConfig">
-            <summary>
-            The instant replay settings.
-            </summary>
-        </member>
-        <member name="M:Quantum.QuantumRunnerLocalSavegame.Start">
-            <summary>
-            Unity start method loads the savegame files and starts the runner.
+            The script has been retired and is not used anymore.
+            The functionality was merged with <see cref="T:Quantum.QuantumRunnerLocalReplay"/>.
             </summary>
         </member>
         <member name="T:Quantum.QuantumReconnectInformation">
@@ -4282,7 +4263,7 @@
         </member>
         <member name="F:Quantum.QuantumRunnerBehaviour.Runner">
             <summary>
-            The runner object set during <see cref="M:Quantum.QuantumRunnerUnityFactory.CreateRunner(Quantum.SessionRunner.Arguments)"/>
+            The runner object set during <see cref="M:Quantum.QuantumRunnerUnityFactory.CreateRunner(Quantum.SessionRunner.Arguments,System.String)"/>
             </summary>
         </member>
         <member name="M:Quantum.QuantumRunnerBehaviour.OnEnable">
@@ -4860,11 +4841,11 @@
         </member>
         <member name="T:Quantum.QuantumRunnerLocalDebug">
             <summary>
-              A debug script that starts the Quantum simulation for <see cref="F:Quantum.QuantumRunnerLocalDebug.MaxPlayerCount" /> players when starting the game
-              from a gameplay scene.
-              Will add <see cref="F:Quantum.QuantumRunnerLocalDebug.LocalPlayers" /> as local players during simulation start.
-              The script will disable itself when it detects that other scene were loaded before this (to delegate adding players
-              to a menu scene / game bootstrap).
+            A Unity script that starts a local Quantum simulation from a gameplay scene.
+            Requires a <see cref="T:Quantum.QuantumMapData"/> in the hierarchy.
+            Player are automatically added to the game which can be listed in <see cref="F:Quantum.QuantumRunnerLocalDebug.LocalPlayers"/>.
+            The script disables itself when other scene were loaded before (which indicates a menu scene).
+            Optionally the Quantum game can be started from a <see cref="F:Quantum.QuantumRunnerLocalDebug.SnapshotFile"/>.
             </summary>
         </member>
         <member name="F:Quantum.QuantumRunnerLocalDebug.DeltaTimeType">
@@ -4872,11 +4853,6 @@
             Set the <see cref="F:Quantum.QuantumRunnerLocalDebug.DeltaTimeType" /> to <see cref="F:Quantum.SimulationUpdateTime.EngineDeltaTime" /> to not progress the
             simulation during break points.
             Has to be set before starting the runner and can only be changed on the runner directly during runtime: <see cref="P:Quantum.SessionRunner.DeltaTimeType"/>.
-            </summary>
-        </member>
-        <member name="P:Quantum.QuantumRunnerLocalDebug.DeltaTypeType">
-            <summary>
-            Use <see cref="F:Quantum.QuantumRunnerLocalDebug.DeltaTimeType" /> instead.
             </summary>
         </member>
         <member name="F:Quantum.QuantumRunnerLocalDebug.RecordingFlags">
@@ -4893,11 +4869,6 @@
         <member name="F:Quantum.QuantumRunnerLocalDebug.RuntimeConfig">
             <summary>
             Configure the RuntimeConfig used for the local simulation.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumRunnerLocalDebug.UseRandomSeed">
-            <summary>
-            If set to true, the <see cref="F:Quantum.RuntimeConfig.Seed"/> seed will be set to a random value.
             </summary>
         </member>
         <member name="F:Quantum.QuantumRunnerLocalDebug.SessionConfig">
@@ -4920,9 +4891,9 @@
             Set a factor to increase or decrease the simulation speed and update the simulation during Update(). Default is 1.
             </summary>
         </member>
-        <member name="F:Quantum.QuantumRunnerLocalDebug.DisplaySaveAndReloadButton">
+        <member name="F:Quantum.QuantumRunnerLocalDebug.UseRandomSeed">
             <summary>
-            Show the reload simulation button.
+            If set to true, the <see cref="F:Quantum.RuntimeConfig.Seed"/> seed will be set to a random value.
             </summary>
         </member>
         <member name="F:Quantum.QuantumRunnerLocalDebug.PreloadAddressables">
@@ -4935,27 +4906,19 @@
             Set a dynamic asset db.
             </summary>
         </member>
-        <member name="F:Quantum.QuantumRunnerLocalDebug.OnBeforeStart">
+        <member name="F:Quantum.QuantumRunnerLocalDebug.SnapshotFile">
             <summary>
-            Unity event that is called before the Quantum simulation is started.
+            Optionally start the game from a snapshot loaded from a file using <see cref="T:Quantum.QuantumReplayFile"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.QuantumRunnerLocalDebug.DatabaseFile">
+            <summary>
+            Optionally starting the game using an asset db from a file.
             </summary>
         </member>
         <member name="M:Quantum.QuantumRunnerLocalDebug.Start">
             <summary>
             Unity start event, will start the Quantum simulation.
-            </summary>
-        </member>
-        <member name="M:Quantum.QuantumRunnerLocalDebug.StartWithFrame(System.Int32,System.Byte[])">
-            <summary>
-            Start the Quantum simulation with a specific frame number and frame data.
-            </summary>
-            <param name="frameNumber">Frame number</param>
-            <param name="frameData">Frame data to start from</param>
-            <exception cref="T:System.Exception">Is raised when no map was found in the scene.</exception>
-        </member>
-        <member name="M:Quantum.QuantumRunnerLocalDebug.OnGUI">
-            <summary>
-            Unity OnGUI event updates the debug runner UI.
             </summary>
         </member>
         <member name="M:Quantum.QuantumRunnerLocalDebug.Update">
@@ -4991,7 +4954,7 @@
             The RuntimeConfig to use for the Quantum game session. The RuntimeConfig describes custom game properties.
             </summary>
         </member>
-        <member name="F:Quantum.Demo.QuantumSimpleConnectionGUI.RuntimePlayers">
+        <member name="F:Quantum.Demo.QuantumSimpleConnectionGUI.RuntimePlayer">
             <summary>
             The RuntimePlayers to add to the Quantum game session. The RuntimePlayers describe individual custom player properties.
             </summary>
@@ -5009,15 +4972,34 @@
         <member name="M:Quantum.Demo.QuantumSimpleConnectionGUI.Connect">
             <summary>
             1) await MatchmakingExtensions.ConnectToRoomAsync
-            2) subscribe to CallbackPluginDisconnect
-            3) await SessionRunner.StartAsync
-            4) QuantumGame.AddPlayer
+            2) await SessionRunner.StartAsync
+            3) QuantumGame.AddPlayer
             </summary>
         </member>
         <member name="M:Quantum.Demo.QuantumSimpleConnectionGUI.Disconnect">
             <summary>
             await SessionRunner.ShutdownAsync
             await RealtimeClient.DisconnectAsync
+            </summary>
+        </member>
+        <member name="T:Quantum.Demo.QuantumSimpleLocalGame">
+            <summary>
+            A Unity script that demonstrates how to connect to a Quantum cloud and start a Quantum game session.
+            </summary>
+        </member>
+        <member name="F:Quantum.Demo.QuantumSimpleLocalGame.RuntimeConfig">
+            <summary>
+            The RuntimeConfig to use for the Quantum game session. The RuntimeConfig describes custom game properties.
+            </summary>
+        </member>
+        <member name="F:Quantum.Demo.QuantumSimpleLocalGame.RuntimePlayer">
+            <summary>
+            The RuntimePlayers to add to the Quantum game session. The RuntimePlayers describe individual custom player properties.
+            </summary>
+        </member>
+        <member name="P:Quantum.Demo.QuantumSimpleLocalGame.Runner">
+            <summary>
+            Access the session runner that runs the Quantum game session.
             </summary>
         </member>
         <member name="T:Quantum.QuantumCallbackHandler_GameResult">
@@ -6548,7 +6530,7 @@
             Create game parameters and set default values based on the platform.
             </summary>
         </member>
-        <member name="P:Quantum.QuantumRunnerUnityFactory.CreatePlaformInfo">
+        <member name="P:Quantum.QuantumRunnerUnityFactory.CreatePlatformInfo">
             <summary>
             Create the Unity platform information object.
             </summary>
@@ -6563,18 +6545,13 @@
             Assign an action to update the global database.
             </summary>
         </member>
-        <member name="M:Quantum.QuantumRunnerUnityFactory.CreateRunner(Quantum.SessionRunner.Arguments)">
+        <member name="M:Quantum.QuantumRunnerUnityFactory.CreateRunner(Quantum.SessionRunner.Arguments,System.String)">
             <summary>
             Creates a unity GameObject and attaches a QuantumRunnerBehaviour to it which will then update the actual session runner object. 
             </summary>
             <param name="arguments">Session arguments</param>
+            <param name="defaultRunnerId">Optionally a default runner name</param>
             <returns>A session runner object</returns>
-        </member>
-        <member name="M:Quantum.QuantumRunnerUnityFactory.CreatePlatformInfo">
-            <summary>
-            Create the Unity platform information object.
-            </summary>
-            <returns>Platform info object</returns>
         </member>
         <member name="M:Quantum.QuantumRunnerUnityFactory.CreateGame(Quantum.QuantumGameStartParameters)">
             <summary>
@@ -9063,17 +9040,7 @@
         <member name="T:Quantum.QuantumRunnerLocalReplay">
             <summary>
             An example of how to start a Quantum replay simulation from a replay file.
-            </summary>
-        </member>
-        <member name="F:Quantum.QuantumRunnerLocalReplay.DeltaTimeType">
-            <summary>
-            Set the <see cref="F:Quantum.QuantumRunnerLocalReplay.DeltaTimeType" /> to <see cref="F:Quantum.SimulationUpdateTime.EngineDeltaTime" /> to not progress the
-            simulation time during break points.
-            </summary>
-        </member>
-        <member name="P:Quantum.QuantumRunnerLocalReplay.DeltaTypeType">
-            <summary>
-            Use <see cref="F:Quantum.QuantumRunnerLocalReplay.DeltaTimeType" /> instead.
+            Also works for loading a snapshot to start a local session from.
             </summary>
         </member>
         <member name="F:Quantum.QuantumRunnerLocalReplay.ReplayFile">
@@ -9096,9 +9063,15 @@
             Toggle the replay gui label on/off.
             </summary>
         </member>
+        <member name="F:Quantum.QuantumRunnerLocalReplay.DeltaTimeType">
+            <summary>
+            Set the <see cref="F:Quantum.QuantumRunnerLocalReplay.DeltaTimeType" /> to <see cref="F:Quantum.SimulationUpdateTime.EngineDeltaTime" /> to not progress the
+            simulation time during break points.
+            </summary>
+        </member>
         <member name="F:Quantum.QuantumRunnerLocalReplay.InstantReplayConfig">
             <summary>
-            Instant replay configurations to start the replay with.
+            Set InstantReplaySettings to enable instant replays.
             </summary>
         </member>
         <member name="M:Quantum.QuantumRunnerLocalReplay.Start">
@@ -9240,6 +9213,12 @@
             Toggle the region import mode. Default is Simple.
             </summary>
         </member>
+        <member name="F:Quantum.QuantumNavMesh.ImportSettings.ImportAutoGeneratedLinks">
+            <summary>
+            If Quantum should import Links that were auto generated by Unity.
+            Only works in Unity 2022 and above, since Unity did not generate links before that.
+            </summary>
+        </member>
         <member name="F:Quantum.QuantumNavMesh.ImportSettings.RegionDetectionMargin">
             <summary>
             The artificial margin is necessary because the Unity NavMesh does not fit the source size very well. The value is added to the navmesh area and checked against all Quantum Region scripts to select the correct region id.
@@ -9329,13 +9308,14 @@
             Create a dictionary that maps Unity NavMesh area ids to area names.
             </summary>
         </member>
-        <member name="M:Quantum.QuantumNavMesh.ImportFromUnity(UnityEngine.SceneManagement.Scene,Quantum.QuantumNavMesh.ImportSettings,System.String)">
+        <member name="M:Quantum.QuantumNavMesh.ImportFromUnity(UnityEngine.SceneManagement.Scene,Quantum.QuantumNavMesh.ImportSettings,System.String,System.Collections.Generic.IEnumerable{UnityEngine.Object})">
             <summary>
             Import a Unity NavMesh into Quantum NavMesh data.
             </summary>
             <param name="scene">The Unity scene.</param>
             <param name="settings">The navmesh import settings.</param>
             <param name="name">The navmesh.</param>
+            <param name="existingData">The existing NavMeshData from Unity (optional)</param>
             <returns>The resulting imported navmesh.</returns>
         </member>
         <member name="M:Quantum.QuantumNavMesh.FindSmallestAgentRadius(UnityEngine.GameObject[])">
@@ -9344,6 +9324,16 @@
             </summary>
             <param name="navmeshSurfaces">List of navmesh surfaces to analyze.</param>
             <returns>The smallets agent radius in FP.</returns>
+        </member>
+        <member name="M:Quantum.QuantumNavMesh.UnityNavMeshLinkData.#ctor(UnityEditor.SerializedProperty,System.Int32)">
+            <summary>
+            Construct from a serialized OffMeshLink element inside NavMeshData
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumNavMesh.UnityNavMeshLinkData.ExtractFrom(UnityEngine.AI.NavMeshData)">
+            <summary>
+            Extract all OffMeshLinks from a NavMeshData into UnityNavMeshLinkData[]
+            </summary>
         </member>
         <member name="T:Quantum.QuantumNavMesh.Vector2Double">
             <summary>
@@ -9521,6 +9511,80 @@
         <member name="M:Quantum.QuantumNavMesh.Vector3Double.ClosestDistanceToTriangle(Quantum.QuantumNavMesh.Vector3Double,Quantum.QuantumNavMesh.Vector3Double,Quantum.QuantumNavMesh.Vector3Double,Quantum.QuantumNavMesh.Vector3Double,Quantum.QuantumNavMesh.Vector3Double@)">
             <summary>
             Calculates the closest distance from point <paramref name="p"/> to the triangle defined by <paramref name="v0"/>, <paramref name="v1"/> and <paramref name="v2"/>.
+            </summary>
+        </member>
+        <member name="T:Quantum.QuantumRunnerExtensions">
+            <summary>
+            Extension methods to enhance creating and initializing <see cref="T:Quantum.SessionRunner.Arguments"/> to simplify Quantum start procedures.
+            Using any form of <see cref="M:Quantum.QuantumRunnerExtensions.Init(Quantum.SessionRunner.Arguments@,Quantum.RuntimeConfig)"/> is optional and can be replaced by setting all arguments manually.
+            </summary>
+        </member>
+        <member name="M:Quantum.QuantumRunnerExtensions.Init(Quantum.SessionRunner.Arguments@,Quantum.RuntimeConfig)">
+            <summary>
+            Init the session runner arguments to bind Unity related and global defaults.
+            It's replacing <see cref="P:Quantum.QuantumRunnerUnityFactory.CreateGameParameters"/>.
+            Sets defaults for AssetSerializer CallbackDispatcher, EventDispatcher, ResourceManager, RunnerFactory, TaskRunner,
+            SessionConfig, RuntimeConfig and PlayerCount.
+            </summary>
+            <param name="arguments">Arguments to initialize</param>
+            <param name="runtimeConfig">Runtime config</param>
+            <returns>Modified arguments</returns>
+        </member>
+        <member name="M:Quantum.QuantumRunnerExtensions.InitForLocal(Quantum.SessionRunner.Arguments@,Quantum.RuntimeConfig)">
+            <summary>
+            Initializes session runner arguments to start a local simulation.
+            <see cref="M:Quantum.QuantumRunnerExtensions.Init(Quantum.SessionRunner.Arguments@,Quantum.RuntimeConfig)"/>
+            </summary>
+            <param name="arguments">Arguments to initialize</param>
+            <param name="runtimeConfig">Runtime config</param>
+            <returns>Modified arguments</returns>
+        </member>
+        <member name="M:Quantum.QuantumRunnerExtensions.InitForMultiplayer(Quantum.SessionRunner.Arguments@,Quantum.RuntimeConfig,Photon.Realtime.RealtimeClient,System.String,Quantum.ShutdownConnectionOptions)">
+            <summary>
+            Initializes session runner arguments to start a multiplayer simulation.
+            <see cref="M:Quantum.QuantumRunnerExtensions.Init(Quantum.SessionRunner.Arguments@,Quantum.RuntimeConfig)"/>
+            </summary>
+            <param name="arguments">Arguments to initialize</param>
+            <param name="runtimeConfig">Runtime config</param>
+            <param name="client">The connected Realtime client object</param>
+            <param name="clientId">The <see cref="F:Quantum.SessionRunner.Arguments.ClientId"/></param>
+            <param name="clientShutdownOption">Optional connection shutdown options</param>
+            <returns>Modified arguments</returns>
+        </member>
+        <member name="M:Quantum.QuantumRunnerExtensions.InitForReplay(Quantum.SessionRunner.Arguments@,Quantum.QuantumReplayFile,Quantum.IAssetSerializer,System.Byte[])">
+            <summary>
+            Initializes session runner arguments to start a local replay simulation from a file.
+            </summary>
+            <param name="arguments">Arguments to initialize</param>
+            <param name="replayFile">Source of the replay data</param>
+            <param name="serializer">Optionally the asset serializer, for example <see cref="T:Quantum.QuantumUnityJsonSerializer"/></param>
+            <param name="assets">Optionally the Quantum DB assets as binary serialized (e.g. from a file).</param>
+            <returns>Modified arguments</returns>
+        </member>
+        <member name="M:Quantum.QuantumRunnerExtensions.InitForInstantReplay(Quantum.SessionRunner.Arguments@,Quantum.QuantumGame,Quantum.Frame,Photon.Deterministic.IDeterministicReplayProvider)">
+            <summary>
+            Initializes session runner arguments to start a local replay simulation from running simulation.
+            </summary>
+            <param name="arguments">Arguments to initialize</param>
+            <param name="game">The main game to copy data from</param>
+            <param name="snapshot">The saved snapshot to start from</param>
+            <param name="replayProvider">The input provider</param>
+            <returns>Modified arguments</returns>
+        </member>
+        <member name="M:Quantum.QuantumRunnerExtensions.InitForSnapshot(Quantum.SessionRunner.Arguments@,Quantum.QuantumReplayFile,Quantum.IAssetSerializer,System.Byte[])">
+            <summary>
+            Initialized session arguments to start a local game from a snapshot file.
+            Internally uses <see cref="M:Quantum.QuantumRunnerExtensions.InitForReplay(Quantum.SessionRunner.Arguments@,Quantum.QuantumReplayFile,Quantum.IAssetSerializer,System.Byte[])"/>
+            </summary>
+            <param name="arguments">Arguments to initialize</param>
+            <param name="replayFile">Source of the replay data</param>
+            <param name="serializer">Optionally the asset serializer, for example <see cref="T:Quantum.QuantumUnityJsonSerializer"/></param>
+            <param name="assets">Optionally the Quantum DB assets as binary serialized (e.g. from a file).</param>
+            <returns></returns>
+        </member>
+        <member name="T:Quantum.CompressionDotNet">
+            <summary>
+            The default compression implementation. Problematic for Web, because it relies on native code internally, and it gets removed when LTO is enabled.
             </summary>
         </member>
         <member name="T:Quantum.IQuantumEntityViewCulling">

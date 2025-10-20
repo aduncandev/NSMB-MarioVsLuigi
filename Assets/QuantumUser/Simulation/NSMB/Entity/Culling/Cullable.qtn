@@ -1,4 +1,4 @@
-component Cullable {
+table component Cullable {
 	FPVector2 Offset;
 	FP BroadRadius;
 }

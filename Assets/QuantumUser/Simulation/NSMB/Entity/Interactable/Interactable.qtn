@@ -1,8 +1,8 @@
-component Interactable {
+table component Interactable {
 	bool ColliderDisabled;
 }
 
-component InteractionInitiator {
+table component InteractionInitiator {
 	[ExcludeFromPrototype] PhysicsQueryRef OverlapQueryRef;
 	[ExcludeFromPrototype] PhysicsQueryRef OverlapLevelSeamQueryRef;
 }

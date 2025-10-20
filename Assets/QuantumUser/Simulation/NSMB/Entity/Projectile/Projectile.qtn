@@ -1,6 +1,6 @@
 import enum ParticleEffect(byte);
 
-component Projectile {
+table component Projectile {
 	AssetRef<ProjectileAsset> Asset;
 	FP Speed;
 

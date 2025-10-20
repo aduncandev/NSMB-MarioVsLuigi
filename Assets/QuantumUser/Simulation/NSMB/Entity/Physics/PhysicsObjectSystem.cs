@@ -447,7 +447,7 @@ namespace Quantum {
 
                     // Get n-lowest contacts (within tolerance)
                     QuickSortSpan(potentialContacts, 0, potentialContactCount - 1);
-                    FP tolerance = 0;
+                    FP tolerance = FP._0_01;
                     FP? min = null;
                     FPVector2 avgNormal = FPVector2.Zero;
                     int contactCount = 0;
@@ -675,7 +675,7 @@ namespace Quantum {
 
                     // Get n-lowest contacts (within tolerance)
                     QuickSortSpan(potentialContacts, 0, potentialContactCount - 1);
-                    FP tolerance = 0;
+                    FP tolerance = FP._0_01;
                     FP? min = null;
                     FPVector2 avgNormal = FPVector2.Zero;
                     int contactCount = 0;

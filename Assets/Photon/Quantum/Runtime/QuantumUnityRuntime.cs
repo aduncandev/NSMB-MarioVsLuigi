@@ -7572,7 +7572,7 @@ namespace Quantum {
           return "Static: (broken)";
         } else if (Object.isSet) {
 #if UNITY_EDITOR
-          if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(Object.instanceID, out var guid, out long fileID)) {
+          if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(Object, out var guid, out long fileID)) {
             return $"Static: {guid}, fileID: {fileID}";
           }
 #endif
@@ -8794,7 +8794,7 @@ namespace Quantum {
         _byRunner.Clear();
         foreach (var entry in Entries) {
           if (!string.IsNullOrEmpty(entry.CompressedFrameDump)) {
-            entry.FrameDump = ByteUtils.GZipDecompressString(ByteUtils.Base64Decode(entry.CompressedFrameDump), Encoding.UTF8);
+            entry.FrameDump = Compression.DecompressString(ByteUtils.Base64Decode(entry.CompressedFrameDump), Encoding.UTF8);
           }
 
           OnEntryAdded(entry);
@@ -8807,7 +8807,7 @@ namespace Quantum {
       public void OnBeforeSerialize() {
         foreach (var entry in Entries) {
           if (string.IsNullOrEmpty(entry.CompressedFrameDump)) {
-            entry.CompressedFrameDump = ByteUtils.Base64Encode(ByteUtils.GZipCompressString(entry.FrameDump, Encoding.UTF8));
+            entry.CompressedFrameDump = ByteUtils.Base64Encode(Compression.CompressString(entry.FrameDump, Encoding.UTF8));
           }
         }
       }
@@ -8984,6 +8984,8 @@ namespace Quantum {
           // Rewind the copied stream
           _inputStream.SeekOrThrow(0, SeekOrigin.Begin);
           replayInputProvider = new StreamReplayInputProvider(_inputStream, liveGame.Session.FrameVerified.Number);
+        } else if (liveGame.Session.IsReplay && liveGame.Session.StreamReplayProvider != null) {
+          replayInputProvider = liveGame.Session.StreamReplayProvider.Clone(snapshot.Number, EndFrame);
         }
       } else {
         replayInputProvider = liveGame.Session.IsReplay ? liveGame.Session.ReplayProvider : liveGame.RecordedInputs;
@@ -9009,19 +9011,9 @@ namespace Quantum {
       _loop = loop;
 
       // Create all required start parameters and serialize the snapshot as start data.
-      var arguments = new SessionRunner.Arguments {
-        RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory,
-        GameParameters = QuantumRunnerUnityFactory.CreateGameParameters,
-        RuntimeConfig = liveGame.Configurations.Runtime,
-        SessionConfig = deterministicConfig,
-        ReplayProvider = replayInputProvider,
-        GameMode = DeterministicGameMode.Replay,
-        FrameData = snapshot.Serialize(DeterministicFrameSerializeMode.Blit),
-        InitialTick = snapshot.Number,
-        RunnerId = "InstantReplay",
-        PlayerCount = deterministicConfig.PlayerCount,
-        HeapExtraCount = snapshotsForRewind?.Count ?? 0,
-      };
+      var arguments = new SessionRunner.Arguments();
+      arguments.InitForInstantReplay(liveGame, snapshot, replayInputProvider);
+      arguments.HeapExtraCount = snapshotsForRewind?.Count ?? 0;
 
       _replayRunner = (QuantumRunner)SessionRunner.Start(arguments);
       _replayRunner.IsSessionUpdateDisabled = true;
@@ -19360,7 +19352,6 @@ namespace Quantum {
   using UnityEditor;
   using UnityEngine;
   using UnityEngine.SceneManagement;
-  using Debug = UnityEngine.Debug;
 
   public class QuantumMapDataBaker {
     [StaticField(StaticFieldResetMode.None)]
@@ -20153,21 +20144,27 @@ namespace Quantum {
           // If NavMeshSurface installed, this will deactivate non linked surfaces 
           // to make the CalculateTriangulation work only with the selected Unity navmesh.
           List<GameObject> deactivatedObjects = new List<GameObject>();
+          List<UnityEngine.Object> existingData = new List<UnityEngine.Object>();
 
           try {
             if (unityNavmeshes[i].NavMeshSurfaces != null && unityNavmeshes[i].NavMeshSurfaces.Length > 0) {
 #if QUANTUM_ENABLE_AI_NAVIGATION
-                var surfaces = FindLocalObjects<Unity.AI.Navigation.NavMeshSurface>(scene);
-                foreach (var surface in surfaces) {
-                  if (unityNavmeshes[i].NavMeshSurfaces.Contains(surface.gameObject) == false) {
-                    surface.gameObject.SetActive(false);
-                    deactivatedObjects.Add(surface.gameObject);
+              var surfaces = FindLocalObjects<Unity.AI.Navigation.NavMeshSurface>(scene);
+              
+              foreach (var surface in surfaces) {
+                if (unityNavmeshes[i].NavMeshSurfaces.Contains(surface.gameObject) == false) {
+                  surface.gameObject.SetActive(false);
+                  deactivatedObjects.Add(surface.gameObject);
+                } else {
+                  if (surface.navMeshData != null) {
+                    existingData.Add(surface.navMeshData);
                   }
                 }
+              }
 #endif
             }
 
-            var bakeData = QuantumNavMesh.ImportFromUnity(scene, unityNavmeshes[i].Settings, unityNavmeshes[i].name);
+            var bakeData = QuantumNavMesh.ImportFromUnity(scene, unityNavmeshes[i].Settings, unityNavmeshes[i].name, existingData);
             if (bakeData == null) {
               Log.Error($"Could not import navmesh '{unityNavmeshes[i].name}'");
             } else {
@@ -20597,6 +20594,12 @@ namespace Quantum {
       [InlineHelp]
       [FormerlySerializedAs("ImportRegions")]
       public NavmeshRegionImportMode ImportRegionMode = NavmeshRegionImportMode.Simple;
+
+      /// <summary>
+      /// If Quantum should import Links that were auto generated by Unity.
+      /// Only works in Unity 2022 and above, since Unity did not generate links before that.
+      /// </summary>
+      public bool ImportAutoGeneratedLinks = true;
       /// <summary>
       /// The artificial margin is necessary because the Unity NavMesh does not fit the source size very well. The value is added to the navmesh area and checked against all Quantum Region scripts to select the correct region id.
       /// </summary>
@@ -20974,8 +20977,9 @@ namespace Quantum {
     /// <param name="scene">The Unity scene.</param>
     /// <param name="settings">The navmesh import settings.</param>
     /// <param name="name">The navmesh.</param>
+    /// <param name="existingData">The existing NavMeshData from Unity (optional)</param>
     /// <returns>The resulting imported navmesh.</returns>
-    public static NavMeshBakeData ImportFromUnity(Scene scene, ImportSettings settings, string name) {
+    public static NavMeshBakeData ImportFromUnity(Scene scene, ImportSettings settings, string name, IEnumerable<UnityEngine.Object> existingData = null) {
       var result = new NavMeshBakeData();
 
       using (var progressBar = Log.Settings.Level <= LogLevel.Debug ? new ProgressBar("Importing Unity NavMesh", true) : null) {
@@ -21112,13 +21116,20 @@ namespace Quantum {
         }
 
         // Find links
-        var links = new List<NavMeshLinkTemp>();
+        var links = new List<UnityNavMeshLinkData>();
 #if QUANTUM_ENABLE_AI_NAVIGATION
-        links.AddRange(QuantumMapDataBaker.FindLocalObjects<Unity.AI.Navigation.NavMeshLink>(scene).Select(l => new NavMeshLinkTemp(l)));
+#if UNITY_EDITOR
+        if (existingData != null && settings.ImportAutoGeneratedLinks) {
+          foreach (var data in existingData) {
+            links.AddRange(UnityNavMeshLinkData.ExtractFrom((NavMeshData)data));
+          }
+        }
+#endif        
+        links.AddRange(QuantumMapDataBaker.FindLocalObjects<Unity.AI.Navigation.NavMeshLink>(scene).Select(l => new UnityNavMeshLinkData(l)));
 #endif
 #if !UNITY_2023_3_OR_NEWER
 #pragma warning disable CS0618 // Type or member is obsolete
-        links.AddRange(QuantumMapDataBaker.FindLocalObjects<OffMeshLink>(scene).Select(l => new NavMeshLinkTemp(l)));
+        links.AddRange(QuantumMapDataBaker.FindLocalObjects<OffMeshLink>(scene).Select(l => new UnityNavMeshLinkData(l)));
 #pragma warning restore CS0618
 #endif
         result.Links = new NavMeshBakeDataLink[0];
@@ -21143,10 +21154,8 @@ namespace Quantum {
                 }
                 break;
               case NavmeshRegionImportMode.Advanced:
-                var navMeshRegion = links[l].Object.GetComponent<QuantumNavMeshRegion>();
-                if (navMeshRegion != null && string.IsNullOrEmpty(navMeshRegion.Id) == false) {
-                  regionId = navMeshRegion.Id;
-                }
+                
+                regionId = links[l].RegionId;
                 break;
             }
 
@@ -21181,7 +21190,7 @@ namespace Quantum {
                 Bidirectional = links[l].Bidirectional,
                 CostOverride = FP.FromFloat_UNSAFE(links[l].CostModifier),
                 RegionId = regionId,
-                Name = links[l].Object.name
+                Name = links[l].Name
               });
             }
 
@@ -21238,7 +21247,7 @@ namespace Quantum {
       return FP.FromFloat_UNSAFE(DefaultMinAgentRadius);
     }
 
-    private struct NavMeshLinkTemp {
+    public struct UnityNavMeshLinkData {
       public Vector3 StartPoint;
       public Vector3 EndPoint;
       public float Width;
@@ -21247,10 +21256,61 @@ namespace Quantum {
       public bool AutoUpdatePosition;
       public bool IsEnabled;
       public int Area;
-      public GameObject Object;
+      public string Name;
+      public string RegionId;
 
 #if QUANTUM_ENABLE_AI_NAVIGATION
-      public NavMeshLinkTemp(Unity.AI.Navigation.NavMeshLink link) {
+#if UNITY_EDITOR
+      /// <summary>
+      /// Construct from a serialized OffMeshLink element inside NavMeshData
+      /// </summary>
+      private UnityNavMeshLinkData(UnityEditor.SerializedProperty element, int index)
+      {
+        // Extract serialized values
+        Vector3 start = element.FindPropertyRelative("m_Start").vector3Value;
+        Vector3 end = element.FindPropertyRelative("m_End").vector3Value;
+        float radius = element.FindPropertyRelative("m_Radius").floatValue;
+        int area = element.FindPropertyRelative("m_Area").intValue;
+        int direction = element.FindPropertyRelative("m_LinkDirection").intValue;
+
+        // Map into struct fields
+        StartPoint = start;
+        EndPoint = end;
+        Width = radius * 2f; 
+        CostModifier = 1f;   
+        Bidirectional = (direction == 0);
+        AutoUpdatePosition = false; // not serialized
+        IsEnabled = true;           // from navmeshdata, assumed enabled
+        Area = area;
+        Name = $"Link_{index}";
+        CreateUnityNavmeshAreaMap().TryGetValue(area, out RegionId);
+      }
+
+      /// <summary>
+      /// Extract all OffMeshLinks from a NavMeshData into UnityNavMeshLinkData[]
+      /// </summary>
+      public static UnityNavMeshLinkData[] ExtractFrom(NavMeshData navMeshData) {
+        if (navMeshData == null)
+          return Array.Empty<UnityNavMeshLinkData>();
+
+        UnityEditor.SerializedObject so = new UnityEditor.SerializedObject(navMeshData);
+        UnityEditor.SerializedProperty linksProp = so.FindProperty("m_OffMeshLinks");
+
+        if (linksProp == null || !linksProp.isArray)
+          return Array.Empty<UnityNavMeshLinkData>();
+
+        var result = new UnityNavMeshLinkData[linksProp.arraySize];
+
+        for (int i = 0; i < linksProp.arraySize; i++) {
+          var element = linksProp.GetArrayElementAtIndex(i);
+          result[i] = new UnityNavMeshLinkData(element, i);
+        }
+
+        return result;
+      }
+#endif
+
+      public UnityNavMeshLinkData(Unity.AI.Navigation.NavMeshLink link) {
         StartPoint = link.transform != null ? link.transform.TransformPoint(link.startPoint) : link.startPoint;
         EndPoint   = link.transform != null ? link.transform.TransformPoint(link.endPoint)   : link.endPoint;
         Width = link.width;
@@ -21259,13 +21319,18 @@ namespace Quantum {
         AutoUpdatePosition = link.autoUpdate;
         IsEnabled = link.enabled;
         Area = link.area;
-        Object = link.gameObject;
+        Name = link.gameObject.name;
+        if (link.TryGetComponent(out QuantumNavMeshRegion quantumNavMeshRegion)) {
+          RegionId = quantumNavMeshRegion.Id;
+        } else {
+          CreateUnityNavmeshAreaMap().TryGetValue(link.area, out RegionId);
+        }
       }
 #endif
 
 #if !UNITY_2023_3_OR_NEWER
 #pragma warning disable CS0618 // Type or member is obsolete
-      public NavMeshLinkTemp(OffMeshLink link) {
+      public UnityNavMeshLinkData(OffMeshLink link) {
         Assert.Always(link.startTransform != null && link.endTransform != null, "Failed to import Off Mesh Link '{0}' start or end transforms are invalid", link.name);
 
         StartPoint = link.startTransform.position;
@@ -21276,7 +21341,12 @@ namespace Quantum {
         AutoUpdatePosition = link.autoUpdatePositions;
         IsEnabled = link.enabled && link.activated;
         Area = link.area;
-        Object = link.gameObject;
+        Name = link.gameObject.name;
+        if (link.TryGetComponent(out QuantumNavMeshRegion quantumNavMeshRegion)) {
+          RegionId = quantumNavMeshRegion.Id;
+        } else {
+          CreateUnityNavmeshAreaMap().TryGetValue(link.area, out RegionId);
+        }
       }
 #pragma warning restore CS0618
 #endif
@@ -22887,6 +22957,191 @@ namespace Quantum {
 #endregion
 
 
+#region Assets/Photon/Quantum/Runtime/QuantumRunnerExtensions.cs
+
+namespace Quantum {
+  using Photon.Deterministic;
+  using Photon.Realtime;
+  using UnityEngine;
+  using static QuantumUnityExtensions;
+
+  /// <summary>
+  /// Extension methods to enhance creating and initializing <see cref="SessionRunner.Arguments"/> to simplify Quantum start procedures.
+  /// Using any form of <see cref="Init(ref SessionRunner.Arguments, RuntimeConfig)"/> is optional and can be replaced by setting all arguments manually.
+  /// </summary>
+  public static class QuantumRunnerExtensions {
+    /// <summary>
+    /// Init the session runner arguments to bind Unity related and global defaults.
+    /// It's replacing <see cref="QuantumRunnerUnityFactory.CreateGameParameters"/>.
+    /// Sets defaults for AssetSerializer CallbackDispatcher, EventDispatcher, ResourceManager, RunnerFactory, TaskRunner,
+    /// SessionConfig, RuntimeConfig and PlayerCount.
+    /// </summary>
+    /// <param name="arguments">Arguments to initialize</param>
+    /// <param name="runtimeConfig">Runtime config</param>
+    /// <returns>Modified arguments</returns>
+    public static ref SessionRunner.Arguments Init(this ref SessionRunner.Arguments arguments, RuntimeConfig runtimeConfig) {
+      Assert.Always(runtimeConfig != null, "Requires valid RuntimeConfig");
+
+      arguments.AssetSerializer = new QuantumUnityJsonSerializer();
+      arguments.CallbackDispatcher = QuantumCallback.Dispatcher;
+      arguments.EventDispatcher = QuantumEvent.Dispatcher;
+      arguments.PlayerCount = Input.MAX_COUNT;
+      arguments.ResourceManager = QuantumUnityDB.Global;
+      arguments.RunnerFactory = QuantumRunnerUnityFactory.DefaultFactory;
+      arguments.TaskRunner = QuantumTaskRunnerJobs.GetInstance();
+      arguments.SessionConfig = QuantumDeterministicSessionConfigAsset.DefaultConfig;
+
+      var runtimeConfigCopy = default(RuntimeConfig);
+
+      // If simulation config not set, clone the runtime config and set the default one.
+      if (runtimeConfig.SimulationConfig.Id.IsValid == false && QuantumDefaultConfigs.TryGetGlobal(out var defaultConfigs)) {
+        runtimeConfigCopy ??= arguments.AssetSerializer.CloneConfig(runtimeConfig);
+        runtimeConfigCopy.SimulationConfig = defaultConfigs.SimulationConfig;
+        QuantumEditorLog.Warn("RuntimeConfig does not have a valid SimulationConfig set, using default.", defaultConfigs.SimulationConfig);
+      }
+
+      // If systems config not set, clone the runtime config and set the default one.
+      if (runtimeConfig.SystemsConfig.IsValid == false && QuantumDefaultConfigs.TryGetGlobal(out var defaultConfigs2)) {
+        runtimeConfigCopy ??= arguments.AssetSerializer.CloneConfig(runtimeConfig);
+        runtimeConfigCopy.SystemsConfig = defaultConfigs2.SystemsConfig;
+        QuantumEditorLog.Warn("RuntimeConfig does not have a valid SystemsConfig set, using default.", defaultConfigs2.SystemsConfig);
+      }
+
+      // If map is not set, try finding a local one.
+      if (runtimeConfig.Map.IsValid == false) {
+#if UNITY_2022_1_OR_NEWER && !UNITY_2022_2_OR_NEWER
+        var mapData = FindFirstObjectByType<QuantumMapData>();
+#else
+        var mapData = Object.FindFirstObjectByType<QuantumMapData>();
+#endif
+        if (mapData != null) {
+          runtimeConfigCopy ??= arguments.AssetSerializer.CloneConfig(runtimeConfig);
+          runtimeConfigCopy.Map = mapData.AssetRef;
+          QuantumEditorLog.Warn("RuntimeConfig does not have a valid Map set, using local map data.", mapData);
+        }
+      }
+
+      arguments.RuntimeConfig = runtimeConfigCopy ?? runtimeConfig;
+
+      return ref arguments;
+    }
+
+    /// <summary>
+    /// Initializes session runner arguments to start a local simulation.
+    /// <see cref="Init(ref SessionRunner.Arguments, RuntimeConfig)"/>
+    /// </summary>
+    /// <param name="arguments">Arguments to initialize</param>
+    /// <param name="runtimeConfig">Runtime config</param>
+    /// <returns>Modified arguments</returns>
+    public static ref SessionRunner.Arguments InitForLocal(this ref SessionRunner.Arguments arguments, RuntimeConfig runtimeConfig) {
+      arguments.Init(runtimeConfig);
+
+      arguments.GameMode = DeterministicGameMode.Local;
+
+      return ref arguments;
+    }
+
+    /// <summary>
+    /// Initializes session runner arguments to start a multiplayer simulation.
+    /// <see cref="Init(ref SessionRunner.Arguments, RuntimeConfig)"/>
+    /// </summary>
+    /// <param name="arguments">Arguments to initialize</param>
+    /// <param name="runtimeConfig">Runtime config</param>
+    /// <param name="client">The connected Realtime client object</param>
+    /// <param name="clientId">The <see cref="SessionRunner.Arguments.ClientId"/></param>
+    /// <param name="clientShutdownOption">Optional connection shutdown options</param>
+    /// <returns>Modified arguments</returns>
+    public static ref SessionRunner.Arguments InitForMultiplayer(this ref SessionRunner.Arguments arguments, RuntimeConfig runtimeConfig, RealtimeClient client, string clientId, ShutdownConnectionOptions clientShutdownOption = ShutdownConnectionOptions.Disconnect) {
+      arguments.Init(runtimeConfig);
+
+      arguments.ClientId = clientId;
+      arguments.GameMode = DeterministicGameMode.Multiplayer;
+      arguments.Communicator = new QuantumNetworkCommunicator(client, clientShutdownOption);
+
+      return ref arguments;
+
+    }
+
+    /// <summary>
+    /// Initializes session runner arguments to start a local replay simulation from a file.
+    /// </summary>
+    /// <param name="arguments">Arguments to initialize</param>
+    /// <param name="replayFile">Source of the replay data</param>
+    /// <param name="serializer">Optionally the asset serializer, for example <see cref="QuantumUnityJsonSerializer"/></param>
+    /// <param name="assets">Optionally the Quantum DB assets as binary serialized (e.g. from a file).</param>
+    /// <returns>Modified arguments</returns>
+    public static ref SessionRunner.Arguments InitForReplay(this ref SessionRunner.Arguments arguments, QuantumReplayFile replayFile, IAssetSerializer serializer = null, byte[] assets = null) {
+      serializer ??= new QuantumUnityJsonSerializer();
+      var runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replayFile.RuntimeConfigData.Decode(), compressed: true);
+
+      arguments.Init(runtimeConfig);
+
+      arguments.SessionConfig = replayFile.DeterministicConfig;
+      arguments.ReplayProvider = replayFile.CreateInputProvider();
+      arguments.GameMode = DeterministicGameMode.Replay;
+      arguments.PlayerCount = replayFile.DeterministicConfig.PlayerCount;
+      arguments.InitialTick = replayFile.InitialTick;
+      arguments.FrameData = replayFile.InitialFrameData;
+
+      assets = assets ?? replayFile.AssetDatabaseData?.Decode();
+
+      if (assets?.Length > 0) {
+        var resourceManager = new ResourceManagerStatic(serializer.AssetsFromByteArray(assets));
+        arguments.ResourceManager = resourceManager;
+        arguments.ShutdownCallback += (args) => resourceManager.Dispose();
+      }
+
+      if (arguments.ReplayProvider == null) {
+        QuantumEditorLog.Warn("The replay file does not contain an input provider, replay playback is not possible.");
+      }
+
+      return ref arguments;
+    }
+
+    /// <summary>
+    /// Initializes session runner arguments to start a local replay simulation from running simulation.
+    /// </summary>
+    /// <param name="arguments">Arguments to initialize</param>
+    /// <param name="game">The main game to copy data from</param>
+    /// <param name="snapshot">The saved snapshot to start from</param>
+    /// <param name="replayProvider">The input provider</param>
+    /// <returns>Modified arguments</returns>
+    public static ref SessionRunner.Arguments InitForInstantReplay(this ref SessionRunner.Arguments arguments, QuantumGame game, Frame snapshot, IDeterministicReplayProvider replayProvider) {
+      arguments.Init(game.Configurations.Runtime);
+
+      arguments.FrameData = snapshot.Serialize(DeterministicFrameSerializeMode.Serialize);
+      arguments.InitialTick = snapshot.Number;
+      arguments.SessionConfig = game.Session.SessionConfig;
+      arguments.ReplayProvider = replayProvider;
+      arguments.GameMode = DeterministicGameMode.Replay;
+      arguments.RunnerId = "InstantReplay";
+      arguments.PlayerCount = game.Session.SessionConfig.PlayerCount;
+
+      return ref arguments;
+    }
+
+    /// <summary>
+    /// Initialized session arguments to start a local game from a snapshot file.
+    /// Internally uses <see cref="InitForReplay(ref SessionRunner.Arguments, QuantumReplayFile, IAssetSerializer, byte[])"/>
+    /// </summary>
+    /// <param name="arguments">Arguments to initialize</param>
+    /// <param name="replayFile">Source of the replay data</param>
+    /// <param name="serializer">Optionally the asset serializer, for example <see cref="QuantumUnityJsonSerializer"/></param>
+    /// <param name="assets">Optionally the Quantum DB assets as binary serialized (e.g. from a file).</param>
+    /// <returns></returns>
+    public static ref SessionRunner.Arguments InitForSnapshot(this ref SessionRunner.Arguments arguments, QuantumReplayFile replayFile, IAssetSerializer serializer = null, byte[] assets = null) {
+      InitForReplay(ref arguments, replayFile, serializer, assets);
+
+      arguments.GameMode = DeterministicGameMode.Local;
+
+      return ref arguments;
+    }
+  }
+}
+
+#endregion
+
+
 #region Assets/Photon/Quantum/Runtime/QuantumRunnerRegistry.cs
 
 namespace Quantum {
@@ -23001,13 +23256,12 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/QuantumRunnerUnityFactory.cs
 
 namespace Quantum {
-  using System;
-  using System.Runtime.InteropServices;
-  using System.Threading.Tasks;
   using Photon.Analyzer;
   using Photon.Deterministic;
   using Photon.Realtime;
-  using Profiling;
+  using System;
+  using System.Runtime.InteropServices;
+  using System.Threading.Tasks;
   using UnityEngine;
 
   /// <summary>
@@ -23031,10 +23285,62 @@ namespace Quantum {
       TaskRunner = QuantumTaskRunnerJobs.GetInstance(),
     };
 
+    [Obsolete("Use CreatePlatformInfo")]
+    public virtual DeterministicPlatformInfo CreatePlaformInfo => CreatePlatformInfo;
+
     /// <summary>
     /// Create the Unity platform information object.
     /// </summary>
-    public DeterministicPlatformInfo CreatePlaformInfo => CreatePlatformInfo();
+    public DeterministicPlatformInfo CreatePlatformInfo => new DeterministicPlatformInfo {
+      Architecture = RuntimeInformation.ProcessArchitecture switch {
+        Architecture.Arm => DeterministicPlatformInfo.Architectures.ARMv7,
+        Architecture.Arm64 => DeterministicPlatformInfo.Architectures.ARM64,
+        Architecture.X86 => DeterministicPlatformInfo.Architectures.x86,
+        Architecture.X64 => DeterministicPlatformInfo.Architectures.x64,
+        _ => throw new NotSupportedException($"{RuntimeInformation.ProcessArchitecture}"),
+      },
+
+#if UNITY_EDITOR
+      Runtime = DeterministicPlatformInfo.Runtimes.Mono,
+      RuntimeHost = DeterministicPlatformInfo.RuntimeHosts.UnityEditor,
+#if UNITY_EDITOR_WIN
+      Platform = DeterministicPlatformInfo.Platforms.Windows,
+#elif UNITY_EDITOR_OSX
+      Platform = DeterministicPlatformInfo.Platforms.OSX,
+#endif
+
+#else // UNITY_EDITOR
+      RuntimeHost = DeterministicPlatformInfo.RuntimeHosts.Unity,
+#if ENABLE_IL2CPP
+      Runtime = DeterministicPlatformInfo.Runtimes.IL2CPP,
+#else
+      Runtime = DeterministicPlatformInfo.Runtimes.Mono,
+#endif // ENABLE_IL2CPP
+
+#if UNITY_STANDALONE_WIN
+      Platform = DeterministicPlatformInfo.Platforms.Windows,
+#elif UNITY_STANDALONE_OSX
+      Platform = DeterministicPlatformInfo.Platforms.OSX,
+#elif UNITY_STANDALONE_LINUX
+      Platform = DeterministicPlatformInfo.Platforms.Linux,
+#elif UNITY_IOS
+      Platform = DeterministicPlatformInfo.Platforms.IOS,
+#elif UNITY_ANDROID
+      Platform = DeterministicPlatformInfo.Platforms.Android,
+#elif UNITY_TVOS
+      Platform = DeterministicPlatformInfo.Platforms.TVOS,
+#elif UNITY_XBOXONE
+      Platform = DeterministicPlatformInfo.Platforms.XboxOne,
+#elif UNITY_PS4
+      Platform = DeterministicPlatformInfo.Platforms.PlayStation4,
+#elif UNITY_SWITCH
+      Platform = DeterministicPlatformInfo.Platforms.Switch,
+#elif UNITY_WEBGL
+      Platform = DeterministicPlatformInfo.Platforms.WebGL,
+#endif // UNITY_STANDALONE_WIN
+
+#endif // UNITY_EDITOR
+    };
     /// <summary>
     /// Assign a task factory that will be used by the runner to create and chain new tasks.
     /// </summary>
@@ -23047,73 +23353,15 @@ namespace Quantum {
     /// Creates a unity GameObject and attaches a QuantumRunnerBehaviour to it which will then update the actual session runner object. 
     /// </summary>
     /// <param name="arguments">Session arguments</param>
+    /// <param name="defaultRunnerId">Optionally a default runner name</param>
     /// <returns>A session runner object</returns>
-    public SessionRunner CreateRunner(SessionRunner.Arguments arguments) {
-      var go = new GameObject($"QuantumRunner ({arguments.RunnerId})");
+    public SessionRunner CreateRunner(SessionRunner.Arguments arguments, string defaultRunnerId) {
+      var go = new GameObject($"QuantumRunner ({(string.IsNullOrEmpty(arguments.RunnerId) ? defaultRunnerId : arguments.RunnerId)})");
       GameObject.DontDestroyOnLoad(go);
       var script = go.AddComponent<QuantumRunnerBehaviour>();
       script.Runner = new QuantumRunner(script);
       QuantumRunnerRegistry.Global.AddRunner(script.Runner);
       return script.Runner;
-    }
-
-    /// <summary>
-    /// Create the Unity platform information object.
-    /// </summary>
-    /// <returns>Platform info object</returns>
-    public static DeterministicPlatformInfo CreatePlatformInfo() {
-      DeterministicPlatformInfo info = new();
-      
-      info.Architecture = RuntimeInformation.ProcessArchitecture switch {
-        Architecture.Arm => DeterministicPlatformInfo.Architectures.ARMv7,
-        Architecture.Arm64 => DeterministicPlatformInfo.Architectures.ARM64,
-        Architecture.X86 => DeterministicPlatformInfo.Architectures.x86,
-        Architecture.X64 => DeterministicPlatformInfo.Architectures.x64,
-        _ => throw new NotSupportedException($"{RuntimeInformation.ProcessArchitecture}"),
-      };
-
-#if UNITY_EDITOR
-      info.Runtime = DeterministicPlatformInfo.Runtimes.Mono;
-      info.RuntimeHost = DeterministicPlatformInfo.RuntimeHosts.UnityEditor;
-#if UNITY_EDITOR_WIN
-      info.Platform = DeterministicPlatformInfo.Platforms.Windows;
-#elif UNITY_EDITOR_OSX
-      info.Platform = DeterministicPlatformInfo.Platforms.OSX;
-#endif
-
-#else // UNITY_EDITOR
-      info.RuntimeHost = DeterministicPlatformInfo.RuntimeHosts.Unity;
-#if ENABLE_IL2CPP
-      info.Runtime = DeterministicPlatformInfo.Runtimes.IL2CPP;
-#else
-      info.Runtime = DeterministicPlatformInfo.Runtimes.Mono;
-#endif // ENABLE_IL2CPP
-
-#if UNITY_STANDALONE_WIN
-      info.Platform = DeterministicPlatformInfo.Platforms.Windows;
-#elif UNITY_STANDALONE_OSX
-      info.Platform = DeterministicPlatformInfo.Platforms.OSX;
-#elif UNITY_STANDALONE_LINUX
-      info.Platform = DeterministicPlatformInfo.Platforms.Linux;
-#elif UNITY_IOS
-      info.Platform = DeterministicPlatformInfo.Platforms.IOS;
-#elif UNITY_ANDROID
-      info.Platform = DeterministicPlatformInfo.Platforms.Android;
-#elif UNITY_TVOS
-      info.Platform = DeterministicPlatformInfo.Platforms.TVOS;
-#elif UNITY_XBOXONE
-      info.Platform = DeterministicPlatformInfo.Platforms.XboxOne;
-#elif UNITY_PS4
-      info.Platform = DeterministicPlatformInfo.Platforms.PlayStation4;
-#elif UNITY_SWITCH
-      info.Platform = DeterministicPlatformInfo.Platforms.Switch;
-#elif UNITY_WEBGL
-      info.Platform = DeterministicPlatformInfo.Platforms.WebGL;
-#endif // UNITY_STANDALONE_WIN
-
-#endif // UNITY_EDITOR
-
-      return info;
     }
 
     [RuntimeInitializeOnLoadMethod]
@@ -23345,7 +23593,6 @@ namespace Quantum {
 #region Assets/Photon/Quantum/Runtime/QuantumStaticInitializer.cs
 
 namespace Quantum {
-  using System.IO;
   using UnityEngine;
 
   static class QuantumStaticInitializer {
@@ -23365,6 +23612,12 @@ namespace Quantum {
       _ = FPMathUtils.LoadLookupTablesAsync(true);
 #else
       FPMathUtils.LoadLookupTables();
+#endif
+      
+#if QUANTUM_ENABLE_SHARPZIPLIB && !QUANTUM_DISABLE_SHARPZIPLIB
+      Compression.Init(new CompressionSharpZipLib());
+#else
+      Compression.Init(new CompressionDotNet());
 #endif
       
 #if ENABLE_PROFILER
@@ -23713,7 +23966,7 @@ namespace Quantum {
         byte[] data = asset.Data ?? Array.Empty<byte>();
         bool isCompressed = asset.IsCompressed;
         if (!asset.IsCompressed && compressThreshold.HasValue && data.Length >= compressThreshold.Value) {
-          data = ByteUtils.GZipCompressBytes(data);
+          data = Compression.CompressBytes(data);
           isCompressed = true;
         }
 
@@ -23732,7 +23985,7 @@ namespace Quantum {
         result.IsCompressed = IsCompressed;
         if (IsCompressed && serializer.DecompressBinaryDataOnDeserialization) {
           result.IsCompressed = false;
-          result.Data = ByteUtils.GZipDecompressBytes(result.Data);
+          result.Data = Compression.DecompressBytes(result.Data);
         }
         return result;
       }
@@ -25865,6 +26118,57 @@ namespace Quantum {
 #endif
   }
 }
+
+#endregion
+
+
+#region Assets/Photon/Quantum/Runtime/Utils/CompressionDotNet.cs
+
+#if (UNITY_2021_1_OR_NEWER || !QUANTUM_UNITY) && !QUANTUM_ENABLE_SHARPZIPLIB
+namespace Quantum {
+  using System.IO;
+  using System.IO.Compression;
+  
+  /// <summary>
+  /// The default compression implementation. Problematic for Web, because it relies on native code internally, and it gets removed when LTO is enabled.
+  /// </summary>
+  class CompressionDotNet : Compression {
+    protected override Stream CreateCompressingStreamInternal(Stream underlyingStream, bool leaveOpen) {
+      return new GZipStream(underlyingStream, CompressionMode.Compress, leaveOpen);
+    }
+
+    protected override Stream CreateDecompressingStreamInternal(Stream underlyingStream, bool leaveOpen) {
+      return new GZipStream(underlyingStream, CompressionMode.Decompress, leaveOpen);
+    }
+  }
+}
+#endif
+
+#endregion
+
+
+#region Assets/Photon/Quantum/Runtime/Utils/CompressionSharpZipLib.cs
+
+#if QUANTUM_ENABLE_SHARPZIPLIB && !QUANTUM_DISABLE_SHARPZIPLIB
+namespace Quantum {
+  using System.IO;
+  using Unity.SharpZipLib.GZip;
+
+  class CompressionSharpZipLib : Compression {
+    protected override Stream CreateCompressingStreamInternal(Stream underlyingStream, bool leaveOpen) {
+      return new GZipOutputStream(underlyingStream) {
+        IsStreamOwner = (leaveOpen == false)
+      };
+    }
+
+    protected override Stream CreateDecompressingStreamInternal(Stream underlyingStream, bool leaveOpen) {
+      return new GZipInputStream(underlyingStream) {
+        IsStreamOwner = (leaveOpen == false)
+      };
+    }
+  }
+}
+#endif
 
 #endregion
 

@@ -1,4 +1,4 @@
-component Coin {
+table component Coin {
 	CoinType CoinType;
 	ushort Lifetime;
 	byte UncollectableFrames;

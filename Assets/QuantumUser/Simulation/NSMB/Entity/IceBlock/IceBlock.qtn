@@ -1,7 +1,7 @@
 import enum IceBlockBreakReason(byte);
 import enum LiquidType(byte);
 
-component IceBlock {
+table component IceBlock {
 	FP SlidingSpeed;
 	[ExcludeFromPrototype] EntityRef Entity;
 	[ExcludeFromPrototype] FPVector2 Size;

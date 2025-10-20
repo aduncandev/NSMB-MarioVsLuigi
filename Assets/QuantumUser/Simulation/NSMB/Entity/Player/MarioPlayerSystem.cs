@@ -1928,11 +1928,11 @@ namespace Quantum {
             // Waiting to prerespawn
             if (QuantumUtils.Decrement(ref mario->PreRespawnFrames)) {
                 mario->PreRespawn(f, entity, stage);
-                f.Events.StartCameraFadeIn(f, entity);
+                f.Events.StartCameraFadeIn(entity);
                 return true;
 
             } else if (mario->PreRespawnFrames == 20) {
-                f.Events.StartCameraFadeOut(f, entity);
+                f.Events.StartCameraFadeOut(entity);
                 return true;
             }
 

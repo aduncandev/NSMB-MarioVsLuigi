@@ -1,17 +1,17 @@
-component BulletBill {
+table component BulletBill {
 	FP Speed;
 	FP DespawnRadius;
 	[ExcludeFromPrototype] byte DespawnFrames;
 	[ExcludeFromPrototype] EntityRef Owner;
 }
 
-component BulletBillLauncher {
+table component BulletBillLauncher {
 	AssetRef<EntityPrototype> BulletBillPrototype;
 	ushort TimeToShoot;
 	FP MinimumShootRadius;
 	FP MaximumShootRadius;
-	byte BulletBillCount;
-	ushort TimeToShootFrames;
+	[ExcludeFromPrototype] byte BulletBillCount;
+	[ExcludeFromPrototype] ushort TimeToShootFrames;
 }
 
 event BulletBillHitByProjectile {

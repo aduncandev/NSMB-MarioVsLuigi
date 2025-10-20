@@ -1,4 +1,4 @@
-component Powerup {
+table component Powerup {
 	bool FacingRight;
 
 	FPVector2 AnimationCurveOrigin;

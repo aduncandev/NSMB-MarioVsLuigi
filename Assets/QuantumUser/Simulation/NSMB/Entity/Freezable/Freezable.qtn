@@ -1,4 +1,4 @@
-component Freezable {
+table component Freezable {
 	FPVector2 IceBlockSize;
 	byte AutoBreakFrames;
 	byte AutoBreakGrabAdditionalFrames;

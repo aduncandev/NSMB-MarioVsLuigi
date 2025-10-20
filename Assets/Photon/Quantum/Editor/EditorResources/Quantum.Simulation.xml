@@ -1402,7 +1402,7 @@
             <param name="endFrame">End frame</param>
             <param name="frames">Resulting frames</param>
         </member>
-        <member name="M:Quantum.QuantumGame.CreateSavegame(System.Boolean)">
+        <member name="M:Quantum.QuantumGame.GetSnapshotFile(System.Boolean)">
             <summary>
             Create a <see cref="T:Quantum.QuantumReplayFile"/> file that represents a save game.
             </summary>
@@ -2524,7 +2524,8 @@
         </member>
         <member name="F:Quantum.SessionRunner.Arguments.RunnerId">
             <summary>
-            Optionally name the runner to access it from by id. This is useful when multiple runners are active on the client (for example an instant replay).
+            Optionally name the runner to access it from by id. By default the GameMode is used the runner id.
+            Setting a custom runner id is useful when multiple runners are active on the client.
             </summary>
         </member>
         <member name="F:Quantum.SessionRunner.Arguments.PlayerCount">
@@ -2582,11 +2583,6 @@
             When enabled QuantumGame.GetRecordedReplay can be used access the replay data.
             </summary>
         </member>
-        <member name="M:Quantum.SessionRunner.Arguments.CreateDefault">
-            <summary>
-            Initializes struct with default values.
-            </summary>
-        </member>
         <member name="P:Quantum.SessionRunner.Arguments.ResourceManager">
             <summary>
             Optionally override the resource manager for example from deserialized Quantum assets (as showcased in QuantumRunnerLocalReplay).
@@ -2634,6 +2630,11 @@
         <member name="P:Quantum.SessionRunner.Arguments.TaskRunner">
             <summary>
             The Quantum internal task runner.
+            </summary>
+        </member>
+        <member name="M:Quantum.SessionRunner.Arguments.CreateDefault">
+            <summary>
+            Initializes struct with default values.
             </summary>
         </member>
         <member name="M:Quantum.SessionRunner.Arguments.Validate">
@@ -3097,6 +3098,15 @@
             <param name="stream">Stream</param>
             <param name="frame">Frame to fast forward to</param>
         </member>
+        <member name="M:Quantum.StreamReplayInputProvider.Clone(System.Int32,System.Int32)">
+            <summary>
+            Clone a part of the input provider, copying internal buffers.
+            Is not implemented for this stream.
+            </summary>
+            <param name="startFrame">The frame to start from</param>
+            <param name="endFrame">The last frame this input provider can produce input for.</param>
+            <returns>New input provider of the same type.</returns>
+        </member>
         <member name="T:Quantum.DotNetRunnerFactory">
             <summary>
             Platform dependent information and factory methods for the <see cref="T:Quantum.SessionRunner"/>.
@@ -3104,7 +3114,7 @@
             standalone Quantum applications and on the Quantum server plugin.
             </summary>
         </member>
-        <member name="P:Quantum.DotNetRunnerFactory.CreatePlaformInfo">
+        <member name="P:Quantum.DotNetRunnerFactory.CreatePlatformInfo">
             <summary>
             Gather the platform information.
             </summary>
@@ -3126,19 +3136,13 @@
             <param name="startParameters">Start parameters</param>
             <returns>Instance of IDeterministicGame</returns>
         </member>
-        <member name="M:Quantum.DotNetRunnerFactory.CreateRunner(Quantum.SessionRunner.Arguments)">
+        <member name="M:Quantum.DotNetRunnerFactory.CreateRunner(Quantum.SessionRunner.Arguments,System.String)">
             <summary>
             Instantiate a <see cref="T:Quantum.SessionRunner"/>.
             </summary>
             <param name="arguments">Session arguments</param>
+            <param name="defaultRunnerId">Optional default runner id.</param>
             <returns>A session runner</returns>
-        </member>
-        <member name="M:Quantum.DotNetRunnerFactory.CreatePlatformInfo">
-            <summary>
-            Static method to create platform info.
-            Initializes statics <see cref="F:Photon.Deterministic.Native.Utils"/> and <see cref="!:MemoryLayoutVerifier.Platform"/>.
-            </summary>
-            <returns>Platform information data</returns>
         </member>
         <member name="T:Quantum.SessionRunnerException">
             <summary>
@@ -3441,6 +3445,14 @@
             <summary>
             Unused.
             </summary>
+        </member>
+        <member name="M:Quantum.BitStreamReplayInputProvider.Clone(System.Int32,System.Int32)">
+            <summary>
+            Clone a part of the input provider, copying internal buffers.
+            </summary>
+            <param name="startFrame">The frame to start from</param>
+            <param name="endFrame">The last frame this input provider can produce input for.</param>
+            <returns>New input provider of the same type.</returns>
         </member>
         <member name="T:Quantum.CallbackId">
             <summary>
@@ -4923,7 +4935,7 @@
             The interface for the runner factory. It creates platform specific objects to run the Quantum simulation.
             </summary>
         </member>
-        <member name="P:Quantum.IRunnerFactory.CreatePlaformInfo">
+        <member name="P:Quantum.IRunnerFactory.CreatePlatformInfo">
             <summary>
             Gather the platform information.
             There is a spelling mistake in the method name, but it's considered a bigger annoyance to change the interface.
@@ -4946,12 +4958,13 @@
             The action to when an update to the AssetDB is required.
             </summary>
         </member>
-        <member name="M:Quantum.IRunnerFactory.CreateRunner(Quantum.SessionRunner.Arguments)">
+        <member name="M:Quantum.IRunnerFactory.CreateRunner(Quantum.SessionRunner.Arguments,System.String)">
             <summary>
             Create an object that the SessionRunner is running on.
             For Unity it is wrapped in a MonoBehaviour.
             </summary>
             <param name="arguments">Session arguments</param>
+            <param name="defaultRunnerId">Optionally a default runner name</param>
             <returns>A session runner</returns>
         </member>
         <member name="T:Quantum.SystemSignalsOnly">

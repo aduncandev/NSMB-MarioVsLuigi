@@ -8,7 +8,14 @@ namespace Quantum.Editor {
   using UnityEngine.Profiling;
   using UnityEngine.Serialization;
   using Debug = UnityEngine.Debug;
+  using Object = UnityEngine.Object;
 
+#if UNITY_6000_3_OR_NEWER
+  using InstanceIdType = UnityEngine.EntityId;
+#else 
+  using InstanceIdType = System.Int32;
+#endif
+  
   [ScriptedImporter(6, Extension, importQueueOffset: 200000)]
   internal unsafe partial class QuantumUnityDBImporter : ScriptedImporter {
     public const  string Extension              = "qunitydb";
@@ -54,9 +61,9 @@ namespace Quantum.Editor {
 
       {
         Profiler.BeginSample("Iterating Assets");
-        foreach (HierarchyProperty it in QuantumUnityDBUtilities.IterateAssets(rootFolder)) {
+        foreach (var it in QuantumUnityDBUtilities.IterateAssets(rootFolder)) {
           try {
-            var source = CreateAssetSource(factory, it.instanceID, it.name, it.isMainRepresentation);
+            var source = CreateAssetSource(factory, it.GetObjectId(), it.name, it.isMainRepresentation);
             if (source != default) {
               sources.Add(source);
             }
@@ -115,7 +122,7 @@ namespace Quantum.Editor {
       ctx.SetMainObject(db);
     }
 
-    private (IQuantumAssetObjectSource, AssetGuid, string) CreateAssetSource(QuantumAssetSourceFactory factory, int instanceID, string unityAssetName, bool isMain) {
+    private (IQuantumAssetObjectSource, AssetGuid, string) CreateAssetSource(QuantumAssetSourceFactory factory, InstanceIdType instanceID, string unityAssetName, bool isMain) {
       
       var (unityAssetGuid, fileId) = AssetDatabaseUtils.GetGUIDAndLocalFileIdentifierOrThrow(instanceID);
       
@@ -129,7 +136,7 @@ namespace Quantum.Editor {
       IQuantumAssetObjectSource source = factory.TryCreateAssetObjectSource(context);
 
       if (source == null) {
-        QuantumEditorLog.ErrorImport($"No source found for asset {unityAssetName} ({unityAssetGuid})", EditorUtility.InstanceIDToObject(instanceID));
+        QuantumEditorLog.ErrorImport($"No source found for asset {unityAssetName} ({unityAssetGuid})", new LazyLoadReference<Object>(instanceID).asset);
         return default;
       }
 
@@ -151,7 +158,7 @@ namespace Quantum.Editor {
         }
 
         // any changes to asset's guid affects the hash
-        var assetGuid = QuantumUnityDBUtilities.GetExpectedAssetGuid(it.instanceID, out _);
+        var assetGuid = QuantumUnityDBUtilities.GetExpectedAssetGuid(it.GetObjectId(), out _);
         hash.Append(assetGuid);
       }
 

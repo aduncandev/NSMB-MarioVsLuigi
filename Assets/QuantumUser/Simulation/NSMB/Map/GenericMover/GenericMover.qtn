@@ -1,4 +1,4 @@
-component GenericMover {
+table component GenericMover {
 	AssetRef<GenericMoverAsset> MoverAsset;
 	FP StartOffset;
 }

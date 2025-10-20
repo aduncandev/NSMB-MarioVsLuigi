@@ -33,7 +33,7 @@ enum JumpState : Byte {
     TripleJump,
 }
 
-component MarioPlayer {
+table component MarioPlayer {
 	AssetRef<MarioPlayerPhysicsInfo> PhysicsAsset;
 	AssetRef<CharacterAsset> CharacterAsset;
 

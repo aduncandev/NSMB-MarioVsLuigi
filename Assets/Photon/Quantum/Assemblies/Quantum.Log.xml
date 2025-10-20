@@ -379,12 +379,6 @@
             </summary>
             <param name="msg">A message</param>
         </member>
-        <member name="M:Quantum.QuantumEditorLog.SetPrefixColor(UnityEngine.Color)">
-            <summary>
-            Sets the color of the prefix.
-            </summary>
-            <param name="color"></param>
-        </member>
         <member name="M:Quantum.QuantumEditorLog.SetPrefixColor(UnityEngine.Color32)">
             <summary>
             Sets the color of the prefix.

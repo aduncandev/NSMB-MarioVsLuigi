@@ -1,6 +1,6 @@
 import enum LiquidType(byte);
 
-component Liquid {
+table component Liquid {
 	LiquidType LiquidType;
 	int WidthTiles;
 	FP HeightTiles;

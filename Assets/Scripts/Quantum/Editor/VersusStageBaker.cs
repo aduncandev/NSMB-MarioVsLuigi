@@ -116,7 +116,15 @@ namespace NSMB.Quantum {
                 enemy.Prototype.Spawnpoint = enemy.transform.position.ToFPVector2();
                 EditorUtility.SetDirty(enemy);
             }
-            LogInfo($"Baked {enemies.Length} enemies");
+            LogInfo($"Baked {enemies.Length} enemy(s)");
+
+            // --- Bake Donut Blocks(' spawnpoints)
+            QPrototypeDonutBlock[] donutBlocks = GameObject.FindObjectsByType<QPrototypeDonutBlock>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (var donutBlock in donutBlocks) {
+                donutBlock.Prototype.Origin = donutBlock.transform.position.ToFPVector2();
+            }
+            LogInfo($"Baked {donutBlocks.Length} donut block(s)");
+
 
             /*
             // --- Bake Breakable Objects

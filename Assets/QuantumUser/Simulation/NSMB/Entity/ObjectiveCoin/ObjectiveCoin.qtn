@@ -1,4 +1,4 @@
-component ObjectiveCoin {
+table component ObjectiveCoin {
 	[ExcludeFromPrototype] byte UncollectableByTeam;
 	[ExcludeFromPrototype] bool SpawnedViaSelfDamage;
 }

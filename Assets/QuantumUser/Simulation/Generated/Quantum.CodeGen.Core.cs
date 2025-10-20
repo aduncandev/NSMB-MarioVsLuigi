@@ -1726,8 +1726,10 @@ namespace Quantum {
     [FieldOffset(16)]
     public FP MaximumShootRadius;
     [FieldOffset(0)]
+    [ExcludeFromPrototype()]
     public Byte BulletBillCount;
     [FieldOffset(4)]
+    [ExcludeFromPrototype()]
     public UInt16 TimeToShootFrames;
     public override readonly Int32 GetHashCode() {
       unchecked { 
@@ -1941,6 +1943,51 @@ namespace Quantum {
         var p = (Cullable*)ptr;
         FP.Serialize(&p->BroadRadius, serializer);
         FPVector2.Serialize(&p->Offset, serializer);
+    }
+  }
+  [StructLayout(LayoutKind.Explicit)]
+  public unsafe partial struct DonutBlock : Quantum.IComponent {
+    public const Int32 SIZE = 40;
+    public const Int32 ALIGNMENT = 8;
+    [FieldOffset(0)]
+    public UInt16 FramesUntilFall;
+    [FieldOffset(2)]
+    public UInt16 FramesUntilRespawn;
+    [FieldOffset(16)]
+    public FP FallSpeed;
+    [FieldOffset(24)]
+    public FPVector2 Origin;
+    [FieldOffset(8)]
+    [ExcludeFromPrototype()]
+    public QBoolean HasMario;
+    [FieldOffset(12)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsFalling;
+    [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    public UInt16 Timer;
+    public override readonly Int32 GetHashCode() {
+      unchecked { 
+        var hash = 3319;
+        hash = hash * 31 + FramesUntilFall.GetHashCode();
+        hash = hash * 31 + FramesUntilRespawn.GetHashCode();
+        hash = hash * 31 + FallSpeed.GetHashCode();
+        hash = hash * 31 + Origin.GetHashCode();
+        hash = hash * 31 + HasMario.GetHashCode();
+        hash = hash * 31 + IsFalling.GetHashCode();
+        hash = hash * 31 + Timer.GetHashCode();
+        return hash;
+      }
+    }
+    public static void Serialize(void* ptr, FrameSerializer serializer) {
+        var p = (DonutBlock*)ptr;
+        serializer.Stream.Serialize(&p->FramesUntilFall);
+        serializer.Stream.Serialize(&p->FramesUntilRespawn);
+        serializer.Stream.Serialize(&p->Timer);
+        QBoolean.Serialize(&p->HasMario, serializer);
+        QBoolean.Serialize(&p->IsFalling, serializer);
+        FP.Serialize(&p->FallSpeed, serializer);
+        FPVector2.Serialize(&p->Origin, serializer);
     }
   }
   [StructLayout(LayoutKind.Explicit)]
@@ -3841,6 +3888,8 @@ namespace Quantum {
       BuildSignalsArrayOnComponentRemoved<Quantum.ComboKeeper>();
       BuildSignalsArrayOnComponentAdded<Quantum.Cullable>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Cullable>();
+      BuildSignalsArrayOnComponentAdded<Quantum.DonutBlock>();
+      BuildSignalsArrayOnComponentRemoved<Quantum.DonutBlock>();
       BuildSignalsArrayOnComponentAdded<Quantum.Enemy>();
       BuildSignalsArrayOnComponentRemoved<Quantum.Enemy>();
       BuildSignalsArrayOnComponentAdded<Quantum.EnterablePipe>();
@@ -4316,6 +4365,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum.Cullable), Quantum.Cullable.SIZE);
       typeRegistry.Register(typeof(DistanceJoint), DistanceJoint.SIZE);
       typeRegistry.Register(typeof(DistanceJoint3D), DistanceJoint3D.SIZE);
+      typeRegistry.Register(typeof(Quantum.DonutBlock), Quantum.DonutBlock.SIZE);
       typeRegistry.Register(typeof(Quantum.Enemy), Quantum.Enemy.SIZE);
       typeRegistry.Register(typeof(Quantum.EnterablePipe), Quantum.EnterablePipe.SIZE);
       typeRegistry.Register(typeof(EntityPrototypeRef), EntityPrototypeRef.SIZE);
@@ -4430,46 +4480,47 @@ namespace Quantum {
       typeRegistry.Register(typeof(Quantum._globals_), Quantum._globals_.SIZE);
     }
     static partial void InitComponentTypeIdGen(Int32 extraComponentCount) {
-      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 38 + extraComponentCount);
+      ComponentTypeId.Reset(ComponentTypeId.BuiltInComponentCount + 39 + extraComponentCount);
       ComponentTypeId.RegisterBuiltInComponents();
       ComponentTypeId.RegisterComponent<Quantum.BetterPhysicsObject>(20, Quantum.BetterPhysicsObject.Serialize, Quantum.BetterPhysicsObject.OnAdded, Quantum.BetterPhysicsObject.OnRemoved, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.BigStar>(21, Quantum.BigStar.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.BlockBump>(22, Quantum.BlockBump.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Bobomb>(23, Quantum.Bobomb.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Boo>(24, Quantum.Boo.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.BreakableObject>(25, Quantum.BreakableObject.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.BulletBill>(26, Quantum.BulletBill.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.BulletBillLauncher>(27, Quantum.BulletBillLauncher.Serialize, null, null, ComponentFlags.None);
+      ComponentTypeId.RegisterComponent<Quantum.BigStar>(21, Quantum.BigStar.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.BlockBump>(22, Quantum.BlockBump.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Bobomb>(23, Quantum.Bobomb.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Boo>(24, Quantum.Boo.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.BreakableObject>(25, Quantum.BreakableObject.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.BulletBill>(26, Quantum.BulletBill.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.BulletBillLauncher>(27, Quantum.BulletBillLauncher.Serialize, null, null, ComponentFlags.Table);
       ComponentTypeId.RegisterComponent<Quantum.CameraController>(28, Quantum.CameraController.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Coin>(29, Quantum.Coin.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.CoinItem>(30, Quantum.CoinItem.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.ComboKeeper>(31, Quantum.ComboKeeper.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Cullable>(32, Quantum.Cullable.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Enemy>(33, Quantum.Enemy.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.EnterablePipe>(34, Quantum.EnterablePipe.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Freezable>(35, Quantum.Freezable.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.GenericMover>(36, Quantum.GenericMover.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.GoldBlock>(37, Quantum.GoldBlock.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Goomba>(38, Quantum.Goomba.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Holdable>(39, Quantum.Holdable.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.IceBlock>(40, Quantum.IceBlock.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Interactable>(41, Quantum.Interactable.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.InteractionInitiator>(42, Quantum.InteractionInitiator.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.InvisibleBlock>(43, Quantum.InvisibleBlock.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Koopa>(44, Quantum.Koopa.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Liquid>(45, Quantum.Liquid.Serialize, Quantum.Liquid.OnAdded, Quantum.Liquid.OnRemoved, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.MarioBrosPlatform>(46, Quantum.MarioBrosPlatform.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.MarioPlayer>(47, Quantum.MarioPlayer.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.MovingPlatform>(48, Quantum.MovingPlatform.Serialize, Quantum.MovingPlatform.OnAdded, Quantum.MovingPlatform.OnRemoved, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.ObjectiveCoin>(49, Quantum.ObjectiveCoin.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.PhysicsObject>(50, Quantum.PhysicsObject.Serialize, Quantum.PhysicsObject.OnAdded, Quantum.PhysicsObject.OnRemoved, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.PiranhaPlant>(51, Quantum.PiranhaPlant.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.PlayerData>(52, Quantum.PlayerData.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Powerup>(53, Quantum.Powerup.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Projectile>(54, Quantum.Projectile.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.Spinner>(55, Quantum.Spinner.Serialize, Quantum.Spinner.OnAdded, Quantum.Spinner.OnRemoved, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.StarCoin>(56, Quantum.StarCoin.Serialize, null, null, ComponentFlags.None);
-      ComponentTypeId.RegisterComponent<Quantum.WrappingObject>(57, Quantum.WrappingObject.Serialize, null, null, ComponentFlags.None);
+      ComponentTypeId.RegisterComponent<Quantum.Coin>(29, Quantum.Coin.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.CoinItem>(30, Quantum.CoinItem.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.ComboKeeper>(31, Quantum.ComboKeeper.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Cullable>(32, Quantum.Cullable.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.DonutBlock>(33, Quantum.DonutBlock.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Enemy>(34, Quantum.Enemy.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.EnterablePipe>(35, Quantum.EnterablePipe.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Freezable>(36, Quantum.Freezable.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.GenericMover>(37, Quantum.GenericMover.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.GoldBlock>(38, Quantum.GoldBlock.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Goomba>(39, Quantum.Goomba.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Holdable>(40, Quantum.Holdable.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.IceBlock>(41, Quantum.IceBlock.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Interactable>(42, Quantum.Interactable.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.InteractionInitiator>(43, Quantum.InteractionInitiator.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.InvisibleBlock>(44, Quantum.InvisibleBlock.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Koopa>(45, Quantum.Koopa.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Liquid>(46, Quantum.Liquid.Serialize, Quantum.Liquid.OnAdded, Quantum.Liquid.OnRemoved, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.MarioBrosPlatform>(47, Quantum.MarioBrosPlatform.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.MarioPlayer>(48, Quantum.MarioPlayer.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.MovingPlatform>(49, Quantum.MovingPlatform.Serialize, Quantum.MovingPlatform.OnAdded, Quantum.MovingPlatform.OnRemoved, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.ObjectiveCoin>(50, Quantum.ObjectiveCoin.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.PhysicsObject>(51, Quantum.PhysicsObject.Serialize, Quantum.PhysicsObject.OnAdded, Quantum.PhysicsObject.OnRemoved, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.PiranhaPlant>(52, Quantum.PiranhaPlant.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.PlayerData>(53, Quantum.PlayerData.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Powerup>(54, Quantum.Powerup.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Projectile>(55, Quantum.Projectile.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.Spinner>(56, Quantum.Spinner.Serialize, Quantum.Spinner.OnAdded, Quantum.Spinner.OnRemoved, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.StarCoin>(57, Quantum.StarCoin.Serialize, null, null, ComponentFlags.Table);
+      ComponentTypeId.RegisterComponent<Quantum.WrappingObject>(58, Quantum.WrappingObject.Serialize, null, null, ComponentFlags.Table);
     }
     [Preserve()]
     public static void EnsureNotStrippedGen() {

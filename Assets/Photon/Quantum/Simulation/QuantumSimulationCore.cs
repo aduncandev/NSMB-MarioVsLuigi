@@ -919,7 +919,7 @@ namespace Quantum {
       }
 
       using (var outputStream = allocOutput ? new MemoryStream() : new MemoryStream(buffer, offset, buffer.Length - offset)) {
-        using (var compressedOutput = ByteUtils.CreateGZipCompressStream(outputStream)) {
+        using (var compressedOutput = Compression.CreateCompressingStream(outputStream)) {
           compressedOutput.Write(buffer, 0, offset);
           compressedOutput.Write(assetDBHeader, 0, assetDBHeader.Length);
           compressedOutput.Write(assetDBData, 0, assetDBData.Length);
@@ -935,7 +935,7 @@ namespace Quantum {
     }
 
     public override void Deserialize(Byte[] data) {
-      var blocks = ByteUtils.ReadByteBlocks(ByteUtils.GZipDecompressBytes(data)).ToArray();
+      var blocks = ByteUtils.ReadByteBlocks(Compression.DecompressBytes(data)).ToArray();
 
       var mode = (DeterministicFrameSerializeMode)BitConverter.ToInt32(blocks[0], 0);
 
@@ -4299,9 +4299,9 @@ namespace Quantum {
     /// </summary>
     /// <param name="includeDb">Include the AssetDb</param>
     /// <returns>Replay file to be stored</returns>
-    public QuantumReplayFile CreateSavegame(bool includeDb = false) {
+    public QuantumReplayFile GetSnapshotFile(bool includeDb = false) {
       if (Frames.Verified == null) {
-        Log.Error("Cannot create a savegame. Frames verified not found.");
+        Log.Error("Cannot create a snapshot file. Frames verified not found.");
         return null;
       }
 
@@ -4323,6 +4323,9 @@ namespace Quantum {
       return result;
     }
 
+    [Obsolete("Use GetSnapshotFile()")]
+    public QuantumReplayFile CreateSavegame(bool includeDb = false) => GetSnapshotFile(includeDb);
+
     /// <summary>
     /// Creates a replay file that represents a recorded replay of the complete simulation.
     /// Requires the <see cref="RecordingFlags"/> to be set accordingly.
@@ -4334,7 +4337,7 @@ namespace Quantum {
     /// <param name="customInputSerializer">A custom input serialized</param>
     /// <returns>Replay file to store</returns>
     public QuantumReplayFile GetRecordedReplay(
-      bool includeChecksums = false, 
+      bool includeChecksums = false,
       bool includeDb = false,
       QuantumJsonFriendlyDataBlob.Encoder customAssetDbSerializer = null,
       QuantumJsonFriendlyDataBlob.Encoder customRuntimeConfigSerializer = null,
@@ -4359,15 +4362,14 @@ namespace Quantum {
         }
       }
 
-      var verifiedFrame = Frames.Verified.Number;
       var runtimeConfigBytes = AssetSerializer.ConfigToByteArray(Frames.Verified.RuntimeConfig, compress: true);
 
       var result = new QuantumReplayFile {
         DeterministicConfig = Frames.Verified.SessionConfig,
         RuntimeConfigData = customRuntimeConfigSerializer?.Invoke(runtimeConfigBytes) ?? QuantumJsonFriendlyDataBlob.Encode(runtimeConfigBytes, isCompressed: false, asBase64String: true),
         InputHistoryDeltaCompressed = customInputSerializer?.Invoke(inputHistoryRaw) ?? QuantumJsonFriendlyDataBlob.Encode(inputHistoryRaw, isCompressed: true, asBase64String: true),
-        InputHistoryLegacy = RecordedInputs?.ExportToList(verifiedFrame),
-        LastTick = verifiedFrame,
+        InputHistoryLegacy = RecordedInputs?.ExportToList(Frames.Verified.Number),
+        LastTick = Frames.Verified.Number,
         InitialTick = Session.InitialTick,
         InitialFrameData = Session.InitialFrameData,
         Checksums = includeChecksums ? RecordedChecksums.Clone() : null,
@@ -5148,7 +5150,7 @@ namespace Quantum {
               byte[] actualData = FrameData;
               bool wasCompressed = false;
               try {
-                actualData = ByteUtils.GZipDecompressBytes(FrameData);
+                actualData = Compression.DecompressBytes(FrameData);
                 wasCompressed = true;
               } catch { }
 
@@ -6073,6 +6075,7 @@ namespace Quantum {
 
 namespace Quantum {
   using Photon.Deterministic;
+  using System;
 
   /// <summary>
   /// This implementation of <see cref="IDeterministicStreamReplayInputProvider"/> 
@@ -6162,6 +6165,56 @@ namespace Quantum {
     public QTuple<byte[], bool> GetRpc(int frame, int player) {
       // unused
       return new QTuple<byte[], bool>();
+    }
+
+    /// <summary>
+    /// Clone a part of the input provider, copying internal buffers.
+    /// </summary>
+    /// <param name="startFrame">The frame to start from</param>
+    /// <param name="endFrame">The last frame this input provider can produce input for.</param>
+    /// <returns>New input provider of the same type.</returns>
+    public IDeterministicStreamReplayInputProvider Clone(int startFrame, int endFrame) {
+      Assert.Always(startFrame < endFrame, "Start frame {0} must be larger then endFrame {1}", startFrame, endFrame);
+
+      var currentPosition = _inputStream.Position;
+      var startPosition = -1;
+      var endPosition = -1;
+      var firstRead = true;
+
+      _inputStream.Position = 0;
+
+      while (_inputStream.CanRead() && (startPosition < 0 || endPosition < 0)) {
+        int dataLength = _inputStream.ReadInt();
+        int recordedFrame = _inputStream.ReadInt();
+
+        if (firstRead) {
+          firstRead = false;
+          Assert.Always(startFrame >= recordedFrame, "Start frame {0} too small, must be larger or equal to {1}", startFrame, recordedFrame);
+        }
+
+        if (recordedFrame == startFrame) {
+          startPosition = _inputStream.Position - 8 * 8;
+        }
+
+        _inputStream.Position += (dataLength - 4) * 8;
+
+        if (recordedFrame == endFrame) {
+          endPosition = _inputStream.Position;
+        }
+      }
+
+      Assert.Always(startPosition >= 0, "Start position not found for frame {0}", startFrame);
+      Assert.Always(endPosition >= 0, "End position not found for frame {0}", endFrame);
+      Assert.Always(startPosition % 8 == 0, "Start position {0} expected to be byte aligned", startPosition);
+      Assert.Always(endPosition % 8 == 0, "End position {0} expected to be byte aligned", endPosition);
+
+      _inputStream.Position = currentPosition;
+
+      var length = (endPosition - startPosition) / 8;
+      var bytes = new byte[length];
+      Array.Copy(_inputStream.Data, startPosition / 8, bytes, 0, length);
+      var inputStream = new BitStream(bytes);
+      return new BitStreamReplayInputProvider(inputStream, endFrame, LocalActorNumber);
     }
   }
 }
@@ -6820,7 +6873,7 @@ namespace Quantum {
       }
 
       if (bytes?.Length > 0) {
-        return IsCompressed ? ByteUtils.GZipDecompressBytes(bytes) : bytes;
+        return IsCompressed ? Compression.DecompressBytes(bytes) : bytes;
       }
 
       return null;
@@ -6840,7 +6893,7 @@ namespace Quantum {
 
       var bytes = data;
       if (isCompressed) {
-        bytes = ByteUtils.GZipCompressBytes(data);
+        bytes = Compression.CompressBytes(data);
       }
 
       return new QuantumJsonFriendlyDataBlob {
@@ -7335,6 +7388,17 @@ namespace Quantum {
         }
       }
     }
+
+    /// <summary>
+    /// Clone a part of the input provider, copying internal buffers.
+    /// Is not implemented for this stream.
+    /// </summary>
+    /// <param name="startFrame">The frame to start from</param>
+    /// <param name="endFrame">The last frame this input provider can produce input for.</param>
+    /// <returns>New input provider of the same type.</returns>
+    public IDeterministicStreamReplayInputProvider Clone(int startFrame, int endFrame) {
+      throw new NotImplementedException();
+    }
   }
 }
 
@@ -7413,7 +7477,7 @@ namespace Quantum {
     /// <summary>
     /// Gather the platform information.
     /// </summary>
-    public virtual DeterministicPlatformInfo CreatePlaformInfo => CreatePlatformInfo();
+    public virtual DeterministicPlatformInfo CreatePlatformInfo => DotNetHardwareInfoCollector.CreatePlatformInfo();
     /// <summary>
     /// Create a Quantum task factory.
     /// </summary>
@@ -7432,17 +7496,9 @@ namespace Quantum {
     /// Instantiate a <see cref="SessionRunner"/>.
     /// </summary>
     /// <param name="arguments">Session arguments</param>
+    /// <param name="defaultRunnerId">Optional default runner id.</param>
     /// <returns>A session runner</returns>
-    public virtual SessionRunner CreateRunner(SessionRunner.Arguments arguments) => new SessionRunner();
-
-    /// <summary>
-    /// Static method to create platform info.
-    /// Initializes statics <see cref="Native.Utils"/> and <see cref="MemoryLayoutVerifier.Platform"/>.
-    /// </summary>
-    /// <returns>Platform information data</returns>
-    public static DeterministicPlatformInfo CreatePlatformInfo() {
-      return DotNetHardwareInfoCollector.CreatePlatformInfo();
-    }
+    public virtual SessionRunner CreateRunner(SessionRunner.Arguments arguments, string defaultRunnerId) => new SessionRunner();
   }
 }
 
@@ -7780,7 +7836,7 @@ namespace Quantum {
     /// Gather the platform information.
     /// There is a spelling mistake in the method name, but it's considered a bigger annoyance to change the interface.
     /// </summary>
-    DeterministicPlatformInfo CreatePlaformInfo { get; }
+    DeterministicPlatformInfo CreatePlatformInfo { get; }
     /// <summary>
     /// Create a Quantum task factory.
     /// </summary>
@@ -7800,8 +7856,9 @@ namespace Quantum {
     /// For Unity it is wrapped in a MonoBehaviour.
     /// </summary>
     /// <param name="arguments">Session arguments</param>
+    /// <param name="defaultRunnerId">Optionally a default runner name</param>
     /// <returns>A session runner</returns>
-    SessionRunner CreateRunner(SessionRunner.Arguments arguments);
+    SessionRunner CreateRunner(SessionRunner.Arguments arguments, string defaultRunnerId);
   }
 }
 
@@ -7865,7 +7922,8 @@ namespace Quantum {
       /// </summary>
       public Byte[] FrameData;
       /// <summary>
-      /// Optionally name the runner to access it from by id. This is useful when multiple runners are active on the client (for example an instant replay).
+      /// Optionally name the runner to access it from by id. By default the GameMode is used the runner id.
+      /// Setting a custom runner id is useful when multiple runners are active on the client.
       /// </summary>
       public string RunnerId;
       /// <summary>
@@ -7914,13 +7972,6 @@ namespace Quantum {
       /// When enabled QuantumGame.GetRecordedReplay can be used access the replay data.
       /// </summary>
       public RecordingFlags RecordingFlags;
-
-      /// <summary>
-      /// Initializes struct with default values.
-      /// </summary>
-      public static Arguments CreateDefault() {
-        return new Arguments { RunnerId = "Default" };
-      }
 
       /// <summary>
       /// Optionally override the resource manager for example from deserialized Quantum assets (as showcased in QuantumRunnerLocalReplay).
@@ -7997,39 +8048,54 @@ namespace Quantum {
         get { return GameParameters.TaskRunner; }
         set { GameParameters.TaskRunner = value; }
       }
-      
+
+      /// <summary>
+      /// Initializes struct with default values.
+      /// </summary>
+      public static Arguments CreateDefault() => new Arguments { RunnerId = "Default" };
+
       /// <summary>
       ///  Validate, log warnings and throw exceptions on errors.
       /// </summary>
       /// <exception cref="SessionRunnerException">Communicator object invalid.</exception>
       public void Validate() {
-        if (FrameData?.Length > 0 && (InitialDynamicAssets?.IsEmpty == false)) {
-          Log.Warn(
-            $"Both {nameof(Arguments.FrameData)} and {nameof(Arguments.InitialDynamicAssets)} are set " +
-            $"and not empty. Serialized frames already contain a copy of DynamicAssetDB and that copy will be used " +
-            $"instead of {nameof(Arguments.InitialDynamicAssets)}");
-        }
+        // Assertions
+
+        Assert.Always(RuntimeConfig != null, "SessionRunner.Arguments validation failed: RuntimeConfig not set");
+        Assert.Always(SessionConfig != null, "SessionRunner.Arguments validation failed: SessionConfig not set");
+        Assert.Always(SessionConfig.PlayerCount > 0 || PlayerCount > 0, "SessionRunner.Arguments validation failed: PlayerCount or SessionConfig.PlayerCount must be greater than 0");
+
+        Assert.Always(RunnerFactory != null, "SessionRunner.Arguments validation failed: RunnerFactory not set");
+        Assert.Always(TaskRunner != null, "SessionRunner.Arguments validation failed: TaskRunner not set");
+        Assert.Always(ResourceManager != null, "SessionRunner.Arguments validation failed: ResourceManager not set");
 
         switch (GameMode) {
           case DeterministicGameMode.Multiplayer:
-            if (Communicator == null) {
-              throw new SessionRunnerException($"Communicator required for game mode {GameMode}");
-            }
-            if (Communicator.IsConnected == false) {
-              throw new SessionRunnerException($"Communicator connection required for game mode {GameMode}");
-            }
+            Assert.Always(Communicator != null, "SessionRunner.Arguments validation failed: Multiplayer mode requires a valid Communicator");
+            Assert.Always(Communicator.IsConnected, "SessionRunner.Arguments validation failed: Multiplayer mode requires a connected Communicator");
+            break;
+
+          case DeterministicGameMode.Replay:
+            Assert.Always(ReplayProvider != null, "SessionRunner.Arguments validation failed: Replay mode requires a valid ReplayProvider");
             break;
         }
 
-        Assert.Always(RunnerFactory != null, "RunnerFactory not set");
-        Assert.Always(RuntimeConfig != null, "RuntimeConfig not set");
-        Assert.Always(SessionConfig != null, "SessionConfig not set");
-        Assert.Always(SessionConfig.PlayerCount > 0 || PlayerCount > 0, "Either PlayerCount or SessionConfig.PlayerCount must be greater than 0");
+        // Warnings
+
+        if (HeapExtraCount > 20) {
+          Log.Warn($"SessionRunner.Arguments validation: HeapExtraCount '{HeapExtraCount}' is unreasonably high");
+        }
+
+        if (FrameData?.Length > 0 && (InitialDynamicAssets?.IsEmpty == false)) {
+          Log.Warn(
+            $"SessionRunner.Arguments validation: Both {nameof(Arguments.FrameData)} and {nameof(Arguments.InitialDynamicAssets)} are set " +
+            $"and not empty. Serialized frames already contain a copy of DynamicAssetDB and that copy will be used " +
+            $"instead of {nameof(Arguments.InitialDynamicAssets)}");
+        }
       }
     }
   }
 }
-
 
 #endregion
 
@@ -8435,12 +8501,13 @@ namespace Quantum {
     /// <param name="arguments">Start arguments.</param>
     /// <returns>Initialized runner object.</returns>
     protected static SessionRunner CreateRunnerInternal(Arguments arguments) {
-      arguments.RunnerId ??= "Default";
-      var runner = arguments.RunnerFactory.CreateRunner(arguments);
+      var defaultRunnerId = arguments.GameMode.ToString();
+      
+      var runner = arguments.RunnerFactory.CreateRunner(arguments, defaultRunnerId);
 
       try {
         runner.State = SessionState.Starting;
-        runner.Id = arguments.RunnerId;
+        runner.Id = string.IsNullOrEmpty(arguments.RunnerId) ? defaultRunnerId : arguments.RunnerId;
         runner.Communicator = arguments.Communicator;
 
         runner._onShutdownCallback = arguments.ShutdownCallback;
@@ -8462,14 +8529,12 @@ namespace Quantum {
           deterministicConfig.PlayerCount = arguments.PlayerCount;
         }
 
-        var platformInfo = arguments.RunnerFactory.CreatePlaformInfo;
-
         var args = new DeterministicSessionArgs {
           FrameData = arguments.FrameData,
           Game = runner.DeterministicGame,
           InitialTick = arguments.InitialTick,
           Mode = arguments.GameMode,
-          PlatformInfo = platformInfo,
+          PlatformInfo = arguments.RunnerFactory.CreatePlatformInfo,
           SessionConfig = deterministicConfig,
           Replay = arguments.ReplayProvider,
           DisableInterpolatableStates = (arguments.GameFlags & QuantumGameFlags.DisableInterpolatableStates) == QuantumGameFlags.DisableInterpolatableStates
@@ -9053,30 +9118,22 @@ namespace Quantum {
     /// <param name="taskHandle">The initial task handle.</param>
     /// <returns>The system task graph.</returns>
     public TaskHandle OnSchedule(Frame f, TaskHandle taskHandle) {
-#if DEBUG
-      var profiler = f.Context.ProfilerContext.GetProfilerForTaskThread(0);
-      try {
-        profiler.Start(ProfilerName);
-#endif
-        
-        taskHandle = Schedule(f, taskHandle);
+      var profilerContext = f.Context.ProfilerContext;
+      using var scope = profilerContext.IsEnabled ? profilerContext.GetProfilerForTaskThread(0).Scope(ProfilerName) : default;
 
-        for (var i = 0; i < _children.Length; ++i) {
-          if (f.SystemIsEnabledSelf(_children[i])) {
-            try {
-              taskHandle = _children[i].OnSchedule(f, taskHandle);
-            } catch (Exception exn) {
-              Log.Exception(exn);
-            }
+      taskHandle = Schedule(f, taskHandle);
+
+      for (var i = 0; i < _children.Length; ++i) {
+        if (f.SystemIsEnabledSelf(_children[i])) {
+          try {
+            taskHandle = _children[i].OnSchedule(f, taskHandle);
+          } catch (Exception exn) {
+            Log.Exception(exn);
           }
         }
-
-        return taskHandle;
-#if DEBUG
-      } finally {
-        profiler.End();
       }
-#endif
+
+      return taskHandle;
     }
 
     /// <summary>

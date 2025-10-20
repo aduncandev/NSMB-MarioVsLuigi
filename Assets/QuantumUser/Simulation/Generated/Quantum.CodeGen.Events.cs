@@ -222,16 +222,14 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventStartCameraFadeOut StartCameraFadeOut(Frame Frame, EntityRef Entity) {
+      public EventStartCameraFadeOut StartCameraFadeOut(EntityRef Entity) {
         var ev = _f.Context.AcquireEvent<EventStartCameraFadeOut>(EventStartCameraFadeOut.ID);
-        ev.Frame = Frame;
         ev.Entity = Entity;
         _f.AddEvent(ev);
         return ev;
       }
-      public EventStartCameraFadeIn StartCameraFadeIn(Frame Frame, EntityRef Entity) {
+      public EventStartCameraFadeIn StartCameraFadeIn(EntityRef Entity) {
         var ev = _f.Context.AcquireEvent<EventStartCameraFadeIn>(EventStartCameraFadeIn.ID);
-        ev.Frame = Frame;
         ev.Entity = Entity;
         _f.AddEvent(ev);
         return ev;
@@ -1022,7 +1020,6 @@ namespace Quantum {
   }
   public unsafe partial class EventStartCameraFadeOut : EventBase {
     public new const Int32 ID = 11;
-    public Frame Frame;
     public EntityRef Entity;
     protected EventStartCameraFadeOut(Int32 id, EventFlags flags) : 
         base(id, flags) {
@@ -1048,7 +1045,6 @@ namespace Quantum {
   }
   public unsafe partial class EventStartCameraFadeIn : EventBase {
     public new const Int32 ID = 12;
-    public Frame Frame;
     public EntityRef Entity;
     protected EventStartCameraFadeIn(Int32 id, EventFlags flags) : 
         base(id, flags) {

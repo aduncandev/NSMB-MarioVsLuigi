@@ -4,6 +4,41 @@
 
 Disclaimer: The Quantum SDK 3.1.0 development snapshots are not intended to be used for live games.
 
+### Build 1870 (Oct 17, 2025)
+
+**What's New**
+
+- Added a NavMesh import option to load auto-generated navmesh links directly from the Unity navmesh, only works in Unity Editor
+- Added `QuantumRunnerExtensions` methods to simplify starting Quantum in different modes by providing specific Init()-methods to create `SessionRunner.Arguments`, see the usage inside the `QuantumRunnerLocalDebug.cs` script for example
+- Quantum instant replays now also work when being activated during a replay
+
+**Changes**
+
+- Renamed `QuantumGame.CreateSavegame()` to `GetSnapshotFile()`, retired the `QuantumRunnerLocalSavegame.cs` script and merged it's functionality with `QuantumRunnerLocalDebug.cs
+- Corrected a typo in `QuantumRunnerUnityFactory.CreatePlatformInfo` and changed the static method to a property
+- Removed the `StartWithFrame()` method from the `QuantumRunnerLocalDebug` class
+
+**Bug Fixes**
+
+- Fixed: A bug where multiple tasks dispatched from the same `SystemThreadedFilter` can visit the same entities. (The slice length was not being respected.)
+- Fixed: An issue that caused the navmesh agent to chose any navmesh link instead of the closest one when having mutliple links available that connects two triangles
+- Fixed: An issue that caused the `QuantumRunnerLocalDebug` script to not apply the `SimulationSpeedMultiplier` when using `EngineDeltaTime`
+
+### Build 1869 (Oct 16, 2025)
+
+**What's New**
+
+- `Quantum.Compression` - an abstract base class for compression algorithms. Comes with two implementations: `CompressionDotNet` (default) and `CompressionSharpLibZib` (enabled when `com.unity.sharp-zip-lib` package is present). Using the latter might help with "Runtime Speed with LTO" Web builds issues. Both implementations produce the same results and rely on `GZip` format
+
+**Changes**
+
+- `ByteUtils` compression methods made obsolete, use `Quantum.Compression` instead
+- `CollisionChecks` in Physics2D and Physics3D namespaces are now static classes
+
+**Bug Fixes**
+
+- Fixed: System task profiler entries not being recorded in non-development builds
+
 ### Build 1865 (Oct 15, 2025)
 
 **Bug Fixes**

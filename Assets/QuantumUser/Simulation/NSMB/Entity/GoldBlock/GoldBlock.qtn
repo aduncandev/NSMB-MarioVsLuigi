@@ -1,4 +1,4 @@
-component GoldBlock {
+table component GoldBlock {
 	EntityRef AttachedTo;
 	int ObjectiveCoinsRemaining;
 	byte Timer;

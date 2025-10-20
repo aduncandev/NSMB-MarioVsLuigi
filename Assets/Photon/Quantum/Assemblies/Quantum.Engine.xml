@@ -4587,7 +4587,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="value"
             >A pointer to data that should be copied as value to the component added.
@@ -4610,7 +4610,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="result">
             A pointer to the component added.
@@ -4633,7 +4633,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="value"
             >A pointer to data that should be copied as value to the component added.
@@ -4673,7 +4673,7 @@
             <param name="entity">Entity reference</param>
             <param name="componentIndex">
             The index of the component to be added.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to retrieve the index of a component type.
             </param>
             <param name="result">A pointer to the component added or already existing. <see langword="null"/> if the <paramref name="entity"/> does not exist.</param>
             <exception cref="T:System.IndexOutOfRangeException">If the <paramref name="componentIndex"/> does not identify a valid component.</exception>
@@ -4701,7 +4701,7 @@
             <param name="entity">Entity ref</param>
             <param name="componentIndex">
             The index of the component being set.
-            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to get the index of a component.
+            See also <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="P:Quantum.ComponentTypeId`1.Id"/> to get the index of a component.
             </param>
             <param name="value">
             A pointer to data that should be copied as value to the component.
@@ -9438,22 +9438,22 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="F:Quantum.ComponentTypeId`1.Id">
+        <member name="P:Quantum.ComponentTypeId`1.Id">
             <summary>
             Component type ID/index.
             </summary>
         </member>
-        <member name="F:Quantum.ComponentTypeId`1.Size">
+        <member name="P:Quantum.ComponentTypeId`1.Size">
             <summary>
             Component type size in bytes.
             </summary>
         </member>
-        <member name="F:Quantum.ComponentTypeId`1.Flags">
+        <member name="P:Quantum.ComponentTypeId`1.Flags">
             <summary>
             Component type flags.
             </summary>
         </member>
-        <member name="F:Quantum.ComponentTypeId`1.Callbacks">
+        <member name="P:Quantum.ComponentTypeId`1.Callbacks">
             <summary>
             Component type callbacks.
             </summary>
@@ -23196,6 +23196,11 @@
             <param name="frame">The frame.</param>
             <returns>The profiler for the frame.</returns>
         </member>
+        <member name="P:Quantum.Profiling.ProfilerContext.IsEnabled">
+            <summary>
+            Returns true if the task profiler is enabled.
+            </summary>
+        </member>
         <member name="T:Quantum.Profiling.ProfilerContextData">
             <summary>
             Represents the data collected by the profiler for all the threads for a single frame.
@@ -26354,6 +26359,60 @@
         <member name="P:Quantum.ColorRGBA.AsColor">
             <summary>
             Cast color into a UnityEngine.Color.
+            </summary>
+        </member>
+        <member name="T:Quantum.Compression">
+            <summary>
+            Provides compression and decompression functionality.
+            For non-Unity builds, uses <see cref="T:System.IO.Compression.GZipStream"/> implementation by default.
+            For Unity builds, the implementation is set from Unity. If com.unity.sharp-zip-lib package is installed, Sharp Zip Lib based implementation will be preferred. Otherwise, falls back to
+            the default implementation. Both implementations are compatible in their output, so clients/plugins can use either implementation.
+            Users can override the implementation at any time with <see cref="M:Quantum.Compression.Init(Quantum.Compression)"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Compression.Init(Quantum.Compression)">
+            <summary>
+            Sets the current implementation.
+            </summary>
+        </member>
+        <member name="M:Quantum.Compression.CompressBytes(System.Byte[])">
+            <summary>
+            Compresses a byte array.
+            </summary>
+        </member>
+        <member name="M:Quantum.Compression.CompressBytes(System.ArraySegment{System.Byte})">
+            <summary>
+            Compresses a byte array.
+            </summary>
+        </member>
+        <member name="M:Quantum.Compression.DecompressBytes(System.Byte[])">
+            <summary>
+            Decompresses a byte array.
+            </summary>
+        </member>
+        <member name="M:Quantum.Compression.DecompressBytes(System.ArraySegment{System.Byte})">
+            <summary>
+            Decompresses a byte array.
+            </summary>
+        </member>
+        <member name="M:Quantum.Compression.CompressString(System.String,System.Text.Encoding)">
+            <summary>
+            Compresses a string to a byte array with <paramref name="encoding"/> and then compresses the result.
+            </summary>
+        </member>
+        <member name="M:Quantum.Compression.DecompressString(System.Byte[],System.Text.Encoding)">
+            <summary>
+            Decompresses and converts a byte array to a string with <paramref name="encoding"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Compression.CreateCompressingStream(System.IO.Stream,System.Boolean)">
+            <summary>
+            Creates a stream that compresses input and writes it into <paramref name="stream"/>.
+            </summary>
+        </member>
+        <member name="M:Quantum.Compression.CreateDecompressionStream(System.IO.Stream,System.Boolean)">
+            <summary>
+            Creates a stream that decompresses output from <paramref name="stream"/>.
             </summary>
         </member>
         <member name="T:Quantum.Draw">
@@ -36372,7 +36431,7 @@
         </member>
         <member name="P:Photon.Deterministic.DeterministicPlatformInfo.TaskRunner">
             <summary>
-            The platform dependend Quantum task runner.
+            The platform depended Quantum task runner.
             </summary>
         </member>
         <member name="M:Photon.Deterministic.DeterministicPlatformInfo.ToString">
@@ -36960,6 +37019,11 @@
             <summary>
             When running replays, input comes from the provider/container.
             Replay input streams can com from file, memory, or a network stream (custom).
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.DeterministicSession.StreamReplayProvider">
+            <summary>
+            Access the wrapped StreamReplayProvider if available.
             </summary>
         </member>
         <member name="P:Photon.Deterministic.DeterministicSession.PlatformInfo">
@@ -38336,6 +38400,14 @@
             <summary>
             Resets the input provider when restarting a replay for example. The stream should be reset to the beginning.
             </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IDeterministicStreamReplayInputProvider.Clone(System.Int32,System.Int32)">
+            <summary>
+            Clone a part of the input provider, copying internal buffers.
+            </summary>
+            <param name="startFrame">The frame to start from</param>
+            <param name="endFrame">The last frame this input provider can produce input for.</param>
+            <returns>New input provider of the same type.</returns>
         </member>
         <member name="M:Photon.Deterministic.LocalInputProvider.GetRawInput(Photon.Deterministic.DeterministicFrame,System.Int32[]@)">
             <summary>

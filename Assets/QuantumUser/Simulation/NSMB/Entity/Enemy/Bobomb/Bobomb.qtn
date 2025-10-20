@@ -3,7 +3,7 @@
 #define _5_50 5.5
 #define _14_75 14.75
 
-component Bobomb {
+table component Bobomb {
 	FP ExplosionRadius;
 	FP Speed;
 	ushort DetonationFrames;

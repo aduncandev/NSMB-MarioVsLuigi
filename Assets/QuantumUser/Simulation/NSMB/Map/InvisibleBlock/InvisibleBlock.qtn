@@ -1,4 +1,4 @@
-component InvisibleBlock {
+table component InvisibleBlock {
 	AssetRef<StageTile> BumpTile;
 	AssetRef<StageTile> Tile;
 }

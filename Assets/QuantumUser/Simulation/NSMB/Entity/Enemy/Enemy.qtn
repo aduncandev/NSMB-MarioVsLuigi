@@ -1,4 +1,4 @@
-component Enemy {
+table component Enemy {
 	FPVector2 Spawnpoint;
 	bool IgnorePlayerWhenRespawning;
 	bool DisableRespawning;

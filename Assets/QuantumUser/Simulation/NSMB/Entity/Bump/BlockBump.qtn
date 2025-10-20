@@ -1,4 +1,4 @@
-component BlockBump {
+table component BlockBump {
 	byte Lifetime;
 	AssetRef<StageTile> StartTile;
 	StageTileInstance ResultTile;

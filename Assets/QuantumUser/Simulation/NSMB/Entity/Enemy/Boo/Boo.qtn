@@ -1,4 +1,4 @@
-component Boo {
+table component Boo {
 	FP MaxRange;
 	[ExcludeFromPrototype] EntityRef CurrentTarget;
 	[ExcludeFromPrototype] byte UnscaredFrames;

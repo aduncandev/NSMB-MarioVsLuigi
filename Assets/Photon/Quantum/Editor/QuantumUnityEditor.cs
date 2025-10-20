@@ -2300,50 +2300,16 @@ namespace Quantum.Editor {
   public class QuantumRunnerLocalReplayEditor : QuantumEditor {
 
     public override void OnInspectorGUI() {
-      base.PrepareOnInspectorGUI();
-
       var data = (QuantumRunnerLocalReplay)target;
-
       var oldReplayFile = data.ReplayFile;
 
-      if (DrawDefaultInspector() && oldReplayFile != data.ReplayFile) {
+      base.OnInspectorGUI();
+
+      if (oldReplayFile != data.ReplayFile) {
         data.DatabaseFile = null;
 
         if (data.ReplayFile != null && data.DatabaseFile == null) {
           var assetPath = AssetDatabase.GetAssetPath(data.ReplayFile);
-          var databaseFilepath = $"{Path.GetDirectoryName(assetPath)}/{Path.GetFileNameWithoutExtension(assetPath)}-DB{Path.GetExtension(assetPath)}";
-          data.DatabaseFile = AssetDatabase.LoadAssetAtPath<TextAsset>(databaseFilepath);
-        }
-      }
-    }
-  }
-}
-
-#endregion
-
-
-#region Assets/Photon/Quantum/Editor/CustomEditors/QuantumRunnerLocalSavegameEditor.cs
-
-namespace Quantum.Editor {
-  using System.IO;
-  using UnityEditor;
-  using UnityEngine;
-
-  [CustomEditor(typeof(QuantumRunnerLocalSavegame))]
-  public class QuantumRunnerLocalSavegameEditor : QuantumEditor {
-
-    public override void OnInspectorGUI() {
-      base.PrepareOnInspectorGUI();
-      
-      var data = (QuantumRunnerLocalSavegame)target;
-
-      var oldSavegameFile = data.SavegameFile;
-
-      if (DrawDefaultInspector() && oldSavegameFile != data.SavegameFile) {
-        data.DatabaseFile = null;
-
-        if (data.SavegameFile != null && data.DatabaseFile == null) {
-          var assetPath = AssetDatabase.GetAssetPath(data.SavegameFile);
           var databaseFilepath = $"{Path.GetDirectoryName(assetPath)}/{Path.GetFileNameWithoutExtension(assetPath)}-DB{Path.GetExtension(assetPath)}";
           data.DatabaseFile = AssetDatabase.LoadAssetAtPath<TextAsset>(databaseFilepath);
         }
@@ -8168,6 +8134,36 @@ namespace Quantum.Editor {
 #endregion
 
 
+#region Assets/Photon/Quantum/Editor/QuantumBackwardCompatibility.Common.cs
+
+// merged BackwardCompatibility
+
+#region HierarchyIterator.cs
+
+namespace Quantum.Editor {
+  using UnityEditor;
+  using UnityEngine;
+  
+  static class HierarchyIteratorExtensions {
+#if UNITY_6000_3_OR_NEWER
+    public static EntityId GetObjectId(this HierarchyIterator iterator) {
+      return iterator.entityId;
+    }
+#else
+    public static int GetObjectId(this HierarchyProperty iterator) {
+      return iterator.instanceID;
+    }
+#endif
+  }
+}
+
+#endregion
+
+
+
+#endregion
+
+
 #region Assets/Photon/Quantum/Editor/QuantumEditor.Common.cs
 
 // merged Editor
@@ -8177,6 +8173,14 @@ namespace Quantum.Editor {
 namespace Quantum.Editor {
   using UnityEditor;
 
+#if UNITY_6000_3_OR_NEWER
+  using ObjectIdType = UnityEngine.EntityId;
+  using HierarchyIteratorType = UnityEditor.HierarchyIterator;
+#else 
+  using ObjectIdType = System.Int32;
+  using HierarchyIteratorType = UnityEditor.HierarchyProperty;
+#endif
+  
   /// <summary>
   /// A factory that creates asset source instances for a given asset.
   /// </summary>
@@ -8194,7 +8198,7 @@ namespace Quantum.Editor {
     /// <summary>
     /// Asset instance ID.
     /// </summary>
-    public readonly int    InstanceID;
+    public readonly ObjectIdType InstanceID;
     /// <summary>
     /// Asset Unity GUID;
     /// </summary>
@@ -8213,9 +8217,21 @@ namespace Quantum.Editor {
     public string AssetPath => AssetDatabaseUtils.GetAssetPathOrThrow(InstanceID);
 
     /// <summary>
+    /// The object pointed to be <see cref="InstanceID"/>
+    /// </summary>
+    public UnityEngine.Object Object {
+      get =>
+#if UNITY_6000_3_OR_NEWER
+        EditorUtility.EntityIdToObject(InstanceID);
+#else
+        EditorUtility.InstanceIDToObject(InstanceID);
+#endif
+    }
+
+    /// <summary>
     /// Create a new instance of <see cref="QuantumAssetSourceFactoryContext"/>.
     /// </summary>
-    public QuantumAssetSourceFactoryContext(string assetGuid, int instanceID, string assetName, bool isMainAsset) {
+    public QuantumAssetSourceFactoryContext(string assetGuid, ObjectIdType instanceID, string assetName, bool isMainAsset) {
       AssetGuid = assetGuid;
       InstanceID = instanceID;
       AssetName = assetName;
@@ -8225,9 +8241,9 @@ namespace Quantum.Editor {
     /// <summary>
     /// Create a new instance of <see cref="QuantumAssetSourceFactoryContext"/>.
     /// </summary>
-    public QuantumAssetSourceFactoryContext(HierarchyProperty hierarchyProperty) {
+    public QuantumAssetSourceFactoryContext(HierarchyIteratorType hierarchyProperty) {
       AssetGuid = hierarchyProperty.guid;
-      InstanceID = hierarchyProperty.instanceID;
+      InstanceID = hierarchyProperty.GetObjectId();
       AssetName = hierarchyProperty.name;
       IsMainAsset = hierarchyProperty.isMainRepresentation;
     }
@@ -8240,11 +8256,10 @@ namespace Quantum.Editor {
         throw new System.ArgumentNullException(nameof(obj));
       }
       
-      var instanceId = obj.GetInstanceID();
-      (AssetGuid, _) = AssetDatabaseUtils.GetGUIDAndLocalFileIdentifierOrThrow(instanceId);
-      InstanceID = instanceId;
+      (AssetGuid, _) = AssetDatabaseUtils.GetGUIDAndLocalFileIdentifierOrThrow(obj);
+      InstanceID = obj.GetInstanceID();
       AssetName = obj.name;
-      IsMainAsset = AssetDatabase.IsMainAsset(instanceId);
+      IsMainAsset = AssetDatabase.IsMainAsset(obj);
     } 
   }
 }
@@ -8372,7 +8387,7 @@ namespace Quantum.Editor {
       where TAsset : UnityEngine.Object {
       
       if (typeof(TAsset).IsSubclassOf(typeof(Component))) {
-        var prefab = (GameObject)EditorUtility.InstanceIDToObject(context.InstanceID);
+        var prefab = (GameObject)context.Object;
 
         result = new TSource() {
           Object = prefab.GetComponent<TAsset>()
@@ -8588,6 +8603,16 @@ namespace Quantum.Editor {
   using UnityEditor.Build;
   using UnityEditor.PackageManager;
   using UnityEngine;
+  
+  
+#if UNITY_6000_3_OR_NEWER
+  using ObjectIdType = UnityEngine.EntityId;
+  using HierarchyIteratorType = UnityEditor.HierarchyIterator;
+#else 
+  using ObjectIdType = System.Int32;
+  using HierarchyIteratorType = UnityEditor.HierarchyProperty;
+#endif
+
 
   /// <summary>
   /// Utility methods for working with Unity's <see cref="AssetDatabase"/>
@@ -8615,7 +8640,7 @@ namespace Quantum.Editor {
     /// <summary>
     /// Returns the asset path for the given instance ID or throws an exception if the asset is not found.
     /// </summary>
-    public static string GetAssetPathOrThrow(int instanceID) {
+    public static string GetAssetPathOrThrow(ObjectIdType instanceID) {
       var result = AssetDatabase.GetAssetPath(instanceID);
       if (string.IsNullOrEmpty(result)) {
         throw new ArgumentException($"Asset with InstanceID {instanceID} not found");
@@ -8662,7 +8687,7 @@ namespace Quantum.Editor {
     /// <summary>
     /// Returns the asset GUID for the given instance ID or throws an exception if the asset is not found.
     /// </summary>
-    public static string GetAssetGuidOrThrow(int instanceId) {
+    public static string GetAssetGuidOrThrow(ObjectIdType instanceId) {
       var assetPath = GetAssetPathOrThrow(instanceId);
       return GetAssetGuidOrThrow(assetPath);
     }
@@ -8700,7 +8725,7 @@ namespace Quantum.Editor {
     /// <summary>
     /// Gets the GUID and local file identifier for the instance ID or throws an exception if the asset is not found.
     /// </summary>
-    public static (string, long) GetGUIDAndLocalFileIdentifierOrThrow(int instanceId) {
+    public static (string, long) GetGUIDAndLocalFileIdentifierOrThrow(ObjectIdType instanceId) {
       if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(instanceId, out var guid, out long localId)) {
         throw new ArgumentException($"Asset with instanceId {instanceId} not found");
       }
@@ -9044,12 +9069,12 @@ namespace Quantum.Editor {
     private static bool IsPackageHidden(UnityEditor.PackageManager.PackageInfo info) => info.type == "module" || info.type == "feature" && info.source != PackageSource.Embedded;
     
     /// <summary>
-    /// Enumerates assets in the project that match the given search criteria using <see cref="HierarchyProperty"/> API.
+    /// Enumerates assets in the project that match the given search criteria using <see cref="HierarchyIteratorType"/> API.
     /// Obtained with <see cref="AssetDatabaseUtils.IterateAssets"/>.
     /// </summary>
-    public struct AssetEnumerator : IEnumerator<HierarchyProperty> {
+    public struct AssetEnumerator : IEnumerator<HierarchyIteratorType> {
 
-      private HierarchyProperty _hierarchyProperty;
+      private HierarchyIteratorType _hierarchyProperty;
       private int               _rootFolderIndex;
 
       private readonly string[] _rootFolders;
@@ -9063,17 +9088,17 @@ namespace Quantum.Editor {
         if (string.IsNullOrEmpty(root)) {
           // search everywhere
           _rootFolders = s_rootFolders.Value;
-          _hierarchyProperty = new HierarchyProperty(_rootFolders[0]);
+          _hierarchyProperty = new HierarchyIteratorType(_rootFolders[0]);
         } else {
           _rootFolders       = null;
-          _hierarchyProperty = new HierarchyProperty(root);
+          _hierarchyProperty = new HierarchyIteratorType(root);
         }
 
         _hierarchyProperty.SetSearchFilter(searchFilter, (int)SearchableEditorWindow.SearchMode.All);
       }
 
       /// <summary>
-      /// Updates internal <see cref="HierarchyProperty"/>.
+      /// Updates internal <see cref="HierarchyIteratorType"/>.
       /// </summary>
       /// <returns></returns>
       public bool MoveNext() {
@@ -9085,8 +9110,8 @@ namespace Quantum.Editor {
           return false;
         }
 
-        var newHierarchyProperty = new HierarchyProperty(_rootFolders[++_rootFolderIndex]);
-        UnityInternal.HierarchyProperty.CopySearchFilterFrom(newHierarchyProperty, _hierarchyProperty);
+        var newHierarchyProperty = new HierarchyIteratorType(_rootFolders[++_rootFolderIndex]);
+        UnityInternal.HierarchyIterator.CopySearchFilterFrom(newHierarchyProperty, _hierarchyProperty);
         _hierarchyProperty = newHierarchyProperty;
 
         // try again
@@ -9102,11 +9127,11 @@ namespace Quantum.Editor {
       }
 
       /// <summary>
-      /// Returns the internernal <see cref="HierarchyProperty"/>. Most of the time
+      /// Returns the internernal <see cref="HierarchyIteratorType"/>. Most of the time
       /// this will be the same instance as returned the last time, so do not cache
       /// the result - check its properties intestead.
       /// </summary>
-      public HierarchyProperty Current => _hierarchyProperty;
+      public HierarchyIteratorType Current => _hierarchyProperty;
 
       object IEnumerator.Current => Current;
 
@@ -9140,7 +9165,7 @@ namespace Quantum.Editor {
     /// Enumerable of assets in the project that match the given search criteria.
     /// </summary>
     /// <seealso cref="AssetEnumerator"/>
-    public struct AssetEnumerable : IEnumerable<HierarchyProperty> {
+    public struct AssetEnumerable : IEnumerable<HierarchyIteratorType> {
 
       private readonly string _root;
       private readonly string _label;
@@ -9160,7 +9185,7 @@ namespace Quantum.Editor {
       /// </summary>
       public AssetEnumerator GetEnumerator() => new AssetEnumerator(_root, _label, _type);
 
-      IEnumerator<HierarchyProperty> IEnumerable<HierarchyProperty>.GetEnumerator() => GetEnumerator();
+      IEnumerator<HierarchyIteratorType> IEnumerable<HierarchyIteratorType>.GetEnumerator() => GetEnumerator();
 
       IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
@@ -13899,10 +13924,16 @@ namespace Quantum.Editor {
     }
 
     [UnityEditor.InitializeOnLoad]
-    public static class HierarchyProperty {
+    public static class HierarchyIterator {
+#if UNITY_6000_3_OR_NEWER
+      public delegate void CopySearchFilterFromDelegate(UnityEditor.HierarchyIterator to, UnityEditor.HierarchyIterator from);
+      public static CopySearchFilterFromDelegate CopySearchFilterFrom = typeof(UnityEditor.HierarchyIterator).CreateMethodDelegate<CopySearchFilterFromDelegate>(nameof(CopySearchFilterFrom), 
+        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+#else
       public delegate void CopySearchFilterFromDelegate(UnityEditor.HierarchyProperty to, UnityEditor.HierarchyProperty from);
       public static CopySearchFilterFromDelegate CopySearchFilterFrom = typeof(UnityEditor.HierarchyProperty).CreateMethodDelegate<CopySearchFilterFromDelegate>(nameof(CopySearchFilterFrom), 
         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+#endif
     }
     
     [UnityEditor.InitializeOnLoad]
@@ -18430,7 +18461,7 @@ namespace Quantum {
         AssetDatabase.AddObjectToAsset(asset, mainAsset);
       }
 
-      var (unityAssetGuid, fileId) = AssetDatabaseUtils.GetGUIDAndLocalFileIdentifierOrThrow(asset.GetInstanceID());
+      var (unityAssetGuid, fileId) = AssetDatabaseUtils.GetGUIDAndLocalFileIdentifierOrThrow(asset);
       var expectedAssetGuid = QuantumUnityDBUtilities.GetExpectedAssetGuid(new GUID(unityAssetGuid), fileId, out _);
       return (asset, expectedAssetGuid);
     }
@@ -20855,6 +20886,40 @@ namespace Quantum.Editor {
     }
 
     /// <summary>
+    /// Create a simple local game scene.
+    /// </summary>
+    /// <param name="scenePath">Path to the new scene</param>
+    public static void CreateSimpleLocalGameScene(string scenePath) {
+      if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) {
+        QuantumDefaultConfigs.TryGetGlobal(out var defaultConfigs);
+        Assert.Always(defaultConfigs != null, "No global QuantumDefaultConfigs found.");
+
+        var map = QuantumUnityDB.FindGlobalAssetGuids(typeof(Map)).FirstOrDefault();
+        if (TryLoadRuntimeConfigFromMap(map, out var runtimeConfig) == false) {
+          runtimeConfig = new RuntimeConfig {
+            Map = map,
+            SimulationConfig = defaultConfigs.SimulationConfig,
+            SystemsConfig = defaultConfigs.SystemsConfig
+          };
+        }
+
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+        var go = new GameObject("SimpleLocalGame");
+        var component = go.AddComponent<QuantumSimpleLocalGame>();
+        component.RuntimePlayer = new RuntimePlayer();
+        component.RuntimeConfig = runtimeConfig;
+
+        var newScenePath = AssetDatabase.GenerateUniqueAssetPath(scenePath);
+        if (EditorSceneManager.SaveScene(scene, newScenePath)) {
+          AddSceneToBuildSettings(scene);
+        }
+
+        QuantumEditorLog.Log("Created new Quantum simple local game sample scene", AssetDatabase.LoadAssetAtPath<SceneAsset>(scene.path));
+      }
+    }
+
+    /// <summary>
     /// Create the simple connection sample scene.
     /// </summary>
     /// <param name="scenePath">Path to scene to be created</param>
@@ -20876,7 +20941,7 @@ namespace Quantum.Editor {
 
         var go = new GameObject("SimpleConnectGUI");
         var component = go.AddComponent<QuantumSimpleConnectionGUI>();
-        component.RuntimePlayers = new List<RuntimePlayer>() { new RuntimePlayer() };
+        component.RuntimePlayer = new RuntimePlayer();
         component.RuntimeConfig = runtimeConfig;
 
         var newScenePath = AssetDatabase.GenerateUniqueAssetPath(scenePath);
@@ -24426,7 +24491,7 @@ namespace Quantum.Editor {
         }
 
         // last resort
-        var instance = EditorUtility.InstanceIDToObject(InstanceID);
+        var instance = Object;
         if (instance) {
           return instance.GetType();
         }
@@ -25033,7 +25098,6 @@ namespace Quantum.Editor {
     }
 
     public static int DeleteMissingNestedScriptableObjects(string path) {
-
       var yamlObjectHeader = new Regex("^--- !u!", RegexOptions.Multiline);
      
       // 114 - class id (see https://docs.unity3d.com/Manual/ClassIDReference.html)
@@ -25045,7 +25109,7 @@ namespace Quantum.Editor {
         if (asset == null)
           continue;
 
-        if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(asset.GetInstanceID(), out var guid, out long fileId)) {
+        if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(asset, out var guid, out long fileId)) {
           validFileIds.Add(fileId);
         }
       }
@@ -25993,7 +26057,7 @@ namespace Quantum.Editor {
   using UnityEngine;
 
   /// <summary>
-  /// Unity menu items to export replays and save games.
+  /// Unity menu items to export replays and snapshots.
   /// </summary>
   internal class ReplayMenu {
     private static string ReplayLocation {
@@ -26001,9 +26065,9 @@ namespace Quantum.Editor {
       set => EditorPrefs.SetString("Quantum_Export_LastReplayLocation", value);
     }
 
-    private static string SavegameLocation {
-      get => EditorPrefs.GetString("Quantum_Export_LastSavegameLocation");
-      set => EditorPrefs.SetString("Quantum_Export_LastSavegameLocation", value);
+    private static string SnapshotLocation {
+      get => EditorPrefs.GetString("Quantum_Export_LastSnapshotLocation");
+      set => EditorPrefs.SetString("Quantum_Export_LastSnapshotLocation", value);
     }
 
     [MenuItem("Tools/Quantum/Export/Replay (Include Asset DB)", true, (int)QuantumEditorMenuPriority.Export + 0)]
@@ -26026,14 +26090,14 @@ namespace Quantum.Editor {
       ExportDialogReplayAndDB(QuantumRunner.Default, includeDb: false);
     }
 
-    [MenuItem("Tools/Quantum/Export/Savegame (Include Asset DB)", true, (int)QuantumEditorMenuPriority.Export + 0)]
-    public static bool SaveGameCheck() {
+    [MenuItem("Tools/Quantum/Export/Snapshot (Include Asset DB)", true, (int)QuantumEditorMenuPriority.Export + 0)]
+    public static bool ExportSnapshotCheck() {
       return Application.isPlaying && QuantumRunner.DefaultGame != null;
     }
 
-    [MenuItem("Tools/Quantum/Export/Savegame (Include Asset DB)", false, (int)QuantumEditorMenuPriority.Export + 0)]
-    public static void SaveGame() {
-      ExportDialogSavegame(QuantumRunner.DefaultGame);
+    [MenuItem("Tools/Quantum/Export/Snapshot (Include Asset DB)", false, (int)QuantumEditorMenuPriority.Export + 0)]
+    public static void ExportSnapshot() {
+      ExportDialogSnapshot(QuantumRunner.DefaultGame);
     }
 
     public static void ExportDialogReplayAndDB(QuantumRunner runner, bool includeDb = false) {
@@ -26073,27 +26137,40 @@ namespace Quantum.Editor {
       }
     }
 
-    public static void ExportDialogSavegame(QuantumGame game) {
-      var fileName = game?.Frames?.Verified?.Map ? game?.Frames?.Verified?.Map.name : "Savegame";
-      var filePath = EditorUtility.SaveFilePanel("Export Savegame File", SavegameLocation, AnnotateFileNameWithDate(fileName), "json");
+    public static void ExportDialogSnapshot(QuantumGame game) {
+      var fileName = game?.Frames?.Verified?.Map ? game?.Frames?.Verified?.Map.name : "Snapshot";
+      var filePath = EditorUtility.SaveFilePanel("Export Snapshot File", SnapshotLocation, AnnotateFileNameWithDate(fileName), "json");
       if (string.IsNullOrEmpty(filePath)) {
         return; 
       }
 
-      var saveGame = game.CreateSavegame(includeDb: true);
+      var snapshotFile = game.GetSnapshotFile(includeDb: true);
 
-      File.WriteAllText(filePath, JsonUtility.ToJson(saveGame));
+      File.WriteAllText(filePath, JsonUtility.ToJson(snapshotFile));
 
       AssetDatabase.Refresh();
 
       if (filePath.StartsWith(Application.dataPath)) {
-        SavegameLocation = Path.Combine("Assets", Path.GetRelativePath(Application.dataPath, Path.GetDirectoryName(filePath)));
+        SnapshotLocation = Path.Combine("Assets", Path.GetRelativePath(Application.dataPath, Path.GetDirectoryName(filePath)));
       } else {
-        SavegameLocation = Path.GetDirectoryName(filePath);
+        SnapshotLocation = Path.GetDirectoryName(filePath);
       }
     }
 
     static string AnnotateFileNameWithDate(string fileName) => $"{fileName}-{DateTime.Now.ToString("yyyy'-'MM'-'dd'-'HH'-'mm'-'ss")}";
+
+    #region Legacy
+
+    [Obsolete("Use SnapshotLocation")]
+    private static string SavegameLocation {
+      get => SnapshotLocation;
+      set => SnapshotLocation = value;
+    }
+
+    [Obsolete("Use ExportDialogSnapshot")]
+    public static void ExportDialogSavegame(QuantumGame game) => ExportDialogSnapshot(game);
+
+    #endregion
   }
 }
 

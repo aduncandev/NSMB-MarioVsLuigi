@@ -4,7 +4,7 @@
 #define OnePixelPerFrame 1.875
 import enum PhysicsFlags(byte);
 
-component PhysicsObject {
+table component PhysicsObject {
     FPVector2 Gravity;
     FP TerminalVelocity;
     bool IsFrozen;
