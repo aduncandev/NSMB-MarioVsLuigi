@@ -9203,9 +9203,9 @@
             Returns an iterator that efficiently iterates the indices of components in the set.
             </summary>
         </member>
-        <member name="M:Quantum.ComponentSet.Zeros">
+        <member name="M:Quantum.ComponentSet.GetEnumerator">
             <summary>
-            Returns an iterator that efficiently iterates the indices of components *not* in the set.
+            Returns an iterator that efficiently iterates the indices of components in the set.
             </summary>
         </member>
         <member name="M:Quantum.ComponentSet.GetHashCode">
@@ -9316,9 +9316,9 @@
             Returns an iterator that efficiently iterates the indices of components in the set.
             </summary>
         </member>
-        <member name="M:Quantum.ComponentSet256.Zeros">
+        <member name="M:Quantum.ComponentSet256.GetEnumerator">
             <summary>
-            Returns an iterator that efficiently iterates the indices of components *not* in the set.
+            Returns an iterator that efficiently iterates the indices of components in the set.
             </summary>
         </member>
         <member name="M:Quantum.ComponentSet256.GetHashCode">
@@ -9419,9 +9419,9 @@
             Returns an iterator that efficiently iterates the indices of components in the set.
             </summary>
         </member>
-        <member name="M:Quantum.ComponentSet64.Zeros">
+        <member name="M:Quantum.ComponentSet64.GetEnumerator">
             <summary>
-            Returns an iterator that efficiently iterates the indices of components *not* in the set.
+            Returns an iterator that efficiently iterates the indices of components in the set.
             </summary>
         </member>
         <member name="M:Quantum.ComponentSet64.GetHashCode">

@@ -197,8 +197,13 @@ MonoBehaviour:
     SegmentSize: 4
     SegmentCapacity: 32
     PageShift: 15
-    PageCount: 256
+    PageCount: 512
     ExtraHeapCount: 1
+  HeapTrackingMode: 0
+  HeapPageShift: 0
+  HeapPageCount: 0
+  HeapExtraCount: 0
+  HeapSettingsMigrated: 0
   AutoLoadSceneFromMap: 0
   DeltaTimeType: 0
   ThreadCount: 4

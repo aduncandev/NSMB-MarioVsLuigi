@@ -1,4 +1,4 @@
-#define MULTITHREADED
+//#define MULTITHREADED
 using Photon.Deterministic;
 using Quantum.Task;
 

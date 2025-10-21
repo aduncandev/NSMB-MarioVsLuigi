@@ -7,11 +7,11 @@
   "targets": {
     ".NETStandard,Version=v2.1": {},
     ".NETStandard,Version=v2.1/": {
-      "Quantum.Engine/3.1.0.1870-UnityDebug": {
+      "Quantum.Engine/3.1.0.1871-UnityDebug": {
         "dependencies": {
           "Fody": "6.9.2",
           "InlineIL.Fody": "1.10.0",
-          "Quantum.Log": "3.1.0.1870-UnityDebug"
+          "Quantum.Log": "3.1.0.1871-UnityDebug"
         },
         "runtime": {
           "Quantum.Engine.dll": {}
@@ -23,18 +23,18 @@
           "Fody": "6.9.2"
         }
       },
-      "Quantum.Log/3.1.0.1870-UnityDebug": {
+      "Quantum.Log/3.1.0.1871-UnityDebug": {
         "runtime": {
           "Quantum.Log.dll": {
-            "assemblyVersion": "3.1.0.1870",
-            "fileVersion": "3.1.0.1870"
+            "assemblyVersion": "3.1.0.1871",
+            "fileVersion": "3.1.0.1871"
           }
         }
       }
     }
   },
   "libraries": {
-    "Quantum.Engine/3.1.0.1870-UnityDebug": {
+    "Quantum.Engine/3.1.0.1871-UnityDebug": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -53,7 +53,7 @@
       "path": "inlineil.fody/1.10.0",
       "hashPath": "inlineil.fody.1.10.0.nupkg.sha512"
     },
-    "Quantum.Log/3.1.0.1870-UnityDebug": {
+    "Quantum.Log/3.1.0.1871-UnityDebug": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

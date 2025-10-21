@@ -4,6 +4,13 @@
 
 Disclaimer: The Quantum SDK 3.1.0 development snapshots are not intended to be used for live games.
 
+### Build 1871 (Oct 18, 2025)
+
+**Bug Fixes**
+
+- Fixed: A regression where ECS internals would GC allocate when iterating elements of `ComponentSet`
+- Fixed: An issue that caused pause mode stepping in Unity Editor to not simulate one tick at a time
+
 ### Build 1870 (Oct 17, 2025)
 
 **What's New**

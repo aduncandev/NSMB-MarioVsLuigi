@@ -8216,15 +8216,7 @@ namespace Quantum {
     /// and the spectator has an extra service task to tick this.
     /// </summary>
     /// <param name="deltaTime">If null the internal stopwatch is used to update, otherwise pass in the desired delta time to progress the simulation.</param>
-    public void Service(double? deltaTime = null) {
-#if UNITY_EDITOR
-      //Guarantees that only one frame will be step during pause mode 
-      if (UnityEditor.EditorApplication.isPaused && !UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
-      {
-        deltaTime = (double)1 / Session.SimulationRate;
-      }
-#endif
-      
+    public void Service(double? deltaTime = null) {     
       if (Session != null && State == SessionState.Starting) {
         // Waiting for a snapshot 
         if (Session.IsRunning && Session.IsPaused == false) {
@@ -8237,6 +8229,15 @@ namespace Quantum {
           State = SessionState.Running;
         }
       }
+
+#if UNITY_EDITOR
+      if (Session != null && State == SessionState.Running) {
+        // Guarantees that only one frame will be step during pause mode 
+        if (UnityEditor.EditorApplication.isPaused) {
+          deltaTime = 1d / Session.SimulationRate;
+        }
+      }
+#endif
 
       if (Session != null) {
         _inSessionUpdate = true;
