@@ -19,7 +19,6 @@ MonoBehaviour:
   Prototype:
     Id:
       Value: 1479918679323180618
-  SoundFolder: luigi
   UiString: <sprite name=hud_luigi>
   TranslationString: character.luigi
   LoadingSmallSprite: {fileID: -3599161207798135845, guid: a7245cae141f3ee449147539ebd2a2c9,
@@ -33,3 +32,6 @@ MonoBehaviour:
   SelectionOrder: -1000
   SmallOverrides: {fileID: 22100000, guid: a1854453357bb034e89ec419b0f57906, type: 2}
   LargeOverrides: {fileID: 22100000, guid: 671e2adc5dbd26a45abdf5c18398a86e, type: 2}
+  SoundEffectOverrides:
+    Id:
+      Value: 529563455592105687

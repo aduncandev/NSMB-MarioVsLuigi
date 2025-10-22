@@ -242,11 +242,14 @@ namespace Quantum {
       // 3.1 Migrating heap config
 #pragma warning disable CS0618 // Type or member is obsolete
       if (HeapSettingsMigrated == false && HeapPageCount > 0) {
-        Heap.Management = HeapManagement.PageBasedLegacy;
         Heap.PageShift = HeapPageShift;
         Heap.PageCount = HeapPageCount;
         Heap.TrackingMode = HeapTrackingMode;
         Heap.ExtraHeapCount = HeapExtraCount;
+        // Force to new page based management and migrate page size, actual required size could be smaller
+        // PageCount not required because heap grows dynamically now
+        Heap.Management = HeapManagement.PageBased;
+        Heap.PageSize = (HeapPageSize) Math.Clamp(HeapPageShift - 10, 0, (int)HeapPageSize.Size_128_KiB);
         HeapSettingsMigrated = true;
       }
 #pragma warning restore CS0618 // Type or member is obsolete

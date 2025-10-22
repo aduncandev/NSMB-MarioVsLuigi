@@ -19601,6 +19601,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf2db399dc5ed094c8b01e459636e673, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  soundEffects:
+    Id:
+      Value: 415285428882097807
   translationManager: {fileID: 6974483067213173336}
   discordController: {fileID: 6841901076153067735}
   rumbleManager: {fileID: 4506347848550621655}
@@ -19674,6 +19677,7 @@ MonoBehaviour:
   generalMaxTempReplays: 0
   generalScoreboardAlways: 0
   generalChatFiltering: 0
+  generalAddonDownloads: 0
   generalUseNicknameColor: 0
   graphicsNametags: 0
   audioSpecialPowerupMusic: 0

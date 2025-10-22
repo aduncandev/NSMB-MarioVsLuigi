@@ -73,19 +73,13 @@ namespace NSMB.Quantum {
         }
 
         private IEnumerator LoadMap(Map map) {
-            // Check if the scene already is loaded
-            Scene loadedScene = SceneManager.GetSceneByName(map.Scene);
-            if (loadedScene.IsValid()) {
-                yield break;
-            }
-
             // Handle special MainMenu case.
             if (map == null) {
                 Scene loadedMainMenuScene = SceneManager.GetSceneByName("MainMenu");
                 if (loadedMainMenuScene.IsValid()) {
                     SceneManager.SetActiveScene(loadedMainMenuScene);
                 } else {
-                    AsyncOperation mainMenuOp = SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);
+                    AsyncOperation mainMenuOp = SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Single);
                     mainMenuOp.allowSceneActivation = true;
                     while (!mainMenuOp.isDone) {
                         yield return null;
@@ -95,6 +89,12 @@ namespace NSMB.Quantum {
                 yield break;
             }
             
+            // Check if the scene already is loaded
+            Scene loadedScene = SceneManager.GetSceneByName(map.Scene);
+            if (loadedScene.IsValid()) {
+                yield break;
+            }
+
             // Load via addressables.
             AsyncOperationHandle<SceneInstance> addressablesOp = default;
             try {

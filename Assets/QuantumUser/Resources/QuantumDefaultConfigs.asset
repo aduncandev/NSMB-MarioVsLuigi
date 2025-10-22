@@ -192,7 +192,7 @@ MonoBehaviour:
       RawValue: 72090
   Heap:
     TrackingMode: 1
-    Management: 1
+    Management: 2
     PageSize: 3
     SegmentSize: 4
     SegmentCapacity: 32

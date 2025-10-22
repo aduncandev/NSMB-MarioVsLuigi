@@ -61,6 +61,19 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         private bool languageChangedSinceLastOpen;
         private FileSystemWatcher watcher;
 
+
+        [RuntimeInitializeOnLoadMethod]
+        public static void CreateDirectories() {
+            ReplayDirectory = Path.Combine(Application.persistentDataPath, "replays");
+            TempDirectory = Path.Combine(ReplayDirectory, "temp");
+            SavedDirectory = Path.Combine(ReplayDirectory, "saved");
+            FavoriteDirectory = Path.Combine(ReplayDirectory, "favorite");
+
+            Directory.CreateDirectory(TempDirectory);
+            Directory.CreateDirectory(FavoriteDirectory);
+            Directory.CreateDirectory(SavedDirectory);
+        }
+
 #if UNITY_EDITOR
         protected override void OnValidate() {
             base.OnValidate();
@@ -98,15 +111,6 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 #endif
             Instance = this;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
-            
-            ReplayDirectory = Path.Combine(Application.persistentDataPath, "replays");
-            TempDirectory = Path.Combine(ReplayDirectory, "temp");
-            SavedDirectory = Path.Combine(ReplayDirectory, "saved");
-            FavoriteDirectory = Path.Combine(ReplayDirectory, "favorite");
-
-            Directory.CreateDirectory(TempDirectory);
-            Directory.CreateDirectory(FavoriteDirectory);
-            Directory.CreateDirectory(SavedDirectory);
 
             _ = FindReplays();
         }

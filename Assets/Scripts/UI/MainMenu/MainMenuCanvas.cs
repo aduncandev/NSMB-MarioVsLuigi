@@ -230,8 +230,8 @@ namespace NSMB.UI.MainMenu {
             ShowHideMainPanel();
         }
 
-        public void PlaySound(SoundEffect sound, CharacterAsset character = null) {
-            sfx.PlayOneShot(sound, character);
+        public void PlaySound(SoundEffect sound, SoundEffectOverrideList overrides = null) {
+            sfx.PlayOneShot(sound, overrides);
         }
 
         public void PlayConfirmSound() {

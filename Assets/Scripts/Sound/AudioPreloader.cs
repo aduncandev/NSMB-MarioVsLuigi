@@ -69,6 +69,7 @@ namespace NSMB.Sound {
         }
 
         private void PreloadSoundEffect(SoundEffect sfx, CharacterAsset[] characters) {
+            /* TODO: fix
             var data = sfx.GetSoundData();
             if (data.Sound.Contains("{char}")) {
                 foreach (var character in characters) {
@@ -89,6 +90,7 @@ namespace NSMB.Sound {
                     sfx.GetClip();
                 }
             }
+            */
         }
 
         //---Callbacks & Events

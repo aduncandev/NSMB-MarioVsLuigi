@@ -1,4 +1,4 @@
-#define MULTITHREADED
+//#define MULTITHREADED
 
 using Quantum.Task;
 
@@ -109,13 +109,11 @@ namespace Quantum {
             if (transform->Position.Y + collider->Shape.Box.Extents.Y + collider->Shape.Centroid.Y < stage.StageWorldMin.Y) {
                 enemy->IsActive = false;
                 enemy->IsDead = true;
-                if (f.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
+                if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
                     physicsObject->IsFrozen = true;
                 }
 
-                lock (despawningEntities) {
-                    despawningEntities.Add(filter.Entity);
-                }
+                f.Signals.OnEnemyDespawned(filter.Entity);
                 return;
             }
         }

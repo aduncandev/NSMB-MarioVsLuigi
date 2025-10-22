@@ -5,7 +5,6 @@ public class CharacterAsset : AssetObject {
 
     public AssetRef<EntityPrototype> Prototype;
 
-    public string SoundFolder;
     public string UiString;
     public string TranslationString;
 
@@ -20,5 +19,7 @@ public class CharacterAsset : AssetObject {
 
     public RuntimeAnimatorController SmallOverrides;
     public RuntimeAnimatorController LargeOverrides;
-#endif 
+
+    public AssetRef<SoundEffectOverrideList> SoundEffectOverrides;
+#endif
 }

@@ -4,6 +4,16 @@
 
 Disclaimer: The Quantum SDK 3.1.0 development snapshots are not intended to be used for live games.
 
+### Build 1872 (Oct 21, 2025)
+
+**Changes**
+
+- The default heap management mode for migrating projects is now the new `PageBased` mode instead of
+
+**Bug Fixes**
+
+- Fixed: An issue where `FrameBase.ComponentCount` throws an `AssertException` for table components that have never been added to an entity
+
 ### Build 1871 (Oct 18, 2025)
 
 **Bug Fixes**
@@ -21,14 +31,14 @@ Disclaimer: The Quantum SDK 3.1.0 development snapshots are not intended to be u
 
 **Changes**
 
-- Renamed `QuantumGame.CreateSavegame()` to `GetSnapshotFile()`, retired the `QuantumRunnerLocalSavegame.cs` script and merged it's functionality with `QuantumRunnerLocalDebug.cs
+- Renamed `QuantumGame.CreateSavegame()` to `GetSnapshotFile()`, retired the `QuantumRunnerLocalSavegame.cs` script and merged its functionality with `QuantumRunnerLocalDebug.cs`
 - Corrected a typo in `QuantumRunnerUnityFactory.CreatePlatformInfo` and changed the static method to a property
 - Removed the `StartWithFrame()` method from the `QuantumRunnerLocalDebug` class
 
 **Bug Fixes**
 
 - Fixed: A bug where multiple tasks dispatched from the same `SystemThreadedFilter` can visit the same entities. (The slice length was not being respected.)
-- Fixed: An issue that caused the navmesh agent to chose any navmesh link instead of the closest one when having mutliple links available that connects two triangles
+- Fixed: An issue that caused the navmesh agent to chose any navmesh link instead of the closest one when having multiple links available that connects two triangles
 - Fixed: An issue that caused the `QuantumRunnerLocalDebug` script to not apply the `SimulationSpeedMultiplier` when using `EngineDeltaTime`
 
 ### Build 1869 (Oct 16, 2025)
@@ -77,7 +87,7 @@ Disclaimer: The Quantum SDK 3.1.0 development snapshots are not intended to be u
 
 **Bug Fixes**
 
-- Fixed: An issue in the component block iterator that could cause the exception _blockCount > 0
+- Fixed: An issue in the component block iterator that could cause the exception `_blockCount > 0`
 
 ### Build 1859 (Oct 09, 2025)
 

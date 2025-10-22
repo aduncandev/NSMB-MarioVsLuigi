@@ -667,7 +667,8 @@ namespace NSMB.Entities.Player {
             if (!characterData) {
                 characterData = character;
             }
-            sfx.PlayOneShot(soundEffect, characterData, variant, volume);
+            QuantumUnityDB.TryGetGlobalAsset(characterData.SoundEffectOverrides, out var overrides);
+            sfx.PlayOneShot(soundEffect, overrides, variant, volume);
         }
 
         public GameObject SpawnParticle(string particle, Vector3 worldPos, Quaternion? rot = null) {
@@ -912,7 +913,7 @@ namespace NSMB.Entities.Player {
                 main.startColor = GlowColor;
             }
 
-            // Particle handles the sound effect.
+            PlaySound(SoundEffect.Player_Sound_Respawn, character);
         }
 
         private void OnMarioPlayerDied(EventMarioPlayerDied e) {

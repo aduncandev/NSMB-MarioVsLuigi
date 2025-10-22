@@ -27,6 +27,7 @@ namespace NSMB {
         public static event Action ResolutionChanged;
 
         //---Public Variables
+        public AssetRef<SoundEffectOverrideList> soundEffects;
         public TranslationManager translationManager;
         public DiscordController discordController;
         public RumbleManager rumbleManager;
@@ -41,6 +42,7 @@ namespace NSMB {
         public LoadingCanvas loadingCanvas;
         public Image fullscreenFadeImage;
         public AudioSource sfx;
+
 
         [NonSerialized] public bool checkedForVersion = false, firstConnection = true;
         [NonSerialized] public int windowWidth = 1280, windowHeight = 720;
