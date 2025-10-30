@@ -28,13 +28,18 @@ public class PowerupAsset : CoinItemAsset, ISoundEffectOverrideProvider {
     public SoundEffectOverride[] SfxOverrides;
 
     [NonSerialized] private Dictionary<SoundEffect, SoundEffectOverride> overridesDict;
-    public SoundEffectOverride GetOverrideForSfx(SoundEffect sfx) {
-        if (overridesDict == null) {
-            overridesDict = new();
+    public override void Loaded(IResourceManager resourceManager) {
+        base.Loaded(resourceManager);
+
+        overridesDict = new();
+        if (SfxOverrides != null) {
             foreach (var @override in SfxOverrides) {
                 overridesDict[@override.SoundEffect] = @override;
             }
         }
+    }
+
+    public SoundEffectOverride GetOverrideForSfx(SoundEffect sfx) {
         overridesDict.TryGetValue(sfx, out var result);
         return result;
     }

@@ -28,8 +28,10 @@ public class CharacterAsset : AssetObject, ISoundEffectOverrideProvider {
     [NonSerialized] private Dictionary<SoundEffect, SoundEffectOverride> overridesDict;
     public override void Loaded(IResourceManager resourceManager) {
         overridesDict = new();
-        foreach (var @override in SfxOverrides) {
-            overridesDict[@override.SoundEffect] = @override;
+        if (SfxOverrides != null) {
+            foreach (var @override in SfxOverrides) {
+                overridesDict[@override.SoundEffect] = @override;
+            }
         }
     }
 

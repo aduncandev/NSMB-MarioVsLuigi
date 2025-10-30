@@ -24,7 +24,9 @@ namespace NSMB.Sound {
 
         public SoundEffectOverride GetOneOverride(SoundEffect sfx, IList<ISoundEffectOverrideProvider> extraProviders, int? variant = null) {
             List<ISoundEffectOverrideProvider> allProviders = new();
-            allProviders.AddRange(extraProviders);
+            if (extraProviders != null) {
+                allProviders.AddRange(extraProviders);
+            }
             allProviders.AddRange(GlobalProviders);
 
             var sortedOverrides = allProviders
@@ -63,9 +65,13 @@ namespace NSMB.Sound {
 
         public float PlayOneShot(AudioSource localSfxSource, SoundEffect sfx, IList<ISoundEffectOverrideProvider> extraProviders, int? variant = null, float volume = 1) {
             List<ISoundEffectOverrideProvider> allProviders = new();
-            allProviders.AddRange(extraProviders);
+            if (extraProviders != null) {
+                allProviders.AddRange(extraProviders);
+            }
             allProviders.AddRange(GlobalProviders);
-            
+
+            Debug.Log($"Resolving {sfx} with providers [{string.Join(", ", allProviders.Select(x => x.GetType().Name))}]");
+
             var sortedOverrides = allProviders
                 .Select(op => op.GetOverrideForSfx(sfx))
                 .Where(o => o != null)
@@ -121,8 +127,12 @@ namespace NSMB.Sound {
 
             variant ??= Random.Range(0, clips.Length);
             var randomClip = clips[QuantumUtils.Modulo(variant.Value, clips.Length)];
-            source.PlayOneShot(randomClip, volume);
-            return randomClip.length;
+            if (randomClip) {
+                source.PlayOneShot(randomClip, volume);
+                return randomClip.length;
+            } else {
+                return 0;
+            }
         }
     }
 }

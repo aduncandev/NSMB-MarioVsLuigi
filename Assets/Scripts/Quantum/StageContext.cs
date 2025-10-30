@@ -14,7 +14,9 @@ namespace NSMB.Quantum {
         }
 
         public void OnDestroy() {
-            SoundEffectResolver.Instance.GlobalProviders.Remove(Stage);
+            if (SoundEffectResolver.Instance) {
+                SoundEffectResolver.Instance.GlobalProviders.Remove(Stage);
+            }
         }
     }
 }

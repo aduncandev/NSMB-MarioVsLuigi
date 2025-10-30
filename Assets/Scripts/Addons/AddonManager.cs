@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using NSMB.Sound;
 using Quantum;
 using System;
 using System.Collections.Generic;
@@ -185,7 +186,6 @@ namespace NSMB.Addons {
 
             var loadAssetObjectsHandle = Addressables.LoadAssetsAsync<AssetObject>(resourceLocator.Keys, _ => {}, Addressables.MergeMode.Union);
             var assetObjects = await loadAssetObjectsHandle.Task;
-
             if (loadAssetObjectsHandle.Status == AsyncOperationStatus.Succeeded) {
                 foreach (var assetObject in assetObjects) {
                     try {
@@ -198,10 +198,18 @@ namespace NSMB.Addons {
                 }
             }
 
+            var loadGlobalOverridesHandle = Addressables.LoadAssetsAsync<GlobalSoundEffectOverrides>(resourceLocator.Keys, _ => { }, Addressables.MergeMode.Union);
+            if (loadGlobalOverridesHandle.Status == AsyncOperationStatus.Succeeded) {
+                foreach (var sfxOverride in loadGlobalOverridesHandle.Result) {
+                    SoundEffectResolver.Instance.GlobalProviders.Add(sfxOverride);
+                }
+            }
+
             var newAddon = new LoadedAddon {
                 Definition = addonDef,
                 CatalogHandle = catalogHandle,
                 AllAssetObjectsHandle = loadAssetObjectsHandle,
+                AllGlobalOverridesHandle = loadGlobalOverridesHandle,
             };
             LoadedAddons.Add(newAddon);
             OnAddonLoaded?.Invoke(newAddon);
@@ -289,9 +297,14 @@ namespace NSMB.Addons {
                 throw new ArgumentNullException("Tried to unload a null addon!");
             }
 
+            /*
             if (!addon.AllAssetObjectsHandle.IsDone) {
                 await addon.AllAssetObjectsHandle.Task;
             }
+            if (!addon.AllGlobalOverridesHandle.IsDone) {
+                await addon.AllAssetObjectsHandle.Task;
+            }
+            */
 
             foreach (var assetObject in addon.AllAssetObjectsHandle.Result) {
                 QuantumUnityDB.Global.DisposeAsset(assetObject.Guid, true);
@@ -299,9 +312,14 @@ namespace NSMB.Addons {
                 Debug.Log($"[Addon] Unloaded asset {assetObject.name} ({assetObject.Guid})");
             }
 
+            foreach (var globalSfxOverride in addon.AllGlobalOverridesHandle.Result) {
+                SoundEffectResolver.Instance.GlobalProviders.Remove(globalSfxOverride);
+            }
+
             LoadedAddons.Remove(addon);
             OnAddonUnloaded?.Invoke(addon);
             addon.AllAssetObjectsHandle.Release();
+            addon.AllGlobalOverridesHandle.Release();
             addon.CatalogHandle.Release();
         }
 
@@ -395,6 +413,7 @@ namespace NSMB.Addons {
         public AddonDefinition Definition;
         public AsyncOperationHandle<IResourceLocator> CatalogHandle;
         public AsyncOperationHandle<IList<AssetObject>> AllAssetObjectsHandle;
+        public AsyncOperationHandle<IList<GlobalSoundEffectOverrides>> AllGlobalOverridesHandle;
     }
 
     public class Addon {
