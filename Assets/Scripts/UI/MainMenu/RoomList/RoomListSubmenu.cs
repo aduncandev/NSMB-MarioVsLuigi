@@ -56,7 +56,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         public override void Show(bool first) {
             base.Show(first);
 
-            if (!overlayed) {
+            if (first && !overlayed) {
                 Reconnect();
             }
             
