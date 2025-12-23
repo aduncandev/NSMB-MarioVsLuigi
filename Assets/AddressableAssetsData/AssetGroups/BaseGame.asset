@@ -15,18 +15,23 @@ MonoBehaviour:
   m_GroupName: BaseGame
   m_GUID: 4d087ae4c291a7147b2c19263ae6576d
   m_SerializeEntries:
+  - m_GUID: 017d859ae3b5f93419c6b106d9683cf3
+    m_Address: Resources/EntityPrototypes/Enemy/KoopaEntityPrototype.qprototype
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 11d0cb89c67de8241922a37e92a1b4dd
     m_Address: Materials
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 18b78f42b518d4141b1337f61e87b7b4
-    m_Address: Resources/EntityPrototypes/Items/StarmanEntityPrototype.qprototype
+  - m_GUID: 2650ba49bfc9c5b4aa2798ce14ae4f1c
+    m_Address: Resources
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 2650ba49bfc9c5b4aa2798ce14ae4f1c
-    m_Address: Resources
+  - m_GUID: 338d137db932aad45b8d78a8cd23b001
+    m_Address: Resources/EntityPrototypes/World/WaterEntityPrototype.qprototype
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

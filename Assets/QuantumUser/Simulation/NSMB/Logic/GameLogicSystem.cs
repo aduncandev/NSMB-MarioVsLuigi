@@ -27,14 +27,15 @@ namespace Quantum {
 
             // Parse lobby commands
             var playerDataDictionary = f.ResolveDictionary(f.Global->PlayerDatas);
-            for (int i = 0; i < f.MaxPlayerCount; i++) {
-                if (f.GetPlayerCommand(i) is ILobbyCommand lobbyCommand) {
-                    var playerData = QuantumUtils.GetPlayerData(f, i, playerDataDictionary);
-                    if (playerData == null) {
-                        continue;
+            for (PlayerRef player = 0; player < f.MaxPlayerCount; player++) {
+                for (int i = 0; i < f.GetPlayerCommandCount(player); i++) {
+                    if (f.GetPlayerCommand(player, i) is ILobbyCommand lobbyCommand) {
+                        var playerData = QuantumUtils.GetPlayerData(f, player, playerDataDictionary);
+                        if (playerData == null) {
+                            break;
+                        }
+                        lobbyCommand.Execute(f, player, playerData);
                     }
-
-                    lobbyCommand.Execute(f, i, playerData);
                 }
             }
 
@@ -140,8 +141,9 @@ namespace Quantum {
                     }
                 }
 
-                if (f.GetPlayerCommand(f.Global->Host) is CommandHostEndGame) {
+                foreach (var _ in f.GetPlayerCommands<CommandHostEndGame>(f.Global->Host)) {
                     EndGame(f, true, null);
+                    break;
                 }
                 break;
 

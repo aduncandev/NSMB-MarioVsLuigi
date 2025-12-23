@@ -108,7 +108,7 @@ namespace NSMB.Networking {
                 if (Runner && (game = Runner.Game) != null) {
                     pingCommand.PingMs = (int) Ping.Value;
                     foreach (int slot in game.GetLocalPlayerSlots()) {
-                        game.SendCommand(slot, pingCommand);
+                        game.AddCommand(slot, pingCommand);
                     }
                 }
                 yield return seconds;
