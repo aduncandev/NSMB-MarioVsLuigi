@@ -40,16 +40,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5d2ac75e854cf5242b33d3dd6f2cb64a
-    m_Address: Resources/EntityPrototypes/Items/Mega MushroomEntityPrototype.qprototype
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5eaf371057635bb489111400f3bc7f89
-    m_Address: Assets/QuantumUser/Resources/EntityPrototypes/Items/HammerSuitEntityPrototype.qprototype
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7c6bca3b7186f2c4294461cfadb2be8b
     m_Address: Shaders
     m_ReadOnly: 0

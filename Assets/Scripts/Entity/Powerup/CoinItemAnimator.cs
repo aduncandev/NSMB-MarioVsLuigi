@@ -1,5 +1,6 @@
 using NSMB.Utilities.Extensions;
 using Quantum;
+using Quantum.Prototypes;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
 
@@ -99,6 +100,10 @@ namespace NSMB.Entities.CoinItems {
 
             HandleSpawningAnimation(f, coinItem);
             HandleDespawningBlinking(coinItem);
+        }
+
+        public class PlayerInformationSerializer : Photon.Deterministic.BitStream.ArrayElementSerializer<PlayerInformation> {
+
         }
 
         private void HandleSpawningAnimation(Frame f, CoinItem* coinItem) {
