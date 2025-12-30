@@ -14,9 +14,7 @@ namespace NSMB.Quantum {
         public bool IsPaused { get; set; }
 
         //---Serialized Variables
-#if UNITY_EDITOR || MVL_DEBUG
         [SerializeField] private List<DebugSpawnCommand> debugSpawnCommands = new();
-#endif
         [SerializeField] private PlayerElements playerElements;
 
         public void Start() {
@@ -28,7 +26,6 @@ namespace NSMB.Quantum {
             Settings.Controls.Player.ReserveItem.performed -= OnPowerupAction;
         }
 
-#if UNITY_EDITOR || MVL_DEBUG
         public void Update() {
             var game = QuantumRunner.DefaultGame;
             if (game == null || game.Configurations.Runtime.IsRealGame) {
@@ -54,13 +51,6 @@ namespace NSMB.Quantum {
                 });
             }
         }
-
-        [Serializable]
-        public class DebugSpawnCommand {
-            public KeyCode KeyCode;
-            public AssetRef<EntityPrototype> Entity;
-        }
-#endif
 
         public void OnPowerupAction(InputAction.CallbackContext context) {
             if (!playerElements.IsSpectating && !playerElements.PauseMenu.IsPaused) {
@@ -104,5 +94,13 @@ namespace NSMB.Quantum {
 
             callback.SetInput(i, DeterministicInputFlags.Repeatable);
         }
+
+
+        [Serializable]
+        public class DebugSpawnCommand {
+            public KeyCode KeyCode;
+            public AssetRef<EntityPrototype> Entity;
+        }
+
     }
 }

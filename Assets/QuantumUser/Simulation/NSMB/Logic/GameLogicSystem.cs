@@ -430,7 +430,6 @@ namespace Quantum {
                 f.Global->PlayerInfo[i] = default;
             }
             f.Global->UsedStarSpawns.ClearAll();
-            f.Global->UsedStarSpawnCount = 0;
 
             foreach (var (_, data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                 data->IsLoaded = false;

@@ -1300,8 +1300,6 @@ namespace Quantum {
     public EntityRef MainBigStar;
     [FieldOffset(1912)]
     public BitSet64 UsedStarSpawns;
-    [FieldOffset(1888)]
-    public Int32 UsedStarSpawnCount;
     [FieldOffset(1936)]
     public GameRules Rules;
     [FieldOffset(1866)]
@@ -1325,16 +1323,16 @@ namespace Quantum {
     public Byte RealPlayers;
     [FieldOffset(1865)]
     public Byte TotalMarios;
-    [FieldOffset(1892)]
+    [FieldOffset(1888)]
     public Int32 WinningTeam;
-    [FieldOffset(1900)]
-    public QBoolean HasWinner;
     [FieldOffset(1896)]
+    public QBoolean HasWinner;
+    [FieldOffset(1892)]
     public PlayerRef Host;
-    [FieldOffset(1904)]
+    [FieldOffset(1900)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
-    [FieldOffset(1908)]
+    [FieldOffset(1904)]
     [AllocateOnComponentAdded()]
     public QListPtr<BannedPlayerInfo> BannedPlayerIds;
     [FieldOffset(1928)]
@@ -1367,7 +1365,6 @@ namespace Quantum {
         hash = hash * 31 + BigStarSpawnTimer.GetHashCode();
         hash = hash * 31 + MainBigStar.GetHashCode();
         hash = hash * 31 + UsedStarSpawns.GetHashCode();
-        hash = hash * 31 + UsedStarSpawnCount.GetHashCode();
         hash = hash * 31 + Rules.GetHashCode();
         hash = hash * 31 + (Byte)GameState;
         hash = hash * 31 + StartFrame.GetHashCode();
@@ -1420,7 +1417,6 @@ namespace Quantum {
         serializer.Stream.Serialize(&p->PlayerLoadFrames);
         serializer.Stream.Serialize(&p->StartFrame);
         serializer.Stream.Serialize(&p->TotalGamesPlayed);
-        serializer.Stream.Serialize(&p->UsedStarSpawnCount);
         serializer.Stream.Serialize(&p->WinningTeam);
         PlayerRef.Serialize(&p->Host, serializer);
         QBoolean.Serialize(&p->HasWinner, serializer);
@@ -3461,6 +3457,7 @@ namespace Quantum {
     void OnTileChanged(Frame frame, IntVector2 position, StageTileInstance newTile);
   }
   public static unsafe partial class Constants {
+    public const Int32 MaxStarSpawns = 64;
     public const Int32 MaxPlayers = 10;
     /// <summary>8.5</summary>
     public static FP _8_50 {

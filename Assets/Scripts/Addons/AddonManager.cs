@@ -1,5 +1,7 @@
 using Newtonsoft.Json;
+using NSMB.Networking;
 using NSMB.Sound;
+using Photon.Client;
 using Photon.Realtime;
 using Quantum;
 using System;
@@ -16,11 +18,14 @@ using UnityEngine.Networking;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace NSMB.Addons {
-    public class AddonManager : MonoBehaviour {
+    public class AddonManager : MonoBehaviour, IOnEventCallback, IMatchmakingCallbacks {
 
         //---Static Variables
         public static event Action<LoadedAddon> OnAddonLoaded, OnAddonUnloaded;
         public static event Action OnAvailableAddonListLoaded;
+
+        private static readonly byte EventBroadcastAddonList = 101;
+        public static readonly DisconnectCause DisconnectCauseMissingAddon = (DisconnectCause) 101;
 
         private static readonly string RemoteRepoUrl = "https://raw.githubusercontent.com/ipodtouch0218/NSMB-MarioVsLuigi-AddonRepository/main/";
         private static readonly string RemoteAddonsFile = RemoteRepoUrl + "addons.json";
@@ -37,11 +42,14 @@ namespace NSMB.Addons {
 
         //---Private Variables
         private List<Addon> _availableAddons = new();
+        private bool waitingForAddons;
 
         public void Start() {
             AddonCachePath = Path.Combine(Application.persistentDataPath, "addoncache");
             PlatformFolder = GetFolderForPlatform();
             _ = FindAvailableAddons();
+
+            NetworkHandler.Client.AddCallbackTarget(this);
         }
 
         public async Awaitable FindAvailableAddons() {
@@ -405,6 +413,56 @@ namespace NSMB.Addons {
             url2 = url2.TrimStart('/', '\\');
 
             return $"{url1}/{url2}";
+        }
+
+        public async void OnEvent(EventData photonEvent) {
+            if (photonEvent.Code == EventBroadcastAddonList && waitingForAddons) {
+                waitingForAddons = false;
+                try {
+                    List<Guid> guids = ((string[]) photonEvent.CustomData).Select(Guid.Parse).ToList();
+                    Debug.Log($"[Addon] Got addon list of {guids.Count} addons: [{string.Join(", ", guids)}]");
+                    var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(guids);
+                    if (loadAddonResult == LoadAllAddonsResult.Success) {
+                        _ = NetworkHandler.Instance.StartQuantum();
+                    } else {
+                        NetworkHandler.ThrowError(
+                            loadAddonResult == LoadAllAddonsResult.FailureDownloadsDisabled
+                                ? "ui.error.join.addons.downloadsdisabled"
+                                : "ui.error.join.addons.downloadfailed",
+                            false);
+                        NetworkHandler.Client.Disconnect(DisconnectCauseMissingAddon);
+                    }
+                } catch (Exception e) {
+                    Debug.LogError($"[Addon] Failed to activate proper addons! Disconnecting. ({e.Message})");
+                    NetworkHandler.Client.Disconnect(DisconnectCauseMissingAddon);
+                    throw;
+                }
+            }
+        }
+
+        public void OnFriendListUpdate(List<FriendInfo> friendList) { }
+
+        public void OnCreatedRoom() {
+            // Send addon list
+            NetworkHandler.Client.OpRaiseEvent(EventBroadcastAddonList,
+                GlobalController.Instance.addonManager.LoadedAddons.Select(la => la.Definition.Guid.ToString()).ToArray(),
+                new RaiseEventArgs {
+                    CachingOption = EventCaching.AddToRoomCacheGlobal
+                }, SendOptions.SendReliable);
+        }
+
+        public void OnCreateRoomFailed(short returnCode, string message) { }
+
+        public void OnJoinedRoom() {
+            waitingForAddons = true;
+        }
+
+        public void OnJoinRoomFailed(short returnCode, string message) { }
+
+        public void OnJoinRandomFailed(short returnCode, string message) { }
+
+        public void OnLeftRoom() {
+            waitingForAddons = false;
         }
     }
 

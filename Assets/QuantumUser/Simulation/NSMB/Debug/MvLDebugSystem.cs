@@ -1,4 +1,3 @@
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 using static Quantum.CommandMvLDebugCmd;
 
 namespace Quantum {
@@ -54,4 +53,3 @@ namespace Quantum {
         }
     }
 }
-#endif

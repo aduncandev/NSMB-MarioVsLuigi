@@ -102,10 +102,6 @@ namespace NSMB.Entities.CoinItems {
             HandleDespawningBlinking(coinItem);
         }
 
-        public class PlayerInformationSerializer : Photon.Deterministic.BitStream.ArrayElementSerializer<PlayerInformation> {
-
-        }
-
         private void HandleSpawningAnimation(Frame f, CoinItem* coinItem) {
             if (f.Exists(coinItem->ParentMarioPlayer) && coinItem->SpawnAnimationFrames > 0) {
                 float timeRemaining = coinItem->SpawnAnimationFrames / 60f;
