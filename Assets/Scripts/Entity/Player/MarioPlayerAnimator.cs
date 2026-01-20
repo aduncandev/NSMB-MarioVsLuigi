@@ -7,7 +7,6 @@ using NSMB.Utilities;
 using NSMB.Utilities.Extensions;
 using Photon.Deterministic;
 using Quantum;
-using Quantum.Profiling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -208,7 +207,8 @@ namespace NSMB.Entities.Player {
 
             if (Game.PlayerIsLocal(mario->PlayerRef)) {
                 MasterCanvas masterCanvas = FindFirstObjectByType<MasterCanvas>();
-                PlayerElements elements = Instantiate(masterCanvas.playerElementsPrefab, masterCanvas.transform);
+                // Use Resources.Load here instead of a serialized variable to the prefab to avoid referencing all the font stuff into addon scenes
+                PlayerElements elements = ((GameObject) Instantiate(Resources.Load(masterCanvas.playerElementsPrefabPath), masterCanvas.transform)).GetComponent<PlayerElements>();
                 elements.Initialize(Game, f, EntityRef, mario->PlayerRef);
             }
 

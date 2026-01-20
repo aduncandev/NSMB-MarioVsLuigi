@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -22,7 +23,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
         [SerializeField] private GameObject downloadingCancelButton;
 
         //---Private Variables
-        private List<(Guid, long)> addons;
+        private List<AddonCatalogEntry> addons;
         private Action<AddonManager.AddonDownloadResult> callback;
         private Coroutine downloadingCoroutine;
 
@@ -36,7 +37,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
             AddonManager.OnRequestingAddonDownloads -= AskToDownload;
         }
 
-        public void AskToDownload(List<(Guid, long)> addons, long totalFileSize, Action<AddonManager.AddonDownloadResult> callback) {
+        public void AskToDownload(List<AddonCatalogEntry> addons, Action<AddonManager.AddonDownloadResult> callback) {
             this.addons = addons;
             this.callback = callback;
 
@@ -45,7 +46,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
 
             askText.text = GlobalController.Instance.translationManager.GetTranslationWithReplacements("ui.addons.download.request",
                 "addons", addons.Count.ToString(),
-                "filesize", Utils.BytesToString(totalFileSize));
+                "filesize", Utils.BytesToString(addons.Sum(ace => ace.Size)));
 
             Canvas.OpenMenu(this);
         }
@@ -63,25 +64,25 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
             allFilesProgressBar.SetAnchorMaxX(0);
             allFilesProgressBar.SetMarginRight(0);
 
-            foreach ((Guid guid, long downloadSize) in addons) {
-                string targetFileUrl = AddonManager.GetDownloadUrl(guid);
-                Debug.Log($"[Addon] Attempting to download addon with ID {guid} from URL ({targetFileUrl})");
+            foreach (var addonCatalogEntry in addons) {
+                Debug.Log($"[Addon] Attempting to download addon with ID {addonCatalogEntry.ReleaseGuid} from URL ({addonCatalogEntry.DownloadUrl})");
 
-                using var addonRequest = UnityWebRequest.Get(targetFileUrl);
+                using var addonRequest = UnityWebRequest.Get(addonCatalogEntry.DownloadUrl);
                 addonRequest.SetRequestHeader("Accept", "*/*");
                 addonRequest.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
                 _ = addonRequest.SendWebRequest();
 
+                string sizeString = Utils.BytesToString(addonCatalogEntry.Size);
                 do {
                     singleFileProgressBar.SetAnchorMaxX(addonRequest.downloadProgress);
                     singleFileProgressBar.SetMarginRight(0);
-                    singleFileProgressText.text = $"{Utils.BytesToString((long) (addonRequest.downloadProgress * downloadSize))} / {Utils.BytesToString(downloadSize)}";
+                    singleFileProgressText.text = $"{Utils.BytesToString((long) (addonRequest.downloadProgress * addonCatalogEntry.Size))} / {sizeString}";
                     yield return null;
                 } while (!addonRequest.isDone && addonRequest.downloadProgress < 1);
 
                 singleFileProgressBar.SetAnchorMaxX(1);
                 singleFileProgressBar.SetMarginRight(0);
-                singleFileProgressText.text = $"{Utils.BytesToString(downloadSize)} / {Utils.BytesToString(downloadSize)}";
+                singleFileProgressText.text = $"{sizeString} / {sizeString}";
 
                 if (addonRequest.responseCode != 200) {
                     Debug.Log($"[Addon] Download failed: {addonRequest.error} ({addonRequest.responseCode})");
@@ -90,7 +91,6 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 }
 
                 byte[] addonBytes = addonRequest.downloadHandler.data;
-
                 using MemoryStream ms = new(addonBytes);
                 var addonStreamTask = GlobalController.Instance.addonManager.LoadAddonStream(ms).GetAwaiter();
                 
@@ -110,7 +110,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 allFilesProgressBar.SetAnchorMaxX((float) downloadedAddons / addons.Count);
                 allFilesProgressBar.SetMarginRight(0);
 
-                _ = GlobalController.Instance.addonManager.SaveAddonToCache(guid, addonBytes);
+                _ = GlobalController.Instance.addonManager.SaveAddonToCache(addonCatalogEntry.ReleaseGuid, addonBytes);
             }
 
             // Success!
@@ -130,7 +130,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
         }
 
         private void Error() {
-            callback(AddonManager.AddonDownloadResult.Failed);
+            callback(AddonManager.AddonDownloadResult.Failure);
             Canvas.CloseSubmenu(this);
         }
 

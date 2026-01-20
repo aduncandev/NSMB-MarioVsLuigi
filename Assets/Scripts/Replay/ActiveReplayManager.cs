@@ -1,3 +1,4 @@
+using NSMB.Addons;
 using NSMB.Networking;
 using NSMB.UI.MainMenu.Submenus.Replays;
 using NSMB.Utilities;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace NSMB.Replay {
@@ -201,34 +203,37 @@ namespace NSMB.Replay {
             GlobalController.Instance.loadingCanvas.dontHideOnGameDestroy = true;
             GlobalController.Instance.loadingCanvas.Initialize(null);
 
-            if (NetworkHandler.Client.IsConnected) {
-                await NetworkHandler.Client.DisconnectAsync();
-            }
             if (NetworkHandler.Runner && NetworkHandler.Runner.IsRunning) {
                 await NetworkHandler.Runner.ShutdownAsync();
             }
-            /*
+            if (NetworkHandler.Client.IsConnected) {
+                await NetworkHandler.Client.DisconnectAsync();
+            }
+
             var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(replay.Header.AddonGuids);
-            if (loadAddonResult != Addons.AddonManager.LoadAllAddonsResult.Success) {
-                NetworkHandler.ThrowError(
-                    loadAddonResult == Addons.AddonManager.LoadAllAddonsResult.FailureDownloadsDisabled 
-                        ? "ui.error.replay.addons.downloadsdisabled"
-                        : "ui.error.replay.addons.downloadfailed",
-                    false);
+            if (loadAddonResult.Result == LoadAllAddonsResult.Success) {
+                _ = StartReplay(replay);
+            } else if (loadAddonResult.Result == LoadAllAddonsResult.DownloadRequired) {
+                AddonManager.RequestDownloadAddons(loadAddonResult.RequiredDownloads, (result) => {
+                    if (result == AddonManager.AddonDownloadResult.Success) {
+                        _ = StartReplay(replay);
+                    } else if (result == AddonManager.AddonDownloadResult.Cancelled) {
+                        GlobalController.Instance.loadingCanvas.EndAnimation();
+                    } else if (result == AddonManager.AddonDownloadResult.Failure) {
+                        NetworkHandler.ThrowError("ui.error.replay.addons.downloadfailed", false);
+                    }
+                });
+            } else if (loadAddonResult.Result == LoadAllAddonsResult.Failure) {
+                NetworkHandler.ThrowError("ui.error.replay.addons.downloadfailed", false);
                 return;
             }
-            */
+        }
 
+        private async Task StartReplay(BinaryReplayFile replay) {
             CurrentReplay = replay;
 
             var serializer = new QuantumUnityJsonSerializer();
-            RuntimeConfig runtimeConfig;
-            try {
-                runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.DecompressedRuntimeConfigData, compressed: false);
-            } catch {
-                // Bodge: support old 1.8 replays that double compressed.
-                runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.DecompressedRuntimeConfigData, compressed: true);
-            }
+            RuntimeConfig runtimeConfig = serializer.ConfigFromByteArray<RuntimeConfig>(replay.DecompressedRuntimeConfigData, compressed: false);
             var deterministicConfig = DeterministicSessionConfig.FromByteArray(replay.DecompressedDeterministicConfigData);
             var inputStream = new BitStream(replay.DecompressedInputData);
             var replayInputProvider = new BitStreamReplayInputProvider(inputStream, ReplayEnd);

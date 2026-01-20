@@ -69,6 +69,7 @@ MonoBehaviour:
   HidePlayersOnMinimap: 1
   SpawnBigPowerups: 0
   SpawnVerticalPowerups: 1
+  SfxOverrides: []
   MainMusic:
   - Id:
       Value: 386992444490795070

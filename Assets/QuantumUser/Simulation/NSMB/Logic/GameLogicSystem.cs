@@ -22,6 +22,12 @@ namespace Quantum {
         }
 
         public override void Update(Frame f) {
+
+            if (f.IsVerified) {
+                for (int i = 0; i < f.MaxPlayerCount; i++) {
+                    UnityEngine.Debug.Log($"{(PlayerRef) i} -> input: {(f.GetPlayerInputFlags(i) & DeterministicInputFlags.PlayerNotPresent) != 0} lastConnectionState: {f.Global->PlayerLastConnectionState.IsSet(i)}");
+                }
+            }
             // Tick RNG
             _ = f.RNG->Next();
 

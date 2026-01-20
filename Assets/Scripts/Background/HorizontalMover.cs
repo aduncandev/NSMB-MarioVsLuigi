@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace NSMB.Background {
-    public class ParallaxMover : MonoBehaviour {
+    public class HorizontalMover : MonoBehaviour {
 
         //---Serialized Variables
         [SerializeField] protected float speed;
@@ -15,7 +15,7 @@ namespace NSMB.Background {
 
         public void Start() {
             moveBy = Vector3.right * speed;
-            foreach (var mover in GetComponentsInParent<ParallaxMover>()) {
+            foreach (var mover in GetComponentsInParent<HorizontalMover>()) {
                 if (mover.transform != transform) {
                     enabled = false;
                     break;

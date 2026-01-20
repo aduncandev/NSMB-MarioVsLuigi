@@ -59,7 +59,6 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         private bool sortAscending;
         private int sortIndex;
         private bool languageChangedSinceLastOpen;
-        private FileSystemWatcher watcher;
 
 
         [RuntimeInitializeOnLoadMethod]
@@ -94,52 +93,14 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
         }
 
         public void Initialize() {
-#if TODO && !UNITY_WEBGL
-            watcher = new FileSystemWatcher(ReplayDirectory) {
-                NotifyFilter = NotifyFilters.CreationTime
-                                     | NotifyFilters.DirectoryName
-                                     | NotifyFilters.FileName
-                                     | NotifyFilters.LastWrite,
-                IncludeSubdirectories = true,
-                Filter = "*.mvlreplay",
-            };
-            watcher.Changed += Watcher_Changed;
-            watcher.Renamed += OnFileRenamed;
-            watcher.Created += OnFileCreated;
-            watcher.Deleted += OnFileDeleted;
-            watcher.EnableRaisingEvents = true;
-#endif
             Instance = this;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
 
             _ = FindReplays();
         }
 
-        private void Watcher_Changed(object sender, FileSystemEventArgs e) {
-            print(e.FullPath + " changed");
-        }
-
-        private void OnFileDeleted(object sender, FileSystemEventArgs e) {
-            foreach (var deletedReplay in replays.Where(rle => rle.ReplayFile.FilePath == e.FullPath).ToArray()) {
-                replays.Remove(deletedReplay);
-                temporaryReplays.Remove(deletedReplay);
-                Destroy(deletedReplay.gameObject);
-            }
-        }
-
-        private void OnFileCreated(object sender, FileSystemEventArgs e) {
-            StartCoroutine(ImportFile(e.FullPath, false));
-        }
-
-        private void OnFileRenamed(object sender, RenamedEventArgs e) {
-            print("RENAMED: " + e.OldFullPath + " -> " + e.FullPath);
-        }
-
         public void OnDestroyCustom() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
-#if TODO && !UNITY_WEBGL
-            watcher.Dispose();
-#endif
         }
 
         public void Show() {
@@ -151,9 +112,8 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform) layout.transform);
             Canvas.ForceUpdateCanvases();
 
-#if !TODO || UNITY_WEBGL
             _ = FindReplays();
-#endif
+
             //SortReplays();
             OnScrollRectScrolled(default);
             OnLanguageChanged(GlobalController.Instance.translationManager);
@@ -224,7 +184,6 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 gamemodeName = "<sprite name=room_customlevel> ???";
             }
 
-            // TODO: possibly parse from initial frame instead of storing as separate members
             // Playerlist
             StringBuilder builder = new();
             foreach (int i in Enumerable.Range(0, header.PlayerInformation.Length).OrderByDescending(idx => header.PlayerInformation[idx].FinalObjectiveCount)) {

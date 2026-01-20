@@ -5,8 +5,8 @@ using UnityEngine;
 namespace NSMB.UI.Game {
     public class MasterCanvas : QuantumSceneViewComponent {
 
-        //---Serialize Variables
-        [SerializeField] public PlayerElements playerElementsPrefab;
+        //---Serialized Variables
+        [SerializeField] public string playerElementsPrefabPath;
 
         //---Private Variables
         private PlayerElements spectatorUI;
@@ -52,7 +52,8 @@ namespace NSMB.UI.Game {
             }
 
             // Create a new spectator-only PlayerElement
-            spectatorUI = Instantiate(playerElementsPrefab, transform);
+            // Use Resources.Load here instead of a serialized variable to the prefab to avoid referencing all the font stuff into addon scenes
+            spectatorUI = ((GameObject) Instantiate(Resources.Load(playerElementsPrefabPath), transform)).GetComponent<PlayerElements>();
             spectatorUI.Initialize(Game, f, EntityRef.None, PlayerRef.None);
         }
 

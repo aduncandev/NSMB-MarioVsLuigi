@@ -31,7 +31,6 @@ namespace NSMB.Addons {
 
         private List<BuildableAddon> availableAddonFolders;
         private int? selectedAddonFolder;
-
         private Vector2 addonFolderSelectScroll;
 
 
@@ -174,7 +173,7 @@ namespace NSMB.Addons {
                         failedBuilds.Add(buildTarget);
                     }
                 }
-                EditorUserBuildSettings.SwitchActiveBuildTarget(oldBuildTargetGroup, oldBuildTarget);
+                //EditorUserBuildSettings.SwitchActiveBuildTarget(oldBuildTargetGroup, oldBuildTarget);
 
                 // Delete manifests
                 foreach (var manifest in Directory.EnumerateFiles(exportPath, "*.manifest", new EnumerationOptions { RecurseSubdirectories = true })) {

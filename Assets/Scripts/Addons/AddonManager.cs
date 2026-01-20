@@ -22,17 +22,18 @@ namespace NSMB.Addons {
         public static event Action OnAvailableAddonListLoaded;
 
         public enum AddonDownloadResult {
-            Failed,
+            Failure,
             Cancelled,
             Success
         };
-        public delegate void RequestingAddonDownloadsDelegate(List<(Guid, long)> addons, long totalBytes, Action<AddonDownloadResult> callback);
+        public delegate void RequestingAddonDownloadsDelegate(List<AddonCatalogEntry> addons, Action<AddonDownloadResult> callback);
         public static event RequestingAddonDownloadsDelegate OnRequestingAddonDownloads;
 
         private static readonly byte EventBroadcastAddonList = 101;
         public static readonly DisconnectCause DisconnectCauseMissingAddon = (DisconnectCause) 101;
 
         private static readonly string RemoteRepoUrl = "https://raw.githubusercontent.com/ipodtouch0218/NSMB-MarioVsLuigi-AddonRepository/main/";
+        private static readonly string RemoteRepoCatalogUrl = RemoteRepoUrl + "catalog.json";
         public static readonly string AddonExtension = ".mvladdon";
 
         public static string LocalFolderPath;
@@ -40,9 +41,9 @@ namespace NSMB.Addons {
 
         //---Properties
         public List<LoadedAddon> LoadedAddons { get; private set; } = new();
-        private Dictionary<AssetGuid, LoadedAddon> RegisteredAssets = new();
 
         //---Private Variables
+        private Dictionary<AssetGuid, LoadedAddon> registeredAssets = new();
         private List<AddonFile> availableAddons = new();
         private bool waitingForAddons;
 #if UNITY_STANDALONE
@@ -108,26 +109,42 @@ namespace NSMB.Addons {
                 await UnloadAddon(addon);
             }
 
+            Dictionary<string, AddonCatalogEntry> remoteCatalog = null;
+
             // Load addons
-            long downloadBytes = 0;
-            List<(Guid, long)> tryDownloading = new();
-            foreach (var addon in requestedAddons) {
-                var loadAddonResult = await LoadAddon(addon);
+            List<AddonCatalogEntry> tryDownloading = new();
+            foreach (var addonGuid in requestedAddons) {
+                var loadAddonResult = await LoadAddon(addonGuid);
                 if (!loadAddonResult.Success) {
                     // Check if this is downloadable.
-                    using UnityWebRequest addonCheck = UnityWebRequest.Head(GetDownloadUrl(addon));
-                    addonCheck.SetRequestHeader("Accept", "*/*");
-                    addonCheck.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
-                    await addonCheck.SendWebRequest();
-                    if (addonCheck.result == UnityWebRequest.Result.Success && addonCheck.responseCode == 200) {
-                        long filesize = long.Parse(addonCheck.GetResponseHeader("Content-Length"));
-                        downloadBytes += filesize;
-                        tryDownloading.Add((addon, filesize));
-                    } else {
-                        // We can't download this. Abort.
-                        return new AllAddonsLoadResult {
-                            Result = LoadAllAddonsResult.Failure,
-                        };
+                    if (remoteCatalog == null) {
+                        using UnityWebRequest catalogRequest = UnityWebRequest.Get(RemoteRepoCatalogUrl);
+                        catalogRequest.SetRequestHeader("Accept", "*/*");
+                        catalogRequest.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
+                        await catalogRequest.SendWebRequest();
+
+                        if (catalogRequest.result == UnityWebRequest.Result.Success && catalogRequest.responseCode == 200) {
+                            try {
+                                remoteCatalog = JsonConvert.DeserializeObject<Dictionary<string, AddonCatalogEntry>>(catalogRequest.downloadHandler.text);
+                            } catch (Exception e) {
+                                Debug.LogError($"[Addon] Failed to deserialize catalog.json: {e.Message}");
+                                Debug.LogError(e);
+                                return new AllAddonsLoadResult {
+                                    Result = LoadAllAddonsResult.Failure,
+                                };
+                            }
+                        } else {
+                            Debug.LogError($"[Addon] Request to download catalog.json failed: {catalogRequest.result} - {catalogRequest.error}");
+                            // We can't download this. Abort.
+                            return new AllAddonsLoadResult {
+                                Result = LoadAllAddonsResult.Failure,
+                            };
+                        }
+                    }
+
+                    if (remoteCatalog.TryGetValue(addonGuid.ToString(), out var catalogEntry)) {
+                        catalogEntry.ReleaseGuid = addonGuid;
+                        tryDownloading.Add(catalogEntry);
                     }
                 }
             }
@@ -137,7 +154,6 @@ namespace NSMB.Addons {
                 return new AllAddonsLoadResult {
                     Result = LoadAllAddonsResult.DownloadRequired,
                     RequiredDownloads = tryDownloading,
-                    RequiredDownloadBytes = downloadBytes,
                 };
             }
 
@@ -182,7 +198,7 @@ namespace NSMB.Addons {
             Debug.Log($"[Addon] Loading addon {addonDef.FullName} ({addonDef.ReleaseGuid})");
 
             List<AssetBundle> loadedBundles = new();
-            List<(string,MemoryStream)> decompressedBundles = new();
+            List<(string, MemoryStream)> decompressedBundles = new();
             List<UnityEngine.Object> registeredAssets = new();
 
             void UnloadAndCleanup() {
@@ -249,11 +265,11 @@ namespace NSMB.Addons {
                             try {
                                 QuantumUnityDB.Global.AddAsset(assetObject);
                                 registeredAssets.Add(assetObject);
-                                RegisteredAssets.Add(assetObject.Guid, newAddon);
+                                this.registeredAssets.Add(assetObject.Guid, newAddon);
                             } catch {
                                 Debug.Log($"[Addon] Failed to load addon {addonDef.FullName} ({addonDef.ReleaseGuid}): registering AssetObject {so.name} ({assetObject.Guid}) failed");
                                 UnloadAndCleanup();
-                                if (RegisteredAssets.TryGetValue(assetObject.Guid, out var incompatibleAddon)) {
+                                if (this.registeredAssets.TryGetValue(assetObject.Guid, out var incompatibleAddon)) {
                                     return new AddonLoadResult {
                                         Result = AddonLoadResultEnum.IncompatibleWithOtherAddon,
                                         IncompatibleWith = incompatibleAddon,
@@ -324,7 +340,7 @@ namespace NSMB.Addons {
             if (obj is AssetObject assetObject) {
                 QuantumUnityDB.Global.DisposeAsset(assetObject.Guid, true);
                 QuantumUnityDB.Global.RemoveSource(assetObject.Guid);
-                RegisteredAssets.Remove(assetObject.Guid);
+                registeredAssets.Remove(assetObject.Guid);
             } else if (obj is GlobalSoundEffectOverrides sfxOverride) {
                 SoundEffectResolver.Instance.GlobalProviders.Remove(sfxOverride);
             }
@@ -465,6 +481,10 @@ namespace NSMB.Addons {
             return $"{url1}/{url2}";
         }
 
+        public static void RequestDownloadAddons(List<AddonCatalogEntry> addons, Action<AddonDownloadResult> callback) {
+            OnRequestingAddonDownloads?.Invoke(addons, callback);
+        }
+
         public async void OnEvent(EventData photonEvent) {
             if (photonEvent.Code == EventBroadcastAddonList && waitingForAddons) {
                 waitingForAddons = false;
@@ -477,7 +497,7 @@ namespace NSMB.Addons {
                         _ = NetworkHandler.Instance.StartQuantum();
                     } else if (loadAddonResult.Result == LoadAllAddonsResult.DownloadRequired) {
                         GlobalController.Instance.connecting.SetActive(false);
-                        OnRequestingAddonDownloads?.Invoke(loadAddonResult.RequiredDownloads, loadAddonResult.RequiredDownloadBytes, async (result) => {
+                        RequestDownloadAddons(loadAddonResult.RequiredDownloads, async (result) => {
                             if (result == AddonDownloadResult.Success) {
                                 GlobalController.Instance.connecting.SetActive(true);
                                 _ = NetworkHandler.Instance.StartQuantum();
@@ -528,6 +548,7 @@ namespace NSMB.Addons {
         }
     }
 
+
     public class LoadedAddon {
         public AddonDefinition Definition;
         public List<AssetBundle> LoadedAssetBundles;
@@ -539,6 +560,15 @@ namespace NSMB.Addons {
         public string FilePath;
     }
 
+    public class AddonCatalogEntry {
+        public Guid ReleaseGuid;
+        public string DisplayName;
+        public string Author;
+        public string Version;
+        public long Size;
+        public string DownloadUrl;
+    }
+
     public struct AddonLoadResult {
         public readonly bool Success => Result == AddonLoadResultEnum.Success || Result == AddonLoadResultEnum.AlreadyLoaded;
         public AddonLoadResultEnum Result;
@@ -548,8 +578,7 @@ namespace NSMB.Addons {
 
     public struct AllAddonsLoadResult {
         public LoadAllAddonsResult Result;
-        public List<(Guid, long)> RequiredDownloads;
-        public long RequiredDownloadBytes;
+        public List<AddonCatalogEntry> RequiredDownloads;
     }
 
     public enum AddonLoadResultEnum {
