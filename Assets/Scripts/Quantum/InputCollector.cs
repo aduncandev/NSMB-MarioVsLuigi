@@ -31,21 +31,22 @@ namespace NSMB.Quantum {
             if (game == null || game.Configurations.Runtime.IsRealGame) {
                 return;
             }
+            var keyboard = Keyboard.current;
 
             foreach (var debug in debugSpawnCommands) {
-                if (UnityEngine.Input.GetKeyDown(debug.KeyCode)) {
-                    game.AddCommand(new CommandMvLDebugCmd { 
+                if (keyboard[debug.Key].wasPressedThisFrame) {
+                    game.AddCommand(new CommandMvLDebugCmd {
                         CommandId = CommandMvLDebugCmd.DebugCommand.SpawnEntity,
                         SpawnData = debug.Entity,
                     });
                 }
             }
-            if (UnityEngine.Input.GetKeyDown(KeyCode.P)) {
+            if (keyboard[Key.P].wasPressedThisFrame) {
                 game.AddCommand(new CommandMvLDebugCmd {
                     CommandId = CommandMvLDebugCmd.DebugCommand.KillSelf,
                 });
             }
-            if (UnityEngine.Input.GetKeyDown(KeyCode.O)) {
+            if (keyboard[Key.O].wasPressedThisFrame) {
                 game.AddCommand(new CommandMvLDebugCmd {
                     CommandId = CommandMvLDebugCmd.DebugCommand.FreezeSelf,
                 });
@@ -98,7 +99,7 @@ namespace NSMB.Quantum {
 
         [Serializable]
         public class DebugSpawnCommand {
-            public KeyCode KeyCode;
+            public Key Key;
             public AssetRef<EntityPrototype> Entity;
         }
 

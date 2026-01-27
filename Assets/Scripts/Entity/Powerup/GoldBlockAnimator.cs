@@ -73,7 +73,6 @@ namespace NSMB.Entities.CoinItems {
         }
 
         public void LateUpdate() {
-            Transform t = helmetModel.transform;
 
             if (PredictedFrame == null) {
                 return;
@@ -83,6 +82,7 @@ namespace NSMB.Entities.CoinItems {
                 SwapParentView(goldBlock->AttachedTo);
             }
 
+            Transform t = helmetModel.transform;
             if (lostViaDamage) {
                 lostViaDamageAngularVelocity = Mathf.MoveTowards(lostViaDamageAngularVelocity, 0, lostViaDamageAngularDeceleration * Time.deltaTime);
                 lostViaDamageVelocity += lostViaDamageGravity * Time.deltaTime;
@@ -162,7 +162,7 @@ namespace NSMB.Entities.CoinItems {
                 return false;
             }
             foreach (var playerElement in PlayerElements.AllPlayerElements) {
-                if (marioPlayerAnimator.EntityRef == playerElement.Entity && (camera == playerElement.Camera || camera == playerElement.ScrollCamera || camera == playerElement.UICamera)) {
+                if (marioPlayerAnimator.EntityRef == playerElement.Entity && playerElement.IsOurCamera(camera)) {
                     return true;
                 }
             }

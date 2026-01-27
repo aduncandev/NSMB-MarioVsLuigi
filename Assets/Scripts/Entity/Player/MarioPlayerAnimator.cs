@@ -668,7 +668,7 @@ namespace NSMB.Entities.Player {
 
         private bool IsCameraFocus(Camera camera) {
             foreach (var playerElement in PlayerElements.AllPlayerElements) {
-                if (EntityRef == playerElement.Entity && (camera == playerElement.Camera || camera == playerElement.ScrollCamera || camera == playerElement.UICamera)) {
+                if (EntityRef == playerElement.Entity && playerElement.IsOurCamera(camera)) {
                     return true;
                 }
             }

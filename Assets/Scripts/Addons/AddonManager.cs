@@ -38,6 +38,7 @@ namespace NSMB.Addons {
 
         public static string LocalFolderPath;
         private static string PlatformFolder;
+        private static string UniversalPlatformFolder = "Universal";
 
         //---Properties
         public List<LoadedAddon> LoadedAddons { get; private set; } = new();
@@ -51,8 +52,14 @@ namespace NSMB.Addons {
 #endif
 
         public void Start() {
-            LocalFolderPath = Path.Combine(Application.dataPath, "addons");
-            Directory.CreateDirectory(LocalFolderPath);
+#if UNITY_WEBGL
+            LocalFolderPath = Application.persistentDataPath + "/addons";
+#else
+            LocalFolderPath = Application.dataPath + "/addons";
+#endif
+            if (!Directory.Exists(LocalFolderPath)) {
+                Directory.CreateDirectory(LocalFolderPath);
+            }
 
             PlatformFolder = GetFolderForPlatform();
             _ = FindAvailableAddons();
@@ -81,11 +88,11 @@ namespace NSMB.Addons {
             NetworkHandler.Client.AddCallbackTarget(this);
         }
 
-        public void OnDestroy() {
 #if UNITY_STANDALONE
+        public void OnDestroy() {
             watcher1?.Dispose();
-#endif
         }
+#endif
 
         public async Awaitable FindAvailableAddons() {
             // Background thread this sh*t
@@ -121,8 +128,13 @@ namespace NSMB.Addons {
                     // Check if this is downloadable.
                     if (remoteCatalog == null) {
                         using UnityWebRequest catalogRequest = UnityWebRequest.Get(RemoteRepoCatalogUrl);
-                        catalogRequest.SetRequestHeader("Accept", "*/*");
-                        catalogRequest.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
+                        catalogRequest.SetRequestHeader("Accept", "application/json");
+                        //catalogRequest.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
+                        catalogRequest.certificateHandler = new MvLCertificateHandler();
+                        catalogRequest.disposeCertificateHandlerOnDispose = true;
+                        catalogRequest.disposeDownloadHandlerOnDispose = true;
+                        catalogRequest.disposeUploadHandlerOnDispose = true;
+                        catalogRequest.timeout = 10;
                         await catalogRequest.SendWebRequest();
 
                         if (catalogRequest.result == UnityWebRequest.Result.Success && catalogRequest.responseCode == 200) {
@@ -225,7 +237,7 @@ namespace NSMB.Addons {
 
             try {
                 // Load bundles
-                var zippedBundles = zipFile.Entries.Where(zae => zae.FullName.StartsWith(PlatformFolder + "/"));
+                var zippedBundles = zipFile.Entries.Where(zae => zae.FullName.StartsWith(PlatformFolder + "/") || zae.FullName.StartsWith(UniversalPlatformFolder + "/"));
                 foreach (var zippedBundle in zippedBundles) {
                     using Stream bundleStream = zippedBundle.Open();
                     MemoryStream memoryStream = new((int) zippedBundle.Length);
@@ -236,9 +248,7 @@ namespace NSMB.Addons {
                 // Load into asset database
                 await Awaitable.MainThreadAsync();
 
-                //Debug.Log(string.Join(",", decompressedBundles.Select(x => x.Item1)));
                 foreach (var bundle in decompressedBundles) {
-                    //Debug.Log(string.Join(", ", AssetBundle.GetAllLoadedAssetBundles().Select(x => x.name)));
                     var loadTask = AssetBundle.LoadFromStreamAsync(bundle.Item2);
                     await loadTask;
                     if (!loadTask.assetBundle) {
@@ -404,7 +414,6 @@ namespace NSMB.Addons {
         }
 
         public async Awaitable SaveAddonToCache(Guid guid, byte[] data) {
-#if UNITY_STANDALONE
             try {
                 await Awaitable.BackgroundThreadAsync();
                 Directory.CreateDirectory($"{LocalFolderPath}/download");
@@ -418,7 +427,6 @@ namespace NSMB.Addons {
                 Debug.LogError($"[Addon] Failed to save addon to download folder: {e.Message}");
                 Debug.LogError(e);
             }
-#endif
         }
 
         public static async Awaitable<AddonDefinition> GetAddonDefinition(ZipArchive zipFile, bool loadIcon) {

@@ -15,7 +15,6 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 #if UNITY_STANDALONE
-using NSMB.UI.MainMenu;
 using NSMB.UI.MainMenu.Submenus.Replays;
 using UnityEngine.Profiling;
 #endif
@@ -101,13 +100,15 @@ namespace NSMB {
 
             //todo: this jitters to hell
 #if UNITY_STANDALONE
-            if (Screen.fullScreenMode == FullScreenMode.Windowed && UnityEngine.Input.GetKey(KeyCode.LeftShift) && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
+            var keyboard = Keyboard.current;
+
+            if (Screen.fullScreenMode == FullScreenMode.Windowed && keyboard.leftShiftKey.isPressed && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
                 newWindowHeight = (int) (newWindowWidth * (9f / 16f));
                 Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
             }
 
             if (Debug.isDebugBuild) {
-                if (UnityEngine.Input.GetKeyDown(KeyCode.F9)) {
+                if (keyboard.f9Key.wasPressedThisFrame) {
                     if (Profiler.enabled) {
                         Profiler.enabled = false;
                         PlaySound(SoundEffect.Player_Sound_Powerdown);
@@ -120,6 +121,7 @@ namespace NSMB {
                     }
                 }
 
+                /*
                 if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha9)) {
                     var canvas = FindFirstObjectByType<MainMenuCanvas>();
                     if (canvas) {
@@ -127,18 +129,18 @@ namespace NSMB {
                         blur.SetActive(!blur.activeSelf);
                     }
                 }
-
+                */
             }
 
-            if (UnityEngine.Input.GetKeyDown(KeyCode.F6)) {
+            if (keyboard.f6Key.wasPressedThisFrame) {
                 System.Diagnostics.Process.Start(Application.consoleLogPath);
             }
 
-            if (UnityEngine.Input.GetKeyDown(KeyCode.F7)) {
+            if (keyboard.f7Key.wasPressedThisFrame) {
                 System.Diagnostics.Process.Start(ReplayListManager.ReplayDirectory);
             }
 
-            if (UnityEngine.Input.GetKeyDown(KeyCode.F8)) {
+            if (keyboard.f8Key.wasPressedThisFrame) {
                 System.Diagnostics.Process.Start(AddonManager.LocalFolderPath);
             }
 #endif

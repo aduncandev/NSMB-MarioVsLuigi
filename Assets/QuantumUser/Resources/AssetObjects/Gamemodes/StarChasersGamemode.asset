@@ -56,7 +56,7 @@ MonoBehaviour:
     StarsToWin: 10
     CoinsForPowerup: 8
     Lives: 0
-    TimerSeconds: 0
+    TimerMinutes: 0
     TeamsEnabled:
       Value: 0
     CustomPowerupsEnabled:

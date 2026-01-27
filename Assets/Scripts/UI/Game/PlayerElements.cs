@@ -29,7 +29,6 @@ namespace NSMB.UI.Game {
         public Canvas Canvas => canvas;
         public Camera Camera => ourCamera;
         public Camera ScrollCamera => scrollCamera;
-        public Camera UICamera => uiCamera;
         public CameraAnimator CameraAnimator => cameraAnimator;
         public ReplayUI ReplayUi => replayUi;
         public PauseMenuManager PauseMenu => pauseMenu;
@@ -39,7 +38,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private Canvas canvas;
         [SerializeField] private UIUpdater uiUpdater;
         [SerializeField] private CameraAnimator cameraAnimator;
-        [SerializeField] private Camera ourCamera, scrollCamera, uiCamera;
+        [SerializeField] private Camera ourCamera, scrollCamera;
         [SerializeField] private InputCollector inputCollector;
         [SerializeField] private ScoreboardUpdater scoreboardUpdater;
         [SerializeField] private ReplayUI replayUi;
@@ -227,6 +226,10 @@ namespace NSMB.UI.Game {
             }
 
             SpectateNextPlayer(-1);
+        }
+
+        public bool IsOurCamera(Camera camera) {
+            return camera == Camera || camera == ScrollCamera;
         }
 
         private unsafe void OnNavigate(InputAction.CallbackContext context) {

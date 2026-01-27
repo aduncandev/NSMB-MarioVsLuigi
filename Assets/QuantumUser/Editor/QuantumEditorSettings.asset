@@ -18,7 +18,7 @@ MonoBehaviour:
   UseQuantumUnityDBAssetPostprocessor: 1
   UseQuantumToolbarUtilities: 1
   QuantumToolbarZone: 0
-  UsePhotonAppVersionsPostprocessor: 1
+  UsePhotonAppVersionsPostprocessor: 0
   EntityComponentInspectorMode: 2
   AutoBuildOnSceneSave: 96
   AutoBuildOnPlaymodeChanged: 96

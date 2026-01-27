@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace NSMB.UI.Translation {
 
@@ -35,7 +36,7 @@ namespace NSMB.UI.Translation {
         }
 
         public void Update() {
-            if (Input.GetKeyDown(KeyCode.F5)) {
+            if (Keyboard.current[Key.F5].wasPressedThisFrame) {
                 LoadLanguage(CurrentLocale);
             }
         }

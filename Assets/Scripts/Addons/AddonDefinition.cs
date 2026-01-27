@@ -13,7 +13,7 @@ namespace NSMB.Addons {
 #if UNITY_EDITOR
         public string IconAssetPath { get; set; }
 #endif
-
+        public string[] SupportedPlatforms { get; set; }
         [JsonIgnore]
         public Texture2D IconTexture { get; set; }
 

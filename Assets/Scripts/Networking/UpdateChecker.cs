@@ -15,7 +15,7 @@ namespace NSMB.Networking {
             // Get http results from the GitHub API
             using UnityWebRequest request = UnityWebRequest.Get(ApiURL);
             request.SetRequestHeader("Accept", "application/json");
-            request.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
+            //request.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
 
             await request.SendWebRequest();
             
@@ -37,7 +37,10 @@ namespace NSMB.Networking {
                 Debug.Log($"[Updater] Local version: {localVersion} / Remote version: {remoteVersion}. Up to date: {upToDate}");
 
                 callback(upToDate, tag);
-            } catch { }
+            } catch (Exception e) {
+                Debug.LogError($"[Updater] Failed to parse API response: {e.Message}");
+                Debug.LogError(e);
+            }
         }
     }
 }

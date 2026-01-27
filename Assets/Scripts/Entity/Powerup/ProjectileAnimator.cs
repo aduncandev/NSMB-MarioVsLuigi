@@ -81,7 +81,7 @@ namespace NSMB.Entities.CoinItems {
             }
 
             foreach (var playerElement in PlayerElements.AllPlayerElements) {
-                if (camera == playerElement.Camera || camera == playerElement.ScrollCamera || camera == playerElement.UICamera) {
+                if (playerElement.IsOurCamera(camera)) {
                     // This camera.
                     if (!PredictedFrame.Unsafe.TryGetPointer(playerElement.Entity, out MarioPlayer* cameraMario)) {
                         return false;

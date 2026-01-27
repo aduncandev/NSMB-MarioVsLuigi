@@ -66,8 +66,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                     Destroy(entry.gameObject);
                 }
                 entries.Clear();
+#if UNITY_STANDALONE
                 watcher?.Dispose();
                 watcher = null;
+#endif
 
                 TranslationManager.OnLanguageChanged -= OnLanguageChanged;
                 AddonManager.OnAddonLoaded -= OnAddonLoaded;
@@ -87,59 +89,62 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
         public async Awaitable OpenFolder(string newPath) {
             await Awaitable.MainThreadAsync();
             loadingGraphic.SetActive(true);
-            var newDirectory = new DirectoryInfo(Path.Combine(AddonManager.LocalFolderPath, currentRelativePath, newPath));
-            string fullNewPath = newDirectory.FullName;
-            string previousPath = currentPath;
-            currentPath = fullNewPath;
-            currentRelativePath = Path.GetRelativePath(AddonManager.LocalFolderPath, fullNewPath).Replace(@"\", "/");
-            if (currentRelativePath == ".") {
-                folderLabel.text = Path.GetFileName(AddonManager.LocalFolderPath) + "/";
-            } else {
-                folderLabel.text = Path.GetFileName(AddonManager.LocalFolderPath) + "/" + currentRelativePath + "/";
-            }
-
             List<ScannedPath> results = new();
+            string previousPath = currentPath;
 
-
-            if (newDirectory.Exists) {
-                // Prepare paths in background thread
-                await Awaitable.BackgroundThreadAsync();
-
-                foreach (string subdirectoryPath in Directory.EnumerateDirectories(fullNewPath)) {
-                    string subdirectoryName = Path.GetFileName(subdirectoryPath);
-                    results.Add(new ScannedPath {
-                        Type = ScannedPath.AddonType.Folder,
-                        FullPath = subdirectoryPath,
-                        Name = subdirectoryName,
-                    });
+            try {
+                string fullNewPath = new DirectoryInfo($"{AddonManager.LocalFolderPath}/{currentRelativePath}/{newPath}").FullName;
+                currentPath = fullNewPath;
+                currentRelativePath = Path.GetRelativePath(AddonManager.LocalFolderPath, fullNewPath).Replace(@"\", "/");
+                if (currentRelativePath == ".") {
+                    folderLabel.text = Path.GetFileName(AddonManager.LocalFolderPath) + "/";
+                } else {
+                    folderLabel.text = Path.GetFileName(AddonManager.LocalFolderPath) + "/" + currentRelativePath + "/";
                 }
 
-                foreach (string filePath in Directory.EnumerateFiles(fullNewPath)) {
-                    AddonDefinition addon = null;
-                    try {
-                        using FileStream fs = new(filePath, FileMode.Open);
-                        using ZipArchive zipArchive = new(fs);
-                        addon = await AddonManager.GetAddonDefinition(zipArchive, true);
-                    } catch { }
+                if (Directory.Exists(fullNewPath)) {
+                    // Prepare paths in background thread
+                    await Awaitable.BackgroundThreadAsync();
 
-                    string fileName = Path.GetFileName(filePath);
-                    if (addon != null) {
-                        // This is an addon.
+                    foreach (string subdirectoryPath in Directory.EnumerateDirectories(fullNewPath)) {
+                        string subdirectoryName = Path.GetFileName(subdirectoryPath);
                         results.Add(new ScannedPath {
-                            Type = ScannedPath.AddonType.AddonFile,
-                            Addon = addon,
-                            FullPath = filePath,
-                            Name = fileName,
-                        });
-                    } else if (!hideNonAddons) {
-                        results.Add(new ScannedPath {
-                            Type = ScannedPath.AddonType.NonAddonFile,
-                            FullPath = filePath,
-                            Name = fileName,
+                            Type = ScannedPath.AddonType.Folder,
+                            FullPath = subdirectoryPath,
+                            Name = subdirectoryName,
                         });
                     }
+
+                    foreach (string filePath in Directory.EnumerateFiles(fullNewPath)) {
+                        AddonDefinition addon = null;
+                        try {
+                            using FileStream fs = new(filePath, FileMode.Open);
+                            using ZipArchive zipArchive = new(fs);
+                            addon = await AddonManager.GetAddonDefinition(zipArchive, true);
+                        } catch { }
+
+                        string fileName = Path.GetFileName(filePath);
+                        if (addon != null) {
+                            // This is an addon.
+                            results.Add(new ScannedPath {
+                                Type = ScannedPath.AddonType.AddonFile,
+                                Addon = addon,
+                                FullPath = filePath,
+                                Name = fileName,
+                            });
+                        } else if (!hideNonAddons) {
+                            results.Add(new ScannedPath {
+                                Type = ScannedPath.AddonType.NonAddonFile,
+                                FullPath = filePath,
+                                Name = fileName,
+                            });
+                        }
+                    }
+                    results.Sort();
                 }
-                results.Sort();
+            } catch (Exception e) {
+                Debug.LogError($"[Addon] Failed to open folder \"{AddonManager.LocalFolderPath}/{currentRelativePath}/{newPath}\": {e.Message}");
+                Debug.LogError(e);
             }
 
             // Create gameobjects in main thread

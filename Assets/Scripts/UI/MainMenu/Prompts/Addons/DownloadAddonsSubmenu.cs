@@ -1,5 +1,6 @@
 using JimmysUnityUtilities;
 using NSMB.Addons;
+using NSMB.Networking;
 using NSMB.Utilities;
 using System;
 using System.Collections;
@@ -60,29 +61,28 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
 
         private IEnumerator UpdateDownloadProgress() {
             int downloadedAddons = 0;
-            allFilesProgressText.text = $"0 / {addons.Count}";
-            allFilesProgressBar.SetAnchorMaxX(0);
-            allFilesProgressBar.SetMarginRight(0);
+            UpdateProgressBars(0, 0, 0);
 
             foreach (var addonCatalogEntry in addons) {
                 Debug.Log($"[Addon] Attempting to download addon with ID {addonCatalogEntry.ReleaseGuid} from URL ({addonCatalogEntry.DownloadUrl})");
 
                 using var addonRequest = UnityWebRequest.Get(addonCatalogEntry.DownloadUrl);
                 addonRequest.SetRequestHeader("Accept", "*/*");
-                addonRequest.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
+                //addonRequest.SetRequestHeader("UserAgent", "ipodtouch0218/NSMB-MarioVsLuigi");
+                addonRequest.certificateHandler = new MvLCertificateHandler();
+                addonRequest.disposeCertificateHandlerOnDispose = true;
+                addonRequest.disposeDownloadHandlerOnDispose = true;
+                addonRequest.disposeUploadHandlerOnDispose = true;
+                addonRequest.timeout = 10;
                 _ = addonRequest.SendWebRequest();
 
                 string sizeString = Utils.BytesToString(addonCatalogEntry.Size);
                 do {
-                    singleFileProgressBar.SetAnchorMaxX(addonRequest.downloadProgress);
-                    singleFileProgressBar.SetMarginRight(0);
-                    singleFileProgressText.text = $"{Utils.BytesToString((long) (addonRequest.downloadProgress * addonCatalogEntry.Size))} / {sizeString}";
+                    UpdateProgressBars(addonCatalogEntry.Size, addonRequest.downloadProgress, downloadedAddons);
                     yield return null;
                 } while (!addonRequest.isDone && addonRequest.downloadProgress < 1);
 
-                singleFileProgressBar.SetAnchorMaxX(1);
-                singleFileProgressBar.SetMarginRight(0);
-                singleFileProgressText.text = $"{sizeString} / {sizeString}";
+                UpdateProgressBars(addonCatalogEntry.Size, addonRequest.downloadProgress, downloadedAddons);
 
                 if (addonRequest.responseCode != 200) {
                     Debug.Log($"[Addon] Download failed: {addonRequest.error} ({addonRequest.responseCode})");
@@ -93,10 +93,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
                 byte[] addonBytes = addonRequest.downloadHandler.data;
                 using MemoryStream ms = new(addonBytes);
                 var addonStreamTask = GlobalController.Instance.addonManager.LoadAddonStream(ms).GetAwaiter();
-                
-                while (!addonStreamTask.IsCompleted) {
-                    yield return null;
-                }
+                yield return addonStreamTask;
 
                 var loadResult = addonStreamTask.GetResult();
                 if (!loadResult.Success) {
@@ -106,9 +103,7 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
 
                 downloadedAddons++;
 
-                allFilesProgressText.text = $"{downloadedAddons} / {addons.Count}";
-                allFilesProgressBar.SetAnchorMaxX((float) downloadedAddons / addons.Count);
-                allFilesProgressBar.SetMarginRight(0);
+                UpdateProgressBars(addonCatalogEntry.Size, 1, downloadedAddons);
 
                 _ = GlobalController.Instance.addonManager.SaveAddonToCache(addonCatalogEntry.ReleaseGuid, addonBytes);
             }
@@ -116,6 +111,16 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
             // Success!
             callback(AddonManager.AddonDownloadResult.Success);
             Canvas.CloseSubmenu(this);
+        }
+
+        private void UpdateProgressBars(long downloadBytes, float downloadProgress, int downloadedAddons) {
+            singleFileProgressText.text = $"{Utils.BytesToString((long) (downloadProgress * downloadBytes))} / {Utils.BytesToString(downloadBytes)}";
+            singleFileProgressBar.SetAnchorMaxX(downloadProgress);
+            singleFileProgressBar.SetMarginRight(0);
+
+            allFilesProgressText.text = $"{downloadedAddons} / {addons.Count}";
+            allFilesProgressBar.SetAnchorMaxX(0);
+            allFilesProgressBar.SetMarginRight(0);
         }
 
         public void RejectDownload() {

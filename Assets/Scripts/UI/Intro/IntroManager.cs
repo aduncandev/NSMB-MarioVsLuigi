@@ -38,7 +38,7 @@ namespace NSMB.UI.Intro {
             var randomCharacterRef = possibleCharacters[UnityEngine.Random.Range(0, possibleCharacters.Length)];
             var randomCharacter = QuantumUnityDB.GetGlobalAsset<CharacterAsset>(randomCharacterRef);
             var randomSfx = possibleSfx[UnityEngine.Random.Range(0, possibleSfx.Length)];
-            sfx.PlayOneShot(randomSfx, randomCharacter.SfxOverrides?.Cast<ISoundEffectOverrideProvider>().ToList());
+            sfx.PlayOneShot(randomSfx, new List<ISoundEffectOverrideProvider>() { randomCharacter });
 
             if (logoBounceRoutine != null) {
                 StopCoroutine(logoBounceRoutine);
@@ -83,8 +83,7 @@ namespace NSMB.UI.Intro {
             while (sceneLoad.progress < 0.9f) {
                 yield return null;
             }
-#endif
-#if !DISABLE_SCENE_CHANGE
+
             sceneLoad.allowSceneActivation = true;
             while (!sceneLoad.isDone) {
                 yield return null;
