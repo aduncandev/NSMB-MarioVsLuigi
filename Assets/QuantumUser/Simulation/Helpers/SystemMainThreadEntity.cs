@@ -6,12 +6,7 @@ namespace Quantum {
         private TaskDelegateHandle updateTaskHandle;
 
         protected override TaskHandle Schedule(Frame f, TaskHandle taskHandle) {
-            try {
-                // Temporary try/catch, currently bugged.
-                if (f.ComponentCount<E>() <= 0) {
-                    return taskHandle;
-                }
-            } catch {
+            if (f.ComponentCount<E>() <= 0) {
                 return taskHandle;
             }
             if (!updateTaskHandle.IsValid) {

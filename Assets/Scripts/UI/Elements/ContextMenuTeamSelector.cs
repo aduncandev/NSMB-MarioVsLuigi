@@ -1,5 +1,4 @@
 using NSMB.UI.MainMenu.Submenus.InRoom;
-using NSMB.Utilities;
 using Quantum;
 using TMPro;
 using UnityEngine;
@@ -8,7 +7,7 @@ using UnityEngine.Scripting;
 using Button = UnityEngine.UI.Button;
 
 namespace NSMB.UI.Elements {
-    public class ContextMenuTeamSelector : Button {
+    public class ContextMenuTeamSelector : Button, IScrollHandler {
 
         //---Serialized Variables
         [SerializeField] private TMP_Text label;
@@ -79,6 +78,16 @@ namespace NSMB.UI.Elements {
             base.OnDeselect(eventData);
             foreach (var go in showOnSelect) {
                 go.SetActive(false);
+            }
+        }
+
+        public void OnScroll(PointerEventData eventData) {
+            if (eventData.scrollDelta.y > 0) {
+                TeamIndex--;
+                eventData.Use();
+            } else if (eventData.scrollDelta.y < 0) {
+                TeamIndex++;
+                eventData.Use();
             }
         }
 

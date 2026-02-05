@@ -20,7 +20,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
         //---Serailized Variables
         [SerializeField] private TMP_Dropdown regionDropdown;
         [SerializeField] private RoomListManager roomManager;
-        [SerializeField] private GameObject reconnectBtn, createRoomBtn, joinPrivateRoomBtn;
+        [SerializeField] private GameObject reconnectBtn, createRoomBtn, joinPrivateRoomBtn, filterAddonsParent;
         [SerializeField] private TMP_InputField usernameField;
         [SerializeField] private SpriteChangingToggle filterInProgressRooms, filterFullRooms, filterAddons;
         [SerializeField] private MainMenuSubmenu inRoomSubmenu;
@@ -46,6 +46,7 @@ namespace NSMB.UI.MainMenu.Submenus.RoomList {
             // This is needed for some bullshit where the "username" box
             // has zero height in builds. But not in the editor.
             // Because fuck you.
+            filterAddonsParent.SetActive(GlobalController.Instance.addonManager.isActiveAndEnabled);
             LayoutRebuilder.ForceRebuildLayoutImmediate(sideMenu);
         }
 

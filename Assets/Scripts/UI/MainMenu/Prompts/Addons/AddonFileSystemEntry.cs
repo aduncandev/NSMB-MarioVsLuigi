@@ -64,6 +64,10 @@ namespace NSMB.UI.MainMenu.Submenus.Prompts.Addons {
             UpdateEnabledState();
         }
 
+        public void OnDestroy() {
+            scannedPath.Addon?.Dispose();
+        }
+
         public async void OnClicked() {
             if (parent.loadingGraphic.activeSelf) {
                 return;

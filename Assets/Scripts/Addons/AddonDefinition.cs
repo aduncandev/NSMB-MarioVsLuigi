@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace NSMB.Addons {
     [Serializable]
-    public class AddonDefinition : IEquatable<AddonDefinition> {
+    public class AddonDefinition : IEquatable<AddonDefinition>, IDisposable {
         public Guid ReleaseGuid { get; set; }
         public string DisplayName { get; set; }
         public string Author { get; set; }
@@ -22,12 +22,19 @@ namespace NSMB.Addons {
 
         ~AddonDefinition() {
             if (IconTexture) {
-                UnityEngine.Object.Destroy(IconTexture);
+                Debug.LogError($"Memory Leak! AddonDefinition ({DisplayName}) IconTexture was not disposed!");
+                Dispose();
             }
         }
 
         public bool Equals(AddonDefinition other) {
             return ReleaseGuid == other.ReleaseGuid;
+        }
+
+        public void Dispose() {
+            if (IconTexture) {
+                UnityEngine.Object.Destroy(IconTexture);
+            }
         }
     }
 }
