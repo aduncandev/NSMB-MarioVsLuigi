@@ -82,10 +82,9 @@ namespace Quantum {
     Groundpound,
   }
   public enum PowerupReserveResult : byte {
-    None,
-    CollectNewIgnoreOld,
-    CollectNewReserveOld,
     KeepOldReserveNew,
+    CollectNewReserveOld,
+    CollectNewIgnoreOld,
   }
   public enum PowerupSpawnReason : byte {
     PowerupBlock,
@@ -1916,7 +1915,7 @@ namespace Quantum {
     public AssetRef<CoinItemAsset> Scriptable;
     [FieldOffset(4)]
     public UInt16 Lifetime;
-    [FieldOffset(2)]
+    [FieldOffset(3)]
     [ExcludeFromPrototype()]
     public PowerupSpawnReason SpawnReason;
     [FieldOffset(8)]
@@ -1934,9 +1933,12 @@ namespace Quantum {
     [FieldOffset(0)]
     [ExcludeFromPrototype()]
     public Byte BlockSpawnAnimationLength;
-    [FieldOffset(1)]
+    [FieldOffset(2)]
     [ExcludeFromPrototype()]
     public Byte SpawnAnimationFrames;
+    [FieldOffset(1)]
+    [ExcludeFromPrototype()]
+    public Byte IgnorePlayerFrames;
     [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public EntityRef ParentMarioPlayer;
@@ -1952,6 +1954,7 @@ namespace Quantum {
         hash = hash * 31 + BlockSpawnDestination.GetHashCode();
         hash = hash * 31 + BlockSpawnAnimationLength.GetHashCode();
         hash = hash * 31 + SpawnAnimationFrames.GetHashCode();
+        hash = hash * 31 + IgnorePlayerFrames.GetHashCode();
         hash = hash * 31 + ParentMarioPlayer.GetHashCode();
         return hash;
       }
@@ -1959,6 +1962,7 @@ namespace Quantum {
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (CoinItem*)ptr;
         serializer.Stream.Serialize(&p->BlockSpawnAnimationLength);
+        serializer.Stream.Serialize(&p->IgnorePlayerFrames);
         serializer.Stream.Serialize(&p->SpawnAnimationFrames);
         serializer.Stream.Serialize((Byte*)&p->SpawnReason);
         serializer.Stream.Serialize(&p->Lifetime);
@@ -3174,28 +3178,25 @@ namespace Quantum {
   public unsafe partial struct Powerup : Quantum.IComponent {
     public const Int32 SIZE = 32;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(4)]
+    [FieldOffset(0)]
     public QBoolean FacingRight;
     [FieldOffset(16)]
+    [ExcludeFromPrototype()]
     public FPVector2 AnimationCurveOrigin;
     [FieldOffset(8)]
-    public FP AnimationCurveTimer;
-    [FieldOffset(0)]
     [ExcludeFromPrototype()]
-    public Byte IgnorePlayerFrames;
+    public FP AnimationCurveTimer;
     public override readonly Int32 GetHashCode() {
       unchecked { 
         var hash = 17891;
         hash = hash * 31 + FacingRight.GetHashCode();
         hash = hash * 31 + AnimationCurveOrigin.GetHashCode();
         hash = hash * 31 + AnimationCurveTimer.GetHashCode();
-        hash = hash * 31 + IgnorePlayerFrames.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Powerup*)ptr;
-        serializer.Stream.Serialize(&p->IgnorePlayerFrames);
         QBoolean.Serialize(&p->FacingRight, serializer);
         FP.Serialize(&p->AnimationCurveTimer, serializer);
         FPVector2.Serialize(&p->AnimationCurveOrigin, serializer);

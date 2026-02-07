@@ -10,4 +10,6 @@ public class CoinItemAsset : AssetObject {
     public bool CanSpawnFromBlock = true;
     public bool OnlyOneCanExist = false;
 
+    public FPVector2 CameraSpawnOffset = new(0, FP.FromString("1.68"));
+
 }

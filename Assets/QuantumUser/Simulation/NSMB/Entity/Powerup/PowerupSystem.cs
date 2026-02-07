@@ -3,8 +3,6 @@ using Photon.Deterministic;
 namespace Quantum {
     public unsafe class PowerupSystem : SystemMainThreadEntityFilter<Powerup, PowerupSystem.Filter>, ISignalOnEntityBumped, ISignalOnEntityCrushed {
 
-        private static readonly FP BumpForce = Constants._5_50;
-
         public struct Filter {
             public EntityRef Entity;
             public Transform2D* Transform;
@@ -20,12 +18,15 @@ namespace Quantum {
         }
 
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
-            var entity = filter.Entity;
-            var powerup = filter.Powerup;
             var coinItem = filter.CoinItem;
+            if (f.FindAsset(coinItem->Scriptable) is not PowerupAsset asset) {
+                Log.Warn($"Powerup contains non-PowerupAsset scriptable! ({coinItem->Scriptable})");
+                return;
+            }
+
+            var powerup = filter.Powerup;
             var physicsObject = filter.PhysicsObject;
             var transform = filter.Transform;
-            var asset = (PowerupAsset) f.FindAsset(coinItem->Scriptable);
 
             if (asset.AvoidPlayers && physicsObject->IsTouchingGround) {
                 FPVector2? closestMarioPosition = null;
@@ -44,7 +45,7 @@ namespace Quantum {
                 }
             }
 
-            HandleCollision(filter, asset);
+            HandleCollision(f, ref filter, asset);
 
             if (powerup->AnimationCurveTimer > 0) {
                 transform->Position = powerup->AnimationCurveOrigin + new FPVector2(
@@ -55,7 +56,7 @@ namespace Quantum {
             }
         }
 
-        public void HandleCollision(Filter filter, PowerupAsset asset) {
+        public void HandleCollision(Frame f, ref Filter filter, PowerupAsset asset) {
             var powerup = filter.Powerup;
             var physicsObject = filter.PhysicsObject;
 
@@ -96,32 +97,24 @@ namespace Quantum {
                 return;
             }
 
-            var powerup = f.Unsafe.GetPointer<Powerup>(powerupEntity);
+            var coinItem = f.Unsafe.GetPointer<CoinItem>(powerupEntity);
 
             // Don't collect if we're ignoring players (usually, after blue shell spawns from a blue koopa,
             // so we dont collect it instantly)
-            if (powerup->IgnorePlayerFrames > 0) {
+            if (coinItem->IgnorePlayerFrames > 0) {
                 return;
             }
 
-            var coinItem = f.Unsafe.GetPointer<CoinItem>(powerupEntity);
-            var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
-            var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
-            var newScriptable = (PowerupAsset) f.FindAsset(coinItem->Scriptable);
+            if (f.FindAsset(coinItem->Scriptable) is PowerupAsset asset) {
+                // Change the player's powerup state
+                PowerupReserveResult result = asset.Collect(f, marioEntity);
 
-            // Change the player's powerup state
-            PowerupReserveResult result = CollectPowerup(f, marioEntity, mario, marioPhysicsObject, newScriptable);
+                f.Signals.OnMarioPlayerCollectedPowerup(marioEntity, powerupEntity);
+                f.Events.MarioPlayerCollectedPowerup(marioEntity, result, asset);
+            }
 
-            f.Signals.OnMarioPlayerCollectedPowerup(marioEntity, powerupEntity);
-            f.Events.MarioPlayerCollectedPowerup(marioEntity, result, newScriptable);
             f.Events.CollectableDespawned(powerupEntity, f.Unsafe.GetPointer<Transform2D>(powerupEntity)->Position, true);
             f.Destroy(powerupEntity);
-        }
-
-        public static PowerupReserveResult CollectPowerup(Frame f, EntityRef marioEntity, MarioPlayer* mario, PhysicsObject* marioPhysicsObject, PowerupAsset newPowerup) {
-
-            return newPowerup.Collect(f, marioEntity);
-
         }
 
         public void OnEntityBumped(Frame f, EntityRef entity, FPVector2 position, EntityRef bumpOwner, QBoolean fromBelow) {
@@ -129,15 +122,16 @@ namespace Quantum {
                 || !f.Unsafe.TryGetPointer(entity, out Powerup* powerup)
                 || !f.Unsafe.TryGetPointer(entity, out CoinItem* coinItem)
                 || !f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)
-                || coinItem->SpawnAnimationFrames > 0) {
+                || coinItem->SpawnAnimationFrames > 0
+                || f.FindAsset(coinItem->Scriptable) is not PowerupAsset asset) {
 
                 return;
             }
 
             QuantumUtils.UnwrapWorldLocations(f, transform->Position, position, out FPVector2 ourPos, out FPVector2 theirPos);
             physicsObject->Velocity = new FPVector2(
-                ((PowerupAsset) f.FindAsset(coinItem->Scriptable)).Speed * (ourPos.X > theirPos.X ? 1 : -1),
-                BumpForce
+                asset.Speed * (ourPos.X > theirPos.X ? 1 : -1),
+                asset.BumpedFromBelowVelocity
             );
             physicsObject->IsTouchingGround = false;
             powerup->FacingRight = ourPos.X > theirPos.X;

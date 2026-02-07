@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 public class PowerupAsset : CoinItemAsset, ISoundEffectOverrideProvider {
-    public PowerupType Type;
+
     public PowerupState State;
 
     public bool SoundPlaysEverywhere;
@@ -18,6 +18,7 @@ public class PowerupAsset : CoinItemAsset, ISoundEffectOverrideProvider {
     public FP Speed;
     public FP BounceStrength;
     public FP TerminalVelocity;
+    public FP BumpedFromBelowVelocity = Constants._5_50;
 
     public bool FollowAnimationCurve;
     public FPAnimationCurve AnimationCurveX;
@@ -84,10 +85,4 @@ public class PowerupAsset : CoinItemAsset, ISoundEffectOverrideProvider {
     }
 
     protected virtual void OnCollected(Frame f, EntityRef entity) { }
-}
-
-public enum PowerupType {
-    Basic,
-    Starman,
-    ExtraLife,
 }

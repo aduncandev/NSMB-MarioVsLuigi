@@ -43,8 +43,11 @@ namespace Quantum {
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(playerToFollow);
             var marioCamera = f.Unsafe.GetPointer<CameraController>(playerToFollow);
 
-            // TODO magic value
-            f.Unsafe.GetPointer<Transform2D>(thisEntity)->Position = new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y + CoinItemSystem.CameraYOffset);
+            var asset = f.FindAsset(Scriptable);
+            var transform = f.Unsafe.GetPointer<Transform2D>(thisEntity);
+            transform->Position = 
+                new FPVector2(marioTransform->Position.X, marioCamera->CurrentPosition.Y)
+                    + asset.CameraSpawnOffset;
             
             if (f.Unsafe.TryGetPointer(thisEntity, out PhysicsObject* physicsObject)) {
                 physicsObject->IsFrozen = true;

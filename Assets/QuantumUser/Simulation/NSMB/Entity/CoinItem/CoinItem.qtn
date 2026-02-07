@@ -9,6 +9,7 @@ table component CoinItem {
 	[ExcludeFromPrototype] byte BlockSpawnAnimationLength;
 
 	[ExcludeFromPrototype] byte SpawnAnimationFrames;
+	[ExcludeFromPrototype] byte IgnorePlayerFrames;
 	[ExcludeFromPrototype] EntityRef ParentMarioPlayer;
 }
 

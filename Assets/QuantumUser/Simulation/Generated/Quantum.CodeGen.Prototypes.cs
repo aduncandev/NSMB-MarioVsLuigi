@@ -862,8 +862,6 @@ namespace Quantum.Prototypes {
   [Quantum.Prototypes.Prototype(typeof(Quantum.Powerup))]
   public unsafe partial class PowerupPrototype : ComponentPrototype<Quantum.Powerup> {
     public QBoolean FacingRight;
-    public FPVector2 AnimationCurveOrigin;
-    public FP AnimationCurveTimer;
     partial void MaterializeUser(Frame frame, ref Quantum.Powerup result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Powerup component = default;
@@ -872,8 +870,6 @@ namespace Quantum.Prototypes {
     }
     public void Materialize(Frame frame, ref Quantum.Powerup result, in PrototypeMaterializationContext context = default) {
         result.FacingRight = this.FacingRight;
-        result.AnimationCurveOrigin = this.AnimationCurveOrigin;
-        result.AnimationCurveTimer = this.AnimationCurveTimer;
         MaterializeUser(frame, ref result, in context);
     }
   }
