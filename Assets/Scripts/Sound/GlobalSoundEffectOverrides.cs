@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class GlobalSoundEffectOverrides : ScriptableObject, ISoundEffectOverrideProvider {
+public class GlobalSoundEffectOverrides : ScriptableObject, ISoundOverrideProvider {
 
     [FormerlySerializedAs("Overrides")] public SoundEffectOverride[] SfxOverrides;
 
@@ -21,7 +21,7 @@ public class GlobalSoundEffectOverrides : ScriptableObject, ISoundEffectOverride
         OnEnable();
     }
 
-    public SoundEffectOverride GetOverrideForSfx(SoundEffect sfx) {
+    public SoundEffectOverride GetOverride(SoundEffect sfx) {
         overridesDict.TryGetValue(sfx, out var result);
         return result;
     }

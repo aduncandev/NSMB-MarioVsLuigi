@@ -31,7 +31,7 @@ namespace NSMB.Editor {
         }
 
         private List<BuildableAddon> availableAddonFolders;
-        private int? selectedAddonFolder;
+        private int selectedAddonFolder;
         private Vector2 addonFolderSelectScroll;
 
 
@@ -42,27 +42,29 @@ namespace NSMB.Editor {
 
         public void OnEnable() {
             availableAddonFolders = new();
-            foreach (var folderPath in Directory.GetDirectories("Assets/Addons")) {
-                if (new DirectoryInfo(folderPath).Name.StartsWith('.')) {
-                    continue;
-                }
+            try {
+                foreach (var folderPath in Directory.GetDirectories("Assets/Addons")) {
+                    if (new DirectoryInfo(folderPath).Name.StartsWith('.')) {
+                        continue;
+                    }
 
-                BuildableAddon buildableAddon = new() {
-                    FolderPath = folderPath
-                };
-                string addonDefPath = folderPath + "/addon.json";
-                try {
-                    string addonDefJson = File.ReadAllText(addonDefPath);
-                    buildableAddon.AddonDef = JsonConvert.DeserializeObject<AddonDefinition>(addonDefJson);
+                    BuildableAddon buildableAddon = new() {
+                        FolderPath = folderPath
+                    };
+                    string addonDefPath = folderPath + "/addon.json";
                     try {
-                        buildableAddon.AddonDef.IconTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(buildableAddon.AddonDef.IconAssetPath);
-                    } catch { }
-                } catch (Exception e) {
-                    Debug.LogWarning($"Failed to find/parse addon definition of addon folder {folderPath} (path: {addonDefPath})");
-                    Debug.LogError(e);
+                        string addonDefJson = File.ReadAllText(addonDefPath);
+                        buildableAddon.AddonDef = JsonConvert.DeserializeObject<AddonDefinition>(addonDefJson);
+                        try {
+                            buildableAddon.AddonDef.IconTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(buildableAddon.AddonDef.IconAssetPath);
+                        } catch { }
+                    } catch (Exception e) {
+                        Debug.LogWarning($"Failed to find/parse addon definition of addon folder {folderPath} (path: {addonDefPath})");
+                        Debug.LogError(e);
+                    }
+                    availableAddonFolders.Add(buildableAddon);
                 }
-                availableAddonFolders.Add(buildableAddon);
-            }
+            } catch { }
         }
 
         public void OnDisable() {
@@ -85,14 +87,13 @@ namespace NSMB.Editor {
 
             EditorGUILayout.LabelField("Select a folder to build into an addon", EditorStyles.boldLabel);
             addonFolderSelectScroll = EditorGUILayout.BeginScrollView(addonFolderSelectScroll);
-            int? prev = selectedAddonFolder;
-            selectedAddonFolder = GUILayout.SelectionGrid(selectedAddonFolder ??= 0, availableAddonFolders.Select(ba => " " + ba.FolderName).ToArray(), 1, EditorStyles.radioButton);
+            selectedAddonFolder = GUILayout.SelectionGrid(selectedAddonFolder, availableAddonFolders.Select(ba => " " + ba.FolderName).ToArray(), 1, EditorStyles.radioButton);
             EditorGUILayout.EndScrollView();
 
             // Separator line
             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
-            BuildableAddon selectedAddon = availableAddonFolders[selectedAddonFolder.Value];
+            BuildableAddon selectedAddon = availableAddonFolders[selectedAddonFolder];
             selectedAddon.AddonDef.DisplayName = EditorGUILayout.TextField("Name", selectedAddon.AddonDef.DisplayName);
             selectedAddon.AddonDef.Author = EditorGUILayout.TextField("Author", selectedAddon.AddonDef.Author);
             selectedAddon.AddonDef.Version = EditorGUILayout.TextField("Version", selectedAddon.AddonDef.Version);
@@ -101,7 +102,6 @@ namespace NSMB.Editor {
             if (selectedAddon.AddonDef.IconTexture) {
                 selectedAddon.AddonDef.IconAssetPath = AssetDatabase.GetAssetPath(selectedAddon.AddonDef.IconTexture);
             }
-
             if (GUILayout.Button("Build")) {
                 string savePath = $"ExportedAddons/{selectedAddon.FolderName}-{selectedAddon.AddonDef.Version}";
 
@@ -144,7 +144,6 @@ namespace NSMB.Editor {
 
                 // Generate list of asset bundles.
                 List<AssetBundleBuild> buildMap = new() {
-                    /*
                     new() {
                         assetBundleName = "basegame-assets",
                         assetNames = AssetDatabase.GetAssetPathsFromAssetBundle("basegame-assets"),
@@ -153,9 +152,8 @@ namespace NSMB.Editor {
                         assetBundleName = "basegame-scenes",
                         assetNames = AssetDatabase.GetAssetPathsFromAssetBundle("basegame-scenes"),
                     }
-                    */
                 };
-                
+
                 string[] sceneAssets =
                     AssetDatabase.FindAssets("t:Scene", new[] { selectedAddon.FolderPath })
                     .Select(AssetDatabase.GUIDToAssetPath)
@@ -192,7 +190,10 @@ namespace NSMB.Editor {
                         EditorUtility.DisplayProgressBar("Building addon", $"Building for {buildTarget} build target...", (float) ++counter / steps);
                         string platformBuildPath = buildPath + "/" + buildTarget;
                         Directory.CreateDirectory(platformBuildPath);
-                        BuildPipeline.BuildAssetBundles(platformBuildPath, buildMapArray, BuildAssetBundleOptions.AppendHashToAssetBundleName | BuildAssetBundleOptions.AssetBundleStripUnityVersion, buildTarget);
+                        BuildPipeline.BuildAssetBundles(platformBuildPath, 
+                            buildMapArray, 
+                            BuildAssetBundleOptions.AppendHashToAssetBundleName | BuildAssetBundleOptions.AssetBundleStripUnityVersion, 
+                            buildTarget);
 
                         // Delete {buildTarget} bundle- it only contains a manifest and causes name collisions.
                         File.Delete(platformBuildPath + "/" + buildTarget);
@@ -217,6 +218,7 @@ namespace NSMB.Editor {
 
                 //EditorUserBuildSettings.SwitchActiveBuildTarget(oldBuildTargetGroup, oldBuildTarget);
 
+                /*
                 // Create standalone addons
                 foreach ((var buildTarget, var buildTargetPretty) in BuildTargets) {
                     if (failedBuilds.Contains(buildTarget)) {
@@ -236,6 +238,7 @@ namespace NSMB.Editor {
                         entry.Delete();
                     }
                 }
+                */
 
                 // Create universal addon
                 string universalZipPath = $"{savePath}/{selectedAddon.FolderName}-{selectedAddon.AddonDef.Version}-Universal{AddonManager.AddonExtension}";

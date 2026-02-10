@@ -8,7 +8,7 @@ namespace NSMB.Sound {
     public class SoundEffectResolver : Singleton<SoundEffectResolver> {
 
         //---Properties
-        public List<ISoundEffectOverrideProvider> GlobalProviders { get; private set; } = new();
+        public List<ISoundOverrideProvider> GlobalProviders { get; private set; } = new();
 
         //---Serialized Variables
         [SerializeField] private GlobalSoundEffectOverrides defaultProvider;
@@ -22,22 +22,22 @@ namespace NSMB.Sound {
             Set(this);
         }
 
-        public SoundEffectOverride GetOneOverride(SoundEffect sfx, IList<ISoundEffectOverrideProvider> extraProviders, int? variant = null) {
-            List<ISoundEffectOverrideProvider> allProviders = new();
+        public SoundEffectOverride GetOneOverride(SoundEffect sfx, IList<ISoundOverrideProvider> extraProviders, int? variant = null) {
+            List<ISoundOverrideProvider> allProviders = new();
             if (extraProviders != null) {
                 allProviders.AddRange(extraProviders);
             }
             allProviders.AddRange(GlobalProviders);
 
             var sortedOverrides = allProviders
-                .Select(op => op.GetOverrideForSfx(sfx))
+                .Select(op => op.GetOverride(sfx))
                 .Where(o => o != null)
                 .OrderByDescending(o => o.Priority)
                 .ThenByDescending(o => o.Mode)
                 .ToList();
 
             // Add default always LAST!
-            var defaultOverride = defaultProvider.GetOverrideForSfx(sfx);
+            var defaultOverride = defaultProvider.GetOverride(sfx);
             if (defaultOverride != null) {
                 sortedOverrides.Add(defaultOverride);
             }
@@ -63,22 +63,22 @@ namespace NSMB.Sound {
             return null;
         }
 
-        public float PlayOneShot(AudioSource localSfxSource, SoundEffect sfx, IList<ISoundEffectOverrideProvider> extraProviders, int? variant = null, float volume = 1) {
-            List<ISoundEffectOverrideProvider> allProviders = new();
+        public float PlayOneShot(AudioSource localSfxSource, SoundEffect sfx, IList<ISoundOverrideProvider> extraProviders, int? variant = null, float volume = 1) {
+            List<ISoundOverrideProvider> allProviders = new();
             if (extraProviders != null) {
                 allProviders.AddRange(extraProviders);
             }
             allProviders.AddRange(GlobalProviders);
 
             var sortedOverrides = allProviders
-                .Select(op => op.GetOverrideForSfx(sfx))
+                .Select(op => op.GetOverride(sfx))
                 .Where(o => o != null)
                 .OrderByDescending(o => o.Priority)
                 .ThenByDescending(o => o.Mode)
                 .ToList();
 
             // Add default always LAST!
-            var defaultOverride = defaultProvider.GetOverrideForSfx(sfx);
+            var defaultOverride = defaultProvider.GetOverride(sfx);
             if (defaultOverride != null) {
                 sortedOverrides.Add(defaultOverride);
             }

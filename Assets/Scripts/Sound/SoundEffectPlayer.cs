@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace NSMB.Sound {
-    public class SoundEffectPlayer : MonoBehaviour, ISoundEffectOverrideProvider {
-
-        //---Properties
-        public AudioSource Source => source;
+    public class SoundEffectPlayer : MonoBehaviour, ISoundOverrideProvider {
 
         //---Serialized Variables
         [SerializeField] private SoundEffectOverride[] sfxOverrides;
@@ -17,8 +14,8 @@ namespace NSMB.Sound {
             this.SetIfNull(ref source);
         }
 
-        public void Play(SoundEffect sfx, IList<ISoundEffectOverrideProvider> extraProviders = null, int? variant = null) {
-            List<ISoundEffectOverrideProvider> providers = new() { this };
+        public void Play(SoundEffect sfx, IList<ISoundOverrideProvider> extraProviders = null, int? variant = null) {
+            List<ISoundOverrideProvider> providers = new() { this };
             if (extraProviders != null) {
                 providers.AddRange(extraProviders);
             }
@@ -35,8 +32,8 @@ namespace NSMB.Sound {
             source.Stop();
         }
 
-        public void PlayOneShot(SoundEffect sfx, IList<ISoundEffectOverrideProvider> extraProviders = null, int? variant = null, float volume = 1) {
-            List<ISoundEffectOverrideProvider> providers = new() { this };
+        public void PlayOneShot(SoundEffect sfx, IList<ISoundOverrideProvider> extraProviders = null, int? variant = null, float volume = 1) {
+            List<ISoundOverrideProvider> providers = new() { this };
             if (extraProviders != null) {
                 providers.AddRange(extraProviders);
             }
@@ -44,7 +41,7 @@ namespace NSMB.Sound {
         }
 
         [NonSerialized] private Dictionary<SoundEffect, SoundEffectOverride> overridesDict;
-        public SoundEffectOverride GetOverrideForSfx(SoundEffect sfx) {
+        public SoundEffectOverride GetOverride(SoundEffect sfx) {
             if (overridesDict == null) {
                 overridesDict = new();
                 foreach (var @override in sfxOverrides) {

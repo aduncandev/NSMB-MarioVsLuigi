@@ -223,7 +223,7 @@ namespace NSMB.Entities.Player {
             if (Game.PlayerIsLocal(mario->PlayerRef)) {
                 MasterCanvas masterCanvas = FindFirstObjectByType<MasterCanvas>();
                 // Use Resources.Load here instead of a serialized variable to the prefab to avoid referencing all the font stuff into addon scenes
-                PlayerElements elements = ((GameObject) Instantiate(Resources.Load(masterCanvas.playerElementsPrefabPath), masterCanvas.transform)).GetComponent<PlayerElements>();
+                PlayerElements elements = Instantiate(masterCanvas.playerElementsPrefab, masterCanvas.transform);
                 elements.Initialize(Game, f, EntityRef, mario->PlayerRef);
             }
 
@@ -675,8 +675,8 @@ namespace NSMB.Entities.Player {
             return false;
         }
 
-        public void PlaySound(SoundEffect soundEffect, IList<ISoundEffectOverrideProvider> extraProviders = null, int? variant = null, float volume = 1) {
-            List<ISoundEffectOverrideProvider> providers = new() { character };
+        public void PlaySound(SoundEffect soundEffect, IList<ISoundOverrideProvider> extraProviders = null, int? variant = null, float volume = 1) {
+            List<ISoundOverrideProvider> providers = new() { character };
             if (extraProviders != null) {
                 providers.AddRange(extraProviders);
             }

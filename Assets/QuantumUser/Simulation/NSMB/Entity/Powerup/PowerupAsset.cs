@@ -3,7 +3,7 @@ using Quantum;
 using System;
 using System.Collections.Generic;
 
-public class PowerupAsset : CoinItemAsset, ISoundEffectOverrideProvider {
+public class PowerupAsset : CoinItemAsset, ISoundOverrideProvider {
 
     public PowerupState State;
 
@@ -41,7 +41,7 @@ public class PowerupAsset : CoinItemAsset, ISoundEffectOverrideProvider {
         }
     }
 
-    public SoundEffectOverride GetOverrideForSfx(SoundEffect sfx) {
+    public SoundEffectOverride GetOverride(SoundEffect sfx) {
         overridesDict.TryGetValue(sfx, out var result);
         return result;
     }

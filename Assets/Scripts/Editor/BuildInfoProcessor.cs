@@ -8,10 +8,9 @@ public class BuildInfoProcessor : IPreprocessBuildWithReport {
     public int callbackOrder => 0;
     public void OnPreprocessBuild(BuildReport report) {
         string code =
-            "using System;\n" +
-            "using System.Globalization;\n" +
+            "using System;\n\n" +
             "public static class BuildInfo {\n" +
-                $"public static readonly DateTime BUILD_TIME = DateTime.ParseExact(\"{DateTime.UtcNow:O}\", DateTimeStyles.RoundtripKind);\n" +
+                $"\tpublic static readonly DateTime BUILD_TIME = DateTime.Parse(\"{DateTime.UtcNow:O}\");\n" +
             "}";
 
         File.WriteAllText("Assets/Scripts/BuildInfo.cs", code);

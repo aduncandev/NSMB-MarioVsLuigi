@@ -10,6 +10,7 @@ public class SoundEffectOverride {
 #if QUANTUM_UNITY
     public AudioClip[] AudioClips;
 #endif
+
     public enum OverrideMode {
         Single = 0,
         Random = 1,
@@ -17,6 +18,6 @@ public class SoundEffectOverride {
     }
 }
 
-public interface ISoundEffectOverrideProvider {
-    public SoundEffectOverride GetOverrideForSfx(SoundEffect sfx);
+public interface ISoundOverrideProvider : IAssetOverrideProvider<SoundEffect, SoundEffectOverride> {
+
 }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -24,9 +25,12 @@ namespace NSMB.UI.Intro {
         //---Private Variables
         private SoundEffect[] possibleSfx;
         private Coroutine logoBounceRoutine;
+        private bool doneLoadingBundles;
 
         public void Start() {
+            StartCoroutine(LoadAssetBundles());
             StartCoroutine(IntroSequence());
+            
             possibleSfx = ((SoundEffect[]) Enum.GetValues(typeof(SoundEffect)))
                 .Where(se => !excludedSounds.Contains(se))
                 .Where(se => !se.ToString().StartsWith("UI_"))
@@ -38,7 +42,7 @@ namespace NSMB.UI.Intro {
             var randomCharacterRef = possibleCharacters[UnityEngine.Random.Range(0, possibleCharacters.Length)];
             var randomCharacter = QuantumUnityDB.GetGlobalAsset<CharacterAsset>(randomCharacterRef);
             var randomSfx = possibleSfx[UnityEngine.Random.Range(0, possibleSfx.Length)];
-            sfx.PlayOneShot(randomSfx, new List<ISoundEffectOverrideProvider>() { randomCharacter });
+            sfx.PlayOneShot(randomSfx, new List<ISoundOverrideProvider>() { randomCharacter });
 
             if (logoBounceRoutine != null) {
                 StopCoroutine(logoBounceRoutine);
@@ -60,11 +64,36 @@ namespace NSMB.UI.Intro {
             logoBounceRoutine = null;
         }
 
+        private IEnumerator LoadAssetBundles() {
+            string[] bundleNames = { /*"basegame-assets",*/ "basegame-scenes" };
+
+            foreach (var bundle in bundleNames) {
+                using var loadRequest = UnityWebRequestAssetBundle.GetAssetBundle(Application.streamingAssetsPath + "/" + bundle);
+                yield return loadRequest.SendWebRequest();
+
+                if (loadRequest.result != UnityWebRequest.Result.Success) {
+                    // Throw error!
+                    Debug.LogError($"[Bundles] Critical error! Failed to load bundle {bundle} from {Application.streamingAssetsPath + "/" + bundle}");
+                    yield break;
+                }
+
+                var loadedBundle = DownloadHandlerAssetBundle.GetContent(loadRequest);
+                Debug.Log($"[Bundles] Successfully loaded {loadedBundle.name} ({(loadedBundle.isStreamedSceneAssetBundle ? loadedBundle.GetAllScenePaths().Length + " scenes" : loadedBundle.GetAllAssetNames().Length + " assets")})");
+            }
+
+            Debug.Log("[Bundles] Loaded all base game content!");
+            doneLoadingBundles = true;
+        }
+
         private IEnumerator IntroSequence() {
             yield return new WaitForSeconds(0.75f);
             sfx.Play();
             yield return FadeImageToValue(fullscreenImage, 0, 0.33f);
             yield return new WaitForSeconds(0.5f);
+
+            while (!doneLoadingBundles) {
+                yield return null;
+            }
 
 #if !DISABLE_SCENE_CHANGE
             AsyncOperation sceneLoad = SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive);

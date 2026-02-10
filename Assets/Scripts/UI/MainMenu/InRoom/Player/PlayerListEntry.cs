@@ -161,9 +161,13 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             var character = QuantumViewUtils.FindAssetOrFirst(playerData->Character);
             builder.Append(character.UiString);
 
-            if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind && !playerData->ManualSpectator) {
-                TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[playerData->RequestedTeam]);
-                builder.Append(team.textSpriteColorblindBig);
+            if (Settings.Instance.GraphicsColorblind && !playerData->ManualSpectator) {
+                if (f.Global->Rules.TeamsEnabled) {
+                    TeamAsset team = f.FindAsset(f.SimulationConfig.Teams[playerData->RequestedTeam]);
+                    builder.Append(team.textSpriteColorblindBig);
+                } else {
+                    builder.Append(Utils.GetPlayerIcon(f, player));
+                }
             }
 
             builder.Append(cachedNickname);

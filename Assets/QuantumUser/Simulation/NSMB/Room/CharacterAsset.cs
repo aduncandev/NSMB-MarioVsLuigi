@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterAsset : AssetObject, ISoundEffectOverrideProvider {
+public class CharacterAsset : AssetObject, ISoundOverrideProvider {
 
     public AssetRef<EntityPrototype> Prototype;
 
@@ -35,7 +35,7 @@ public class CharacterAsset : AssetObject, ISoundEffectOverrideProvider {
         }
     }
 
-    public SoundEffectOverride GetOverrideForSfx(SoundEffect sfx) {
+    public SoundEffectOverride GetOverride(SoundEffect sfx) {
         overridesDict.TryGetValue(sfx, out var result);
         return result;
     }

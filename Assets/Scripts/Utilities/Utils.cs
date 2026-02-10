@@ -1,3 +1,4 @@
+using NSMB.UI.Game;
 using NSMB.Utilities.Extensions;
 using Quantum;
 using System;
@@ -155,6 +156,61 @@ namespace NSMB.Utilities {
             return symbolStringBuilder.ToString();
         }
 
+        public static unsafe int? GetPlayerIndex(Frame f, PlayerRef player) {
+            int ourIndex = 0;
+            int totalPlayers = 0;
+            if (f.Global->GameState == GameState.PreGameRoom) {
+                // use PlayerData here
+                PlayerData* ourPlayerData = QuantumUtils.GetPlayerData(f, player);
+
+                var playerFilter = f.Filter<PlayerData>();
+                playerFilter.UseCulling = false;
+                while (playerFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
+                    if (otherPlayerData->IsSpectator) {
+                        continue;
+                    }
+
+                    totalPlayers++;
+                    if (otherPlayerData->JoinTick < ourPlayerData->JoinTick) {
+                        ourIndex++;
+                    }
+                }
+            } else {
+                // use PlayerInformation here
+                ourIndex = -1;
+                totalPlayers = f.Global->RealPlayers;
+                var playerInfos = f.Global->PlayerInfo;
+                for (int i = 0; i < totalPlayers; i++) {
+                    if (playerInfos[i].PlayerRef == player) {
+                        ourIndex = i;
+                        break;
+                    }
+                }
+
+                if (ourIndex == -1) {
+                    // Spectator
+                    return null;
+                }
+            }
+
+            return Mathf.FloorToInt(ourIndex / (totalPlayers + 1f));
+        }
+
+        public static PlayerSlotInfo GetPlayerSlotInfo(Frame f, PlayerRef player) {
+            int? index = GetPlayerIndex(f, player);
+            var slots = GlobalController.Instance.playerSlots;
+            return index.HasValue && index < slots.Length ? slots[index.Value] : null;
+        }
+
+        public static string GetPlayerIcon(Frame f, PlayerRef player) {
+            var slot = GetPlayerSlotInfo(f, player);
+            if (slot) {
+                return slot.Icon;
+            } else {
+                return "";
+            }
+        }
+
         private static readonly Color spectatorColor = new(0.8f, 0.8f, 0.8f, 0.7f);
         public unsafe static Color GetPlayerColor(Frame f, PlayerRef player, float s = 1, float v = 1, bool considerDisqualifications = true) {
             if (f == null || player == PlayerRef.None) {
@@ -190,47 +246,16 @@ namespace NSMB.Utilities {
 
             // Then team
             if (f.Global->Rules.TeamsEnabled) {
-                return GetTeamColor(f, f.Global->GameState == GameState.PreGameRoom ? playerData->RequestedTeam : playerData->RealTeam, s, v);
+                return GetTeamColor(f, f.Global->GameState == GameState.PreGameRoom ? playerData->RequestedTeam : playerData->RealTeam);
             }
 
             // Then id based color
-            int ourIndex = 0;
-            int totalPlayers = 0;
-            if (f.Global->GameState == GameState.PreGameRoom) {
-                // use PlayerData here
-                PlayerData* ourPlayerData = QuantumUtils.GetPlayerData(f, player);
-
-                var playerFilter = f.Filter<PlayerData>();
-                playerFilter.UseCulling = false;
-                while (playerFilter.NextUnsafe(out _, out PlayerData* otherPlayerData)) {
-                    if (otherPlayerData->IsSpectator) {
-                        continue;
-                    }
-
-                    totalPlayers++;
-                    if (otherPlayerData->JoinTick < ourPlayerData->JoinTick) {
-                        ourIndex++;
-                    }
-                }
+            var slot = GetPlayerSlotInfo(f, player);
+            if (slot) {
+                return slot.GetModifiedColor(s, v);
             } else {
-                // use PlayerInformation here
-                ourIndex = -1;
-                totalPlayers = f.Global->RealPlayers;
-                var playerInfos = f.Global->PlayerInfo;
-                for (int i = 0; i < totalPlayers; i++) {
-                    if (playerInfos[i].PlayerRef == player) {
-                        ourIndex = i;
-                        break;
-                    }
-                }
-
-                if (ourIndex == -1) {
-                    // Spectator
-                    return spectatorColor;
-                }
+                return spectatorColor;
             }
-
-            return Color.HSVToRGB(ourIndex / (totalPlayers + 1f), s, v);
         }
 
         public static Color GetTeamColor(Frame f, int team, float s = 1, float v = 1) {

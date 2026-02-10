@@ -13,6 +13,7 @@ using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using NSMB.UI.Game;
 
 #if UNITY_STANDALONE
 using NSMB.UI.MainMenu.Submenus.Replays;
@@ -40,6 +41,7 @@ namespace NSMB {
         public Image fullscreenFadeImage;
         public AudioSource sfx;
 
+        public PlayerSlotInfo[] playerSlots;
 
         [NonSerialized] public bool checkedForVersion = false, firstConnection = true;
         [NonSerialized] public int windowWidth = 1280, windowHeight = 720;
@@ -55,7 +57,7 @@ namespace NSMB {
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void CreateInstance() {
-            Instantiate(Resources.Load("Prefabs/Static/GlobalController"));
+            Instantiate(Resources.Load("Static/GlobalController"));
         }
 
         public void OnValidate() {

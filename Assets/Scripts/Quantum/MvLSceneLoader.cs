@@ -89,7 +89,11 @@ namespace NSMB.Quantum {
             // Check if the scene already is loaded
             Scene loadedScene = SceneManager.GetSceneByPath(map.ScenePath);
             if (!loadedScene.IsValid()) {
+#if UNITY_EDITOR
+                var loadOp = UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(map.ScenePath, new LoadSceneParameters { loadSceneMode = LoadSceneMode.Additive });
+#else
                 var loadOp = SceneManager.LoadSceneAsync(map.ScenePath, LoadSceneMode.Additive);
+#endif
                 loadOp.allowSceneActivation = true;
                 yield return loadOp;
                 loadedScene = SceneManager.GetSceneByPath(map.ScenePath);

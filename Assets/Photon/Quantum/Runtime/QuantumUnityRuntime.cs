@@ -7289,6 +7289,7 @@ namespace Quantum {
 namespace Quantum {
   using System;
   using System.IO;
+  using System.Linq;
   using System.Runtime.ExceptionServices;
   using UnityEditor;
   using UnityEngine;
@@ -7376,6 +7377,16 @@ namespace Quantum {
     private void LoadInternal(bool synchronous) {
       Assert.Check(_state == null);
       try {
+#if UNITY_EDITOR
+        var allAssets = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(AssetBundleName, AssetName[..AssetName.LastIndexOf('.')])
+          .SelectMany(AssetDatabase.LoadAllAssetsAtPath);
+        foreach (var asset in allAssets) {
+          if (asset && (string.IsNullOrEmpty(NestedAssetName) || asset.name == NestedAssetName)) {
+            _state = asset;
+            return;
+          }
+        }
+#endif
         // load the bundle, if not yet loaded
         var bundle = GetAssetBundle(AssetBundleName);
         if (bundle == null) {
@@ -7541,7 +7552,7 @@ namespace Quantum {
 #endregion
 
 
-#region QuantumAssetSourceResource.cs
+        #region QuantumAssetSourceResource.cs
 
 namespace Quantum {
   using System;
