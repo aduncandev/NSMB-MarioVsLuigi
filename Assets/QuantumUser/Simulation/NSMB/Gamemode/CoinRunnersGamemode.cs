@@ -1,6 +1,5 @@
 using Photon.Deterministic;
 using System;
-using static UnityEditor.Progress;
 
 namespace Quantum {
     public unsafe class CoinRunnersGamemode : GamemodeAsset {

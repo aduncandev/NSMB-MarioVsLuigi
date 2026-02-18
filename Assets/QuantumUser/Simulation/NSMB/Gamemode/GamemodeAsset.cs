@@ -24,6 +24,29 @@ namespace Quantum {
 
         public abstract int GetObjectiveCount(Frame f, MarioPlayer* mario);
 
+        public bool CanItemSpawn(Frame f, CoinItemAsset coinItem, bool fromBlock) {
+            var flag = coinItem.Flags;
+            var rules = f.Global->Rules;
+            if (flag.HasFlag(CoinItemAsset.TypeFlags.Custom) &! rules.CustomPowerupsEnabled) { return false; }
+            if (flag.HasFlag(CoinItemAsset.TypeFlags.RouletteOnly) && fromBlock) { return false; }
+            if (flag.HasFlag(CoinItemAsset.TypeFlags.BlockOnly) &! fromBlock) { return false; }
+            if (coinItem.MaxNumberOfItems > 0 && coinItem.CountItemsExisting(f) > coinItem.MaxNumberOfItems) {
+                return false;
+            }
+            if (coinItem.MaxMatchingPowerStates > 0 && coinItem.CountPlayersWithState(f) > coinItem.MaxMatchingPowerStates) {
+                return false;
+            }
+            if (coinItem is PowerupAsset powerUP) {
+                var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+                PowerupAsset[] bannedPowerUPs = stage.BannedPowerUPs;
+                if (bannedPowerUPs.Any(p => p == powerUP)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public virtual CoinItemAsset GetRandomItem(Frame f, MarioPlayer* mario, bool fromBlock) {
             var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
 
@@ -32,46 +55,10 @@ namespace Quantum {
             int ourObjectiveCount = GetTeamObjectiveCount(f, mario->GetTeam(f)) ?? 0;
             FP averageObjectiveCount = GetAverageObjectiveCount(f);
 
-            var rules = f.Global->Rules;
-            PowerupAsset[] bannedPowerUPs = stage.BannedPowerUPs;
-            bool custom = rules.CustomPowerupsEnabled;
-            bool lives = rules.IsLivesEnabled;
-
-            bool canSpawnMega = true;
-
-
-            foreach ((var _, var otherPlayer) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
-                // Check if another player is actively mega (not growing or shrinking)
-                if (otherPlayer->CurrentPowerupState == PowerupState.MegaMushroom
-                    && otherPlayer->MegaMushroomStartFrames == 0) {
-                    canSpawnMega = false;
-                    break;
-                }
-            }
-
-            bool onlyOneAlreadyExists = false;
-            foreach ((var _, var coinItem) in f.Unsafe.GetComponentBlockIterator<CoinItem>()) {
-                if (f.FindAsset(coinItem->Scriptable).OnlyOneCanExist) {
-                    onlyOneAlreadyExists = true;
-                    break;
-                }
-            }
-
             FP totalChance = 0;
             foreach (AssetRef<CoinItemAsset> coinItemAsset in AllCoinItems) {
                 CoinItemAsset coinItem = f.FindAsset(coinItemAsset);
-                if ((coinItem is PowerupAsset powerup) && powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
-                    continue;
-                }
-
-                if ((coinItem is PowerupAsset powerUP) && bannedPowerUPs.Any(p => p == powerUP)) {
-                    continue;
-                }
-
-                if ((coinItem.CustomPowerup && !custom)
-                    || (coinItem.LivesOnlyPowerup && !lives)
-                    || (!coinItem.CanSpawnFromBlock && fromBlock)
-                    || (coinItem.OnlyOneCanExist && onlyOneAlreadyExists)) {
+                if (!CanItemSpawn(f, coinItem, fromBlock)) {
                     continue;
                 }
 
@@ -81,18 +68,7 @@ namespace Quantum {
             FP rand = mario->RNG.Next(0, totalChance);
             foreach (AssetRef<CoinItemAsset> coinItemAsset in AllCoinItems) {
                 CoinItemAsset coinItem = f.FindAsset(coinItemAsset);
-                if ((coinItem is PowerupAsset powerup) && powerup.State == PowerupState.MegaMushroom && !canSpawnMega) {
-                    continue;
-                }
-
-                if ((coinItem is PowerupAsset powerUP) && bannedPowerUPs.Any(p => p == powerUP)) {
-                    continue;
-                }
-
-                if ((coinItem.CustomPowerup && !custom)
-                    || (coinItem.LivesOnlyPowerup && !lives)
-                    || (!coinItem.CanSpawnFromBlock && fromBlock)
-                    || (coinItem.OnlyOneCanExist && onlyOneAlreadyExists)) {
+                if (!CanItemSpawn(f, coinItem, fromBlock)) {
                     continue;
                 }
 

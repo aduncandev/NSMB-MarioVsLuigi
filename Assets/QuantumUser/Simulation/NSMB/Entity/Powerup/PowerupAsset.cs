@@ -40,6 +40,25 @@ public class PowerupAsset : CoinItemAsset, ISoundOverrideProvider {
             }
         }
     }
+    public override unsafe int CountItemsExisting(Frame f) {
+        int numOfItems = 0;
+        foreach ((var _, var foundItem) in f.Unsafe.GetComponentBlockIterator<CoinItem>()) {
+            if (f.FindAsset(foundItem->Scriptable).Equals(this)) {
+                numOfItems++;
+            }
+        }
+        return numOfItems;
+    }
+    public override unsafe int CountPlayersWithState(Frame f) {
+        int playersWithPower = 0;
+        foreach ((var _, var otherPlayers) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+            // check if another player matches the powerUP state
+            if (otherPlayers->CurrentPowerupState == State) {
+                playersWithPower++;
+            }
+        }
+        return playersWithPower;
+    }
 
     public SoundEffectOverride GetOverride(SoundEffect sfx) {
         overridesDict.TryGetValue(sfx, out var result);

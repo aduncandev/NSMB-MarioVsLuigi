@@ -26,10 +26,8 @@ MonoBehaviour:
   BelowAverageBonus:
     RawValue: 229376
   BlockSpawnSoundEffect: 69
-  CustomPowerup: 0
-  LivesOnlyPowerup: 0
-  CanSpawnFromBlock: 1
-  OnlyOneCanExist: 0
+  Flags: 256
+  MaxMatchingPowerStates: 0
   CameraSpawnOffset:
     X:
       RawValue: 0
