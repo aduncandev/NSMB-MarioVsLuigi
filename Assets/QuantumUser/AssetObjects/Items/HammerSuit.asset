@@ -26,7 +26,7 @@ MonoBehaviour:
   BelowAverageBonus:
     RawValue: 131072
   BlockSpawnSoundEffect: 69
-  Flags: 4
+  Flags: 52
   MaxNumberOfItems: 0
   CameraSpawnOffset:
     X:

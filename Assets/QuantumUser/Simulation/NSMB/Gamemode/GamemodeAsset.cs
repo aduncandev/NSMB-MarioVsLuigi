@@ -28,8 +28,8 @@ namespace Quantum {
             var flag = coinItem.Flags;
             var rules = f.Global->Rules;
             if (flag.HasFlag(CoinItemAsset.TypeFlags.Custom) &! rules.CustomPowerupsEnabled) { return false; }
-            if (flag.HasFlag(CoinItemAsset.TypeFlags.RouletteOnly) && fromBlock) { return false; }
-            if (flag.HasFlag(CoinItemAsset.TypeFlags.BlockOnly) &! fromBlock) { return false; }
+            if (flag.HasFlag(CoinItemAsset.TypeFlags.Roulette) && fromBlock) { return false; }
+            if (flag.HasFlag(CoinItemAsset.TypeFlags.Block) &! fromBlock) { return false; }
             if (!coinItem.SpecialSpawnConditions(f)) { return false; }
             if (coinItem is PowerupAsset powerUP) {
                 var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
@@ -185,7 +185,6 @@ namespace Quantum {
             foreach (int objectiveCount in teamObjectives) {
                 if (objectiveCount > 0) sum += objectiveCount;
             }
-            UnityEngine.Debug.Log($"Sum {sum} Alive count {aliveTeamCount}");
             return (FP)sum / aliveTeamCount;
         }
 

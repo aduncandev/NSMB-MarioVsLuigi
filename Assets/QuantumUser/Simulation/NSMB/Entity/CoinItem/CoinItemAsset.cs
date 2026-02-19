@@ -6,14 +6,15 @@ public class CoinItemAsset : AssetObject {
     [Flags]
     public enum TypeFlags {
         None = 0,
-        BigPower = 1 << 0,
-        VerticalPower = 1 << 1,
+        Big = 1 << 0,
+        Vertical = 1 << 1,
         Custom = 1 << 2,
         LivesOnly = 1 << 3,
-        BlockOnly = 1 << 4,
-        RouletteOnly = 1 << 5,
+        Block = 1 << 4,
+        Roulette = 1 << 5,
         NotPowerUP = 1 << 6,
         NoStateChange = 1 << 7,
+        Disadvantage = 1 << 8,
     }
     public AssetRef<EntityPrototype> Prefab;
     public FP SpawnChance = FP._0_10, AboveAverageBonus = 0, BelowAverageBonus = 0;
