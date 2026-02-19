@@ -20,15 +20,20 @@ public class CoinItemAsset : AssetObject {
     public SoundEffect BlockSpawnSoundEffect = SoundEffect.World_Block_Powerup;
     public TypeFlags Flags = TypeFlags.None;
     public int MaxNumberOfItems = 0;
-    public int MaxMatchingPowerStates = 0; // no more items with a matching powerUP state will spawn if above 0
 
     public FPVector2 CameraSpawnOffset = new(0, FP.FromString("1.68"));
-    
-    public virtual unsafe int CountItemsExisting(Frame f) {
-        return 0;
-    }
 
-    public virtual unsafe int CountPlayersWithState(Frame f) {
-        return 0;
+    public virtual unsafe bool SpecialSpawnConditions(Frame f) {
+        if (MaxNumberOfItems > 0) {
+            int numOfItems = 0;
+            foreach ((var _, var foundItem) in f.Unsafe.GetComponentBlockIterator<CoinItem>()) {
+                if (foundItem->Scriptable == this) {
+                    numOfItems++;
+                }
+            }
+
+            return numOfItems < MaxNumberOfItems;
+        }
+        return true;
     }
 }

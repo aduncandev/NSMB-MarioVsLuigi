@@ -30,12 +30,7 @@ namespace Quantum {
             if (flag.HasFlag(CoinItemAsset.TypeFlags.Custom) &! rules.CustomPowerupsEnabled) { return false; }
             if (flag.HasFlag(CoinItemAsset.TypeFlags.RouletteOnly) && fromBlock) { return false; }
             if (flag.HasFlag(CoinItemAsset.TypeFlags.BlockOnly) &! fromBlock) { return false; }
-            if (coinItem.MaxNumberOfItems > 0 && coinItem.CountItemsExisting(f) > coinItem.MaxNumberOfItems) {
-                return false;
-            }
-            if (coinItem.MaxMatchingPowerStates > 0 && coinItem.CountPlayersWithState(f) > coinItem.MaxMatchingPowerStates) {
-                return false;
-            }
+            if (!coinItem.SpecialSpawnConditions(f)) { return false; }
             if (coinItem is PowerupAsset powerUP) {
                 var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
                 PowerupAsset[] bannedPowerUPs = stage.BannedPowerUPs;
@@ -188,10 +183,10 @@ namespace Quantum {
 
             int sum = 0;
             foreach (int objectiveCount in teamObjectives) {
-                sum += objectiveCount;
+                if (objectiveCount > 0) sum += objectiveCount;
             }
-
-            return ((FP)sum / aliveTeamCount);
+            UnityEngine.Debug.Log($"Sum {sum} Alive count {aliveTeamCount}");
+            return (FP)sum / aliveTeamCount;
         }
 
         public virtual EntityRef SpawnLooseCoin(Frame f, FPVector2 position) {

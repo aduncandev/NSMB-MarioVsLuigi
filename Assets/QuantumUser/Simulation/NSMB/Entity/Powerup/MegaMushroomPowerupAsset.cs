@@ -4,16 +4,23 @@ using Quantum;
 public class MegaMushroomPowerupAsset : PowerupAsset {
 
     public FP GrowAnimationDuration = FP._1_50;
-    public override unsafe int CountPlayersWithState(Frame f) {
+    public unsafe int CountMegaPlayers(Frame f) {
         int playersWithPower = 0;
         foreach ((var _, var otherPlayer) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
-            // check if another player matches the powerUP state
             if (otherPlayer->CurrentPowerupState == PowerupState.MegaMushroom && otherPlayer->MegaMushroomStartFrames == 0) {
                 playersWithPower++;
             }
         }
         return playersWithPower;
     }
+
+    public override unsafe bool SpecialSpawnConditions(Frame f) {
+        var megaPlayers = CountMegaPlayers(f);
+        if (MaxMatchingPowerStates > 0 && megaPlayers > MaxMatchingPowerStates) { return false; }
+
+        return true;
+    }
+
 
     protected override unsafe void OnCollected(Frame f, EntityRef marioEntity) {
         var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
