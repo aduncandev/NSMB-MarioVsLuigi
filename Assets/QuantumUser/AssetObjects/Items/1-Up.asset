@@ -18,23 +18,23 @@ MonoBehaviour:
       Value: 421291512996345105
   Prefab:
     Id:
-      Value: 0
+      Value: 1365421339623582075
   SpawnChance:
     RawValue: 0
-  LosingSpawnBonus:
+  AboveAverageBonus:
+    RawValue: 0
+  BelowAverageBonus:
     RawValue: 0
   BlockSpawnSoundEffect: 69
-  BigPowerup: 0
-  VerticalPowerup: 0
-  CustomPowerup: 1
-  LivesOnlyPowerup: 1
-  CanSpawnFromBlock: 1
-  OnlyOneCanExist: 0
+  Flags: 56
+  MaxNumberOfItems: 0
   CameraSpawnOffset:
     X:
       RawValue: 0
     Y:
       RawValue: 110100
+  MaxMatchingPowerStates: 0
+  MaxMatchingReserveState: 0
   State: 0
   SoundPlaysEverywhere: 0
   SoundEffect: 78

@@ -94,10 +94,11 @@ namespace Quantum {
             return gamemodeDataCopy.StarChasers->Stars;
         }
 
-        public override FP GetItemSpawnWeight(Frame f, CoinItemAsset item, int leaderStars, int ourStars) {
+        public override FP GetItemSpawnWeight(Frame f, CoinItemAsset item, FP starAverage, int ourStars) {
             int starsToWin = f.Global->Rules.StarsToWin;
-            int starDifference = leaderStars - ourStars;
-            FP bonus = item.LosingSpawnBonus * FPMath.Log(starDifference + 1, FP.E) * (FP._1 - ((FP) (starsToWin - leaderStars) / starsToWin));
+            FP avgDiff = ourStars - starAverage;
+            FP whichBonus = avgDiff > 0 ? item.AboveAverageBonus : item.BelowAverageBonus;
+            FP bonus = whichBonus * FPMath.Log(FPMath.Abs(avgDiff) + 1, FP.E) * (FP._1 - ((FP) (starsToWin - starAverage) / starsToWin));
             return FPMath.Max(0, item.SpawnChance + bonus);
         }
     }

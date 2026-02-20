@@ -67,8 +67,8 @@ MonoBehaviour:
     B: 44
     A: 255
   HidePlayersOnMinimap: 0
-  SpawnBigPowerups: 0
-  SpawnVerticalPowerups: 1
+  BannedPowerUPs:
+  - {fileID: 11400000, guid: 348238c0b7671f944aaa8b9d272994f5, type: 2}
   SfxOverrides: []
   MainMusic:
   - Id:

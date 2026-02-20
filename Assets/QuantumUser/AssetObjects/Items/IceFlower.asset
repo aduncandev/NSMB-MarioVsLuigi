@@ -21,20 +21,20 @@ MonoBehaviour:
       Value: 1524544283524633813
   SpawnChance:
     RawValue: 32768
-  LosingSpawnBonus:
+  AboveAverageBonus:
+    RawValue: -8192
+  BelowAverageBonus:
     RawValue: 98304
   BlockSpawnSoundEffect: 69
-  BigPowerup: 0
-  VerticalPowerup: 0
-  CustomPowerup: 1
-  LivesOnlyPowerup: 0
-  CanSpawnFromBlock: 1
-  OnlyOneCanExist: 0
+  Flags: 52
+  MaxNumberOfItems: 0
   CameraSpawnOffset:
     X:
       RawValue: 0
     Y:
       RawValue: 110100
+  MaxMatchingPowerStates: 0
+  MaxMatchingReserveState: 0
   State: 4
   SoundPlaysEverywhere: 0
   SoundEffect: 16

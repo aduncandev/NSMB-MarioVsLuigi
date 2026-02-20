@@ -47,8 +47,7 @@ public unsafe class VersusStageData : AssetObject, ISoundOverrideProvider {
     public bool HidePlayersOnMinimap;
 
     [Header("-- Powerups")]
-    public bool SpawnBigPowerups = true;
-    public bool SpawnVerticalPowerups = true;
+    public PowerupAsset[] BannedPowerUPs;
 
     [Header("---Sound Overrides")]
     public SoundEffectOverride[] SfxOverrides;
