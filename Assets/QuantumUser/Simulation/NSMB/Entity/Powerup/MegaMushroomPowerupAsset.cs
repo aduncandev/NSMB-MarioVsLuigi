@@ -1,31 +1,29 @@
 using Photon.Deterministic;
 using Quantum;
 
-public class MegaMushroomPowerupAsset : PowerupAsset {
+public unsafe class MegaMushroomPowerupAsset : PowerupAsset {
 
     public FP GrowAnimationDuration = FP._1_50;
-    public unsafe int CountMegaPlayers(Frame f) {
+
+    public override int CountPlayersWithState(Frame f) {
         int playersWithPower = 0;
-        foreach ((var _, var otherPlayer) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
-            if (otherPlayer->CurrentPowerupState == PowerupState.MegaMushroom && otherPlayer->MegaMushroomStartFrames == 0) {
+        foreach ((_, var otherPlayer) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+            if (otherPlayer->CurrentPowerupState == PowerupState.MegaMushroom
+                && otherPlayer->MegaMushroomStartFrames == 0
+                && otherPlayer->MegaMushroomEndFrames == 0) {
+
                 playersWithPower++;
             }
         }
         return playersWithPower;
     }
 
-    public override unsafe bool SpecialSpawnConditions(Frame f) {
-        var megaPlayers = CountMegaPlayers(f);
-        if (MaxMatchingPowerStates > 0 && megaPlayers > MaxMatchingPowerStates) { return false; }
-
-        return true;
-    }
-
-
     protected override unsafe void OnCollected(Frame f, EntityRef marioEntity) {
         var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
         var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
 
+        mario->MegaMushroomEndFrames = 0;
+        mario->MegaMushroomStationaryEnd = false;
         mario->MegaMushroomStartFrames = (byte) (GrowAnimationDuration * f.UpdateRate);
         mario->IsSliding = false;
         mario->CurrentKnockback = KnockbackStrength.None;

@@ -24,22 +24,13 @@ namespace Quantum {
 
         public abstract int GetObjectiveCount(Frame f, MarioPlayer* mario);
 
-        public bool CanItemSpawn(Frame f, CoinItemAsset coinItem, bool fromBlock) {
-            var flag = coinItem.Flags;
-            var rules = f.Global->Rules;
-            if (flag.HasFlag(CoinItemAsset.TypeFlags.Custom) &! rules.CustomPowerupsEnabled) { return false; }
-            if (flag.HasFlag(CoinItemAsset.TypeFlags.Roulette) && fromBlock) { return false; }
-            if (flag.HasFlag(CoinItemAsset.TypeFlags.Block) &! fromBlock) { return false; }
-            if (!coinItem.SpecialSpawnConditions(f)) { return false; }
-            if (coinItem is PowerupAsset powerUP) {
-                var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-                PowerupAsset[] bannedPowerUPs = stage.BannedPowerUPs;
-                if (bannedPowerUPs.Any(p => p == powerUP)) {
-                    return false;
-                }
+        public bool CanItemSpawn(Frame f, CoinItemAsset coinItem, bool fromRouletteBlock) {
+            var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            if (stage.BannedCoinItems.Contains(coinItem)) {
+                return false;
             }
 
-            return true;
+            return coinItem.CanSpawn(f, fromRouletteBlock);
         }
 
         public virtual CoinItemAsset GetRandomItem(Frame f, MarioPlayer* mario, bool fromBlock) {
@@ -114,7 +105,7 @@ namespace Quantum {
                 teamObjectiveCounts[i] = -1;
             }
 
-            foreach ((var _, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+            foreach ((_, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
                 if (mario->Disconnected || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)) {
                     continue;
                 }
@@ -141,7 +132,7 @@ namespace Quantum {
 
         public virtual int GetTeamObjectiveCount(Frame f, byte team) {
             int sum = 0;
-            foreach ((var _, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+            foreach ((_, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
                 if (mario->GetTeam(f) != team
                     || (mario->Lives <= 0 && f.Global->Rules.IsLivesEnabled)
                     || mario->Disconnected) {

@@ -46,8 +46,8 @@ public unsafe class VersusStageData : AssetObject, ISoundOverrideProvider {
     public ColorRGBA UIColor = new(24, 178, 170);
     public bool HidePlayersOnMinimap;
 
-    [Header("-- Powerups")]
-    public PowerupAsset[] BannedPowerUPs;
+    [Header("-- Coin Items")]
+    public List<AssetRef<CoinItemAsset>> BannedCoinItems;
 
     [Header("---Sound Overrides")]
     public SoundEffectOverride[] SfxOverrides;

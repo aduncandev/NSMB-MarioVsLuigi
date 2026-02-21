@@ -9,7 +9,7 @@ namespace NSMB.UI.Game.Results {
 
         //---Seriaized Variables
         [SerializeField] private Image leftHalf, rightHalf;
-        [SerializeField] private Image characterIcon;
+        [SerializeField] private Image characterIcon, teamSprite;
         [SerializeField] private TMP_Text usernameText, starCountText;
         [SerializeField] private RectTransform childTransform;
         [SerializeField] private GameObject fullSlot, emptySlot;
@@ -20,12 +20,19 @@ namespace NSMB.UI.Game.Results {
         //---Private Variables
         private PlayerRef player;
         private NicknameColor nicknameColor = NicknameColor.White;
+        private PlayerInformation? playerInfo;
 
         public void Start() {
             QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
+            Settings.OnColorblindModeChanged += OnColorblindModeChanged;
+        }
+
+        public void OnDestroy() {
+            Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
         }
 
         public unsafe void Initialize(Frame f, GamemodeAsset gamemode, in PlayerInformation? info, int ranking, float delay, int stars = -1) {
+            playerInfo = info;
             bool occupied = info.HasValue;
             fullSlot.SetActive(occupied);
             emptySlot.SetActive(!occupied);
@@ -37,7 +44,8 @@ namespace NSMB.UI.Game.Results {
                 nicknameColor = NicknameColor.Parse(info.Value.NicknameColor.ToString());
                 usernameText.color = nicknameColor.Sample();
                 characterIcon.sprite = QuantumViewUtils.FindAssetOrDefault(info.Value.Character, GlobalController.Instance.defaultCharacter).ReadySprite;
-
+                OnColorblindModeChanged();
+                
                 if (stars < 0) {
                     starCountText.text = "<sprite name=results_out>";
                     rightHalf.color = unrankedColor;
@@ -78,6 +86,33 @@ namespace NSMB.UI.Game.Results {
 
             var playerData = QuantumUtils.GetPlayerData(e.Game.Frames.Predicted, player);
             readyCheckmark.SetActive(playerData->VotedToContinue);
+        }
+
+        private unsafe void OnColorblindModeChanged() {
+            if (playerInfo is PlayerInformation info) {
+                if (Settings.Instance.GraphicsColorblind) {
+                    Frame f = QuantumRunner.DefaultGame.Frames.Predicted;
+                    if (f.Global->Rules.TeamsEnabled) {
+                        var teams = f.SimulationConfig.Teams;
+                        if (info.Team < teams.Length) {
+                            var team = teams[info.Team];
+                            teamSprite.sprite = f.FindAsset(team).spriteColorblind;
+                        } else {
+                            teamSprite.sprite = null;
+                        }
+                    } else {
+                        var slot = Utils.GetPlayerSlotInfo(f, info.PlayerRef);
+                        if (slot) {
+                            teamSprite.sprite = slot.Sprite;
+                        } else {
+                            teamSprite.sprite = null;
+                        }
+                    }
+                    teamSprite.gameObject.SetActive(true);
+                } else {
+                    teamSprite.gameObject.SetActive(false);
+                }
+            }
         }
     }
 }

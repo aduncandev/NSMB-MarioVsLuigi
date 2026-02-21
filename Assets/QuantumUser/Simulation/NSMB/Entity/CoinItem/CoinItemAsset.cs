@@ -2,39 +2,51 @@ using System;
 using Photon.Deterministic;
 using Quantum;
 
-public class CoinItemAsset : AssetObject {
-    [Flags]
-    public enum TypeFlags {
-        None = 0,
-        Big = 1 << 0,
-        Vertical = 1 << 1,
-        Custom = 1 << 2,
-        LivesOnly = 1 << 3,
-        Block = 1 << 4,
-        Roulette = 1 << 5,
-        NotPowerUP = 1 << 6,
-        NoStateChange = 1 << 7,
-        Disadvantage = 1 << 8,
-    }
+public unsafe class CoinItemAsset : AssetObject {
+
     public AssetRef<EntityPrototype> Prefab;
     public FP SpawnChance = FP._0_10, AboveAverageBonus = 0, BelowAverageBonus = 0;
     public SoundEffect BlockSpawnSoundEffect = SoundEffect.World_Block_Powerup;
-    public TypeFlags Flags = TypeFlags.None;
+    public TypeFlags Flags = TypeFlags.SpawnableFromCoins | TypeFlags.SpawnableFromRoulette;
     public int MaxNumberOfItems = 0;
 
     public FPVector2 CameraSpawnOffset = new(0, FP.FromString("1.68"));
 
-    public virtual unsafe bool SpecialSpawnConditions(Frame f) {
-        if (MaxNumberOfItems > 0) {
-            int numOfItems = 0;
-            foreach ((var _, var foundItem) in f.Unsafe.GetComponentBlockIterator<CoinItem>()) {
-                if (foundItem->Scriptable == this) {
-                    numOfItems++;
-                }
+    public virtual int CountItemsExisting(Frame f) {
+        int numOfItems = 0;
+        foreach ((_, var coinItem) in f.Unsafe.GetComponentBlockIterator<CoinItem>()) {
+            if (coinItem->Scriptable == this) {
+                numOfItems++;
             }
+        }
+        return numOfItems;
+    }
 
-            return numOfItems < MaxNumberOfItems;
+    public virtual unsafe bool CanSpawn(Frame f, bool fromRouletteBlock) {
+        if (fromRouletteBlock && !Flags.HasFlag(TypeFlags.SpawnableFromCoins)) {
+            return false;
+        }
+        if (fromRouletteBlock && !Flags.HasFlag(TypeFlags.SpawnableFromRoulette)) {
+            return false;
+        }
+        if (Flags.HasFlag(TypeFlags.NonVanillaItem) && !f.Global->Rules.CustomPowerupsEnabled) {
+            return false;
+        }
+        if (Flags.HasFlag(TypeFlags.LivesEnabledOnly) && !f.Global->Rules.IsLivesEnabled) {
+            return false;
+        }
+        if (MaxNumberOfItems > 0) {
+            return CountItemsExisting(f) < MaxNumberOfItems;
         }
         return true;
+    }
+
+    [Flags]
+    public enum TypeFlags : byte {
+        None = 0,
+        SpawnableFromCoins = 1 << 0,
+        SpawnableFromRoulette = 1 << 1,
+        NonVanillaItem = 1 << 2,
+        LivesEnabledOnly = 1 << 3,
     }
 }

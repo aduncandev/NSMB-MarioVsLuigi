@@ -55,6 +55,12 @@ namespace Quantum {
     Dotted = 2,
     Objective = 4,
   }
+  public enum EnemyKillReason : byte {
+    Normal,
+    Special,
+    Groundpounded,
+    InWall,
+  }
   public enum GameState : byte {
     PreGameRoom,
     WaitingForPlayers,
@@ -74,12 +80,6 @@ namespace Quantum {
     SingleJump,
     DoubleJump,
     TripleJump,
-  }
-  public enum KillReason : byte {
-    Normal,
-    Special,
-    Groundpounded,
-    InWall,
   }
   public enum KnockbackStrength : byte {
     None,
@@ -4352,6 +4352,7 @@ namespace Quantum {
       typeRegistry.Register(typeof(DistanceJoint3D), DistanceJoint3D.SIZE);
       typeRegistry.Register(typeof(Quantum.DonutBlock), Quantum.DonutBlock.SIZE);
       typeRegistry.Register(typeof(Quantum.Enemy), Quantum.Enemy.SIZE);
+      typeRegistry.Register(typeof(Quantum.EnemyKillReason), 1);
       typeRegistry.Register(typeof(Quantum.EnterablePipe), Quantum.EnterablePipe.SIZE);
       typeRegistry.Register(typeof(EntityPrototypeRef), EntityPrototypeRef.SIZE);
       typeRegistry.Register(typeof(EntityRef), EntityRef.SIZE);
@@ -4394,7 +4395,6 @@ namespace Quantum {
       typeRegistry.Register(typeof(Joint), Joint.SIZE);
       typeRegistry.Register(typeof(Joint3D), Joint3D.SIZE);
       typeRegistry.Register(typeof(Quantum.JumpState), 1);
-      typeRegistry.Register(typeof(Quantum.KillReason), 1);
       typeRegistry.Register(typeof(Quantum.KnockbackStrength), 1);
       typeRegistry.Register(typeof(Quantum.Koopa), Quantum.Koopa.SIZE);
       typeRegistry.Register(typeof(LayerMask), LayerMask.SIZE);
@@ -4512,12 +4512,12 @@ namespace Quantum {
       FramePrinter.EnsureNotStripped();
       FramePrinter.EnsurePrimitiveNotStripped<CallbackFlags>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.CoinType>();
+      FramePrinter.EnsurePrimitiveNotStripped<Quantum.EnemyKillReason>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.GameState>();
       FramePrinter.EnsurePrimitiveNotStripped<IceBlockBreakReason>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.InputButtons>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.InteractionDirection>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.JumpState>();
-      FramePrinter.EnsurePrimitiveNotStripped<Quantum.KillReason>();
       FramePrinter.EnsurePrimitiveNotStripped<Quantum.KnockbackStrength>();
       FramePrinter.EnsurePrimitiveNotStripped<LiquidType>();
       FramePrinter.EnsurePrimitiveNotStripped<ParticleEffect>();

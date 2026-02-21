@@ -147,7 +147,7 @@ namespace Quantum {
         }
 
         public void OnMarioPlayerDied(Frame f, EntityRef entity) {
-            foreach ((EntityRef goldBlockEntity, var goldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
+            foreach ((var goldBlockEntity, var goldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
                 if (goldBlock->AttachedTo == entity) {
                     f.Events.GoldBlockLostViaDamage(goldBlockEntity);
                     f.Destroy(goldBlockEntity);
@@ -156,7 +156,7 @@ namespace Quantum {
         }
 
         public void OnMarioPlayerTakeDamage(Frame f, EntityRef entity, ref QBoolean keepDamage) {
-            foreach ((EntityRef goldBlockEntity, var goldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
+            foreach ((var goldBlockEntity, var goldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
                 if (goldBlock->AttachedTo == entity) {
                     keepDamage = false;
                     f.Unsafe.GetPointer<MarioPlayer>(entity)->DamageInvincibilityFrames = 90;
@@ -174,7 +174,7 @@ namespace Quantum {
             }
 
             // Break gold blocks for this player
-            foreach ((EntityRef goldBlockEntity, var goldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
+            foreach ((var goldBlockEntity, var goldBlock) in f.Unsafe.GetComponentBlockIterator<GoldBlock>()) {
                 if (goldBlock->AttachedTo == marioEntity) {
                     f.Events.GoldBlockLostViaDamage(goldBlockEntity);
                     f.Destroy(goldBlockEntity);

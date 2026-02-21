@@ -67,7 +67,7 @@ MonoBehaviour:
     B: 170
     A: 255
   HidePlayersOnMinimap: 0
-  BannedPowerUPs: []
+  BannedCoinItems: []
   SfxOverrides: []
   MainMusic:
   - Id:

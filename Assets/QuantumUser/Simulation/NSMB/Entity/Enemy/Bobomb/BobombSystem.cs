@@ -142,11 +142,11 @@ namespace Quantum {
 
             bool anyDamaged = false;
             if (kickedA || eitherHeld) {
-                bobombB->Kill(f, bobombBEntity, bobombAEntity, KillReason.Special);
+                bobombB->Kill(f, bobombBEntity, bobombAEntity, EnemyKillReason.Special);
                 anyDamaged = true;
             }
             if (kickedB || eitherHeld) {
-                bobombA->Kill(f, bobombAEntity, bobombBEntity, KillReason.Special);
+                bobombA->Kill(f, bobombAEntity, bobombBEntity, EnemyKillReason.Special);
                 anyDamaged = true;
             }
 
@@ -172,7 +172,7 @@ namespace Quantum {
 
             // Special insta-kill cases
             if (mario->InstakillsEnemies(marioPhysicsObject, true)) {
-                bobomb->Kill(f, bobombEntity, marioEntity, KillReason.Special);    
+                bobomb->Kill(f, bobombEntity, marioEntity, EnemyKillReason.Special);    
                 return;
             }
 
@@ -229,7 +229,7 @@ namespace Quantum {
 
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers: {
-                f.Unsafe.GetPointer<Bobomb>(bobombEntity)->Kill(f, bobombEntity, projectileEntity, KillReason.Special);
+                f.Unsafe.GetPointer<Bobomb>(bobombEntity)->Kill(f, bobombEntity, projectileEntity, EnemyKillReason.Special);
                 break;
             }
             case ProjectileEffectType.Fire: {
@@ -257,7 +257,7 @@ namespace Quantum {
             if (iceBlock->IsSliding
                 && upDot < Constants.PhysicsGroundMaxAngleCos) {
 
-                bobomb->Kill(f, bobombEntity, iceBlockEntity, KillReason.Special);
+                bobomb->Kill(f, bobombEntity, iceBlockEntity, EnemyKillReason.Special);
             }
             return false;
         }
@@ -306,7 +306,7 @@ namespace Quantum {
             }
 
             if (PhysicsObjectSystem.BoxInGround(f, transform->Position, collider->Shape, entity: entity)) {
-                bobomb->Kill(f, entity, marioEntity, KillReason.Special);
+                bobomb->Kill(f, entity, marioEntity, EnemyKillReason.Special);
                 return;
             }
 
@@ -325,14 +325,14 @@ namespace Quantum {
 
         public void OnBobombExplodeEntity(Frame f, EntityRef bobombEntity, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
-                bobomb->Kill(f, entity, bobombEntity, KillReason.Special);
+                bobomb->Kill(f, entity, bobombEntity, EnemyKillReason.Special);
             }
         }
 
         public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
             if (f.Unsafe.TryGetPointer(iceBlock->Entity, out Bobomb* bobomb)) {
-                bobomb->Kill(f, iceBlock->Entity, brokenIceBlock, KillReason.Special);
+                bobomb->Kill(f, iceBlock->Entity, brokenIceBlock, EnemyKillReason.Special);
             }
         }
 
@@ -343,20 +343,20 @@ namespace Quantum {
                     // Don't die if being held
                     return;
                 }
-                bobomb->Kill(f, entity, EntityRef.None, KillReason.InWall);
+                bobomb->Kill(f, entity, EntityRef.None, EnemyKillReason.InWall);
             }
         }
 
         public void OnEntityCrushed(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
-                bobomb->Kill(f, entity, EntityRef.None, KillReason.InWall);
+                bobomb->Kill(f, entity, EntityRef.None, EnemyKillReason.InWall);
             }
         }
 
         public void OnMarioPlayerBecameInvincible(Frame f, EntityRef entity) {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Bobomb* bobomb)) {
-                bobomb->Kill(f, mario->HeldEntity, entity, KillReason.Special);
+                bobomb->Kill(f, mario->HeldEntity, entity, EnemyKillReason.Special);
             }
         }
         #endregion

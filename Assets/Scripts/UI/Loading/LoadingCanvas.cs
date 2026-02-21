@@ -60,10 +60,11 @@ namespace NSMB.UI.Loading {
 
                     if (playerData != null) {
                         characterRef = playerData->Character;
-                    } else {
-                        characterRef = Settings.Instance.generalCharacter;
                     }
                 }
+            }
+            if (characterRef == default) {
+                characterRef = Settings.Instance.generalCharacter;
             }
 
             CharacterAsset character = FindAssetOrDefault(characterRef, GlobalController.Instance.defaultCharacter);

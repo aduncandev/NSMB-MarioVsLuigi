@@ -31,7 +31,7 @@ PrefabInstance:
     - target: {fileID: 517697212848946230, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       propertyPath: Prototype.Scriptable.Id.Value
-      value: 269903407669338010
+      value: 481353246829238635
       objectReference: {fileID: 0}
     - target: {fileID: 1017215213198693184, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
@@ -102,17 +102,17 @@ PrefabInstance:
     - target: {fileID: 1017215213198693199, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.8
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 1017215213198693199, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.8
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 1017215213198693199, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.875
       objectReference: {fileID: 0}
     - target: {fileID: 1017215213198693199, guid: 6dbe32ab0e6d5bc4c8fe9722f4c86d19,
         type: 3}

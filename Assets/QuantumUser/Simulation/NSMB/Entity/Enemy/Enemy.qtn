@@ -14,7 +14,7 @@ signal OnEnemyEnemyCollision(EntityRef a, EntityRef b);
 signal OnEnemyKilledByStageReset(EntityRef entity);
 signal OnEnemyTurnaround(EntityRef entity);
 
-enum KillReason : Byte {
+enum EnemyKillReason : Byte {
 	Normal,
 	Special,
 	Groundpounded,
@@ -28,7 +28,7 @@ event EnemyDespawned {
 event EnemyKilled {
 	EntityRef Enemy;
 	EntityRef Killer;
-	KillReason KillReason;
+	EnemyKillReason KillReason;
 	nothashed FPVector2 EnemyCenter;
 }
 

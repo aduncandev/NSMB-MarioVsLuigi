@@ -92,12 +92,10 @@ namespace NSMB.Cameras {
 
             zoomSfx.enabled = false;
 
-            if (!Target.IsValid || !f.Exists(Target) || !fp.Exists(Target)) {
+            if (!f.Unsafe.TryGetPointer(Target, out CameraController* cameraControllerCurrent)
+                || !fp.Unsafe.TryGetPointer(Target, out CameraController* cameraControllerPrevious)) {
                 return;
             }
-
-            var cameraControllerCurrent = f.Unsafe.GetPointer<CameraController>(Target);
-            var cameraControllerPrevious = fp.Unsafe.GetPointer<CameraController>(Target);
 
             // Resize from game
             float targetOrthoSize = Mathf.Lerp(cameraControllerPrevious->OrthographicSize.AsFloat, cameraControllerCurrent->OrthographicSize.AsFloat, game.InterpolationFactor);

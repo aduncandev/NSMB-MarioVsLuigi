@@ -200,7 +200,6 @@ namespace NSMB.UI.Game.Scoreboard {
             UpdateEntry(f);
         }
 
-
         private void OnColorblindModeChanged() {
             UpdateEntry(QuantumRunner.DefaultGame.Frames.Predicted);
         }

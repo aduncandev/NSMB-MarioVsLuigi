@@ -75,7 +75,7 @@ namespace Quantum
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
 
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
-                bulletBill->Kill(f, bulletBillEntity, marioEntity, groundpounded ? KillReason.Groundpounded : KillReason.Special);
+                bulletBill->Kill(f, bulletBillEntity, marioEntity, groundpounded ? EnemyKillReason.Groundpounded : EnemyKillReason.Special);
                 mario->DoEntityBounce |= mario->IsDrilling;
                 return;
             }
@@ -84,11 +84,11 @@ namespace Quantum
                 if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                     if (mario->IsGroundpounding) {
                         mario->IsGroundpounding = false;
-                        bulletBill->Kill(f, bulletBillEntity, marioEntity, KillReason.Normal);
+                        bulletBill->Kill(f, bulletBillEntity, marioEntity, EnemyKillReason.Normal);
                     }
                     mario->DoEntityBounce = true;
                 } else {
-                    bulletBill->Kill(f, bulletBillEntity, marioEntity, KillReason.Normal);
+                    bulletBill->Kill(f, bulletBillEntity, marioEntity, EnemyKillReason.Normal);
                     mario->DoEntityBounce = !mario->IsGroundpounding;
                 }
 
@@ -107,7 +107,7 @@ namespace Quantum
             if (iceBlock->IsSliding
                 && upDot < Constants.PhysicsGroundMaxAngleCos) {
 
-                bulletBill->Kill(f, bulletBillEntity, iceBlockEntity, KillReason.Special);
+                bulletBill->Kill(f, bulletBillEntity, iceBlockEntity, EnemyKillReason.Special);
             }
             return false;
         }
@@ -120,7 +120,7 @@ namespace Quantum
             } else if (projectileAsset.Effect == ProjectileEffectType.Fire) {
                 f.Events.BulletBillHitByProjectile(bulletBillEntity);
             } else {
-                f.Unsafe.GetPointer<BulletBill>(bulletBillEntity)->Kill(f, bulletBillEntity, projectileEntity, KillReason.Special);
+                f.Unsafe.GetPointer<BulletBill>(bulletBillEntity)->Kill(f, bulletBillEntity, projectileEntity, EnemyKillReason.Special);
             }
 
             f.Signals.OnProjectileHitEntity(projectileEntity, bulletBillEntity);
@@ -130,13 +130,13 @@ namespace Quantum
         #region Signals
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out BulletBill* bulletBill)) {
-                bulletBill->Kill(f, entity, bobomb, KillReason.Special);
+                bulletBill->Kill(f, entity, bobomb, EnemyKillReason.Special);
             }
         }
         public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
             if (f.Unsafe.TryGetPointer(iceBlock->Entity, out BulletBill* bulletBill)) {
-                bulletBill->Kill(f, iceBlock->Entity, brokenIceBlock, KillReason.Special);
+                bulletBill->Kill(f, iceBlock->Entity, brokenIceBlock, EnemyKillReason.Special);
                 f.Events.PlayComboSound(iceBlock->Entity, 0);
             }
         }

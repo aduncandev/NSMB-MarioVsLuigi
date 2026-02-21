@@ -1,11 +1,9 @@
 using NSMB.Sound;
-using NSMB.UI.Game;
 using NSMB.Utilities;
 using Quantum;
 using System;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 
 namespace NSMB {
@@ -15,7 +13,7 @@ namespace NSMB {
         private static Controls _controls;
         public static Controls Controls => _controls;
         private Action[] VersionUpdaters;
-        public static event Action OnColorblindModeChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
+        public static event Action OnColorblindModeChanged, OnNametagVisibilityChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
         public static event Action<bool> OnInputDisplayActiveChanged, OnReplaysEnabledChanged;
 
         //---Properties
@@ -172,9 +170,7 @@ namespace NSMB {
             get => _graphicsPlayerNametags;
             set {
                 _graphicsPlayerNametags = value;
-                foreach (var element in PlayerElements.AllPlayerElements) {
-                    element.nametagCanvas.SetActive(value);
-                }
+                OnNametagVisibilityChanged?.Invoke();
             }
         }
 

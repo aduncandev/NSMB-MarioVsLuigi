@@ -279,7 +279,7 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventEnemyKilled EnemyKilled(EntityRef Enemy, EntityRef Killer, KillReason KillReason, FPVector2 EnemyCenter) {
+      public EventEnemyKilled EnemyKilled(EntityRef Enemy, EntityRef Killer, EnemyKillReason KillReason, FPVector2 EnemyCenter) {
         var ev = _f.Context.AcquireEvent<EventEnemyKilled>(EventEnemyKilled.ID);
         ev.Enemy = Enemy;
         ev.Killer = Killer;
@@ -1235,7 +1235,7 @@ namespace Quantum {
     public new const Int32 ID = 19;
     public EntityRef Enemy;
     public EntityRef Killer;
-    public KillReason KillReason;
+    public EnemyKillReason KillReason;
     public FPVector2 EnemyCenter;
     protected EventEnemyKilled(Int32 id, EventFlags flags) : 
         base(id, flags) {

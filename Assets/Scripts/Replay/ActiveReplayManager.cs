@@ -98,12 +98,10 @@ namespace NSMB.Replay {
             var manager = ReplayListManager.Instance;
             if (manager) {
                 var deletions = manager.GetTemporaryReplaysToDelete();
-                if (deletions != null) {
-                    foreach (var replay in deletions) {
-                        Debug.Log($"[Replay] Automatically deleting temporary replay '{replay.ReplayFile.Header.GetDisplayName()}' ({replay.ReplayFile.FilePath}) to make room.");
-                        File.Delete(replay.ReplayFile.FilePath);
-                        manager.RemoveReplay(replay);
-                    }
+                foreach (var replayPath in deletions) {
+                    Debug.Log($"[Replay] Automatically deleting temporary replay '{replayPath}'.");
+                    File.Delete(replayPath);
+                    manager.RemoveReplayByPath(replayPath);
                 }
             }
 
@@ -210,22 +208,26 @@ namespace NSMB.Replay {
                 await NetworkHandler.Client.DisconnectAsync();
             }
 
-            var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(replay.Header.AddonGuids);
-            if (loadAddonResult.Result == LoadAllAddonsResult.Success) {
+            if (GlobalController.Instance.addonManager.isActiveAndEnabled) {
+                var loadAddonResult = await GlobalController.Instance.addonManager.LoadAllAddons(replay.Header.AddonGuids);
+                if (loadAddonResult.Result == LoadAllAddonsResult.Success) {
+                    _ = StartReplay(replay);
+                } else if (loadAddonResult.Result == LoadAllAddonsResult.DownloadRequired) {
+                    AddonManager.RequestDownloadAddons(loadAddonResult.RequiredDownloads, (result) => {
+                        if (result == AddonManager.AddonDownloadResult.Success) {
+                            _ = StartReplay(replay);
+                        } else if (result == AddonManager.AddonDownloadResult.Cancelled) {
+                            GlobalController.Instance.loadingCanvas.EndAnimation();
+                        } else if (result == AddonManager.AddonDownloadResult.Failure) {
+                            NetworkHandler.ThrowError("ui.error.replay.addons.downloadfailed", false);
+                        }
+                    });
+                } else if (loadAddonResult.Result == LoadAllAddonsResult.Failure) {
+                    NetworkHandler.ThrowError("ui.error.replay.addons.downloadfailed", false);
+                    return;
+                }
+            } else {
                 _ = StartReplay(replay);
-            } else if (loadAddonResult.Result == LoadAllAddonsResult.DownloadRequired) {
-                AddonManager.RequestDownloadAddons(loadAddonResult.RequiredDownloads, (result) => {
-                    if (result == AddonManager.AddonDownloadResult.Success) {
-                        _ = StartReplay(replay);
-                    } else if (result == AddonManager.AddonDownloadResult.Cancelled) {
-                        GlobalController.Instance.loadingCanvas.EndAnimation();
-                    } else if (result == AddonManager.AddonDownloadResult.Failure) {
-                        NetworkHandler.ThrowError("ui.error.replay.addons.downloadfailed", false);
-                    }
-                });
-            } else if (loadAddonResult.Result == LoadAllAddonsResult.Failure) {
-                NetworkHandler.ThrowError("ui.error.replay.addons.downloadfailed", false);
-                return;
             }
         }
 

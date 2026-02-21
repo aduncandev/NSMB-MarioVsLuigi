@@ -3,7 +3,7 @@ using Quantum;
 using System;
 using System.Collections.Generic;
 
-public class PowerupAsset : CoinItemAsset, ISoundOverrideProvider {
+public unsafe class PowerupAsset : CoinItemAsset, ISoundOverrideProvider {
 
     public int MaxMatchingPowerStates = 0;
     public int MaxMatchingReserveState = 0;
@@ -42,18 +42,10 @@ public class PowerupAsset : CoinItemAsset, ISoundOverrideProvider {
             }
         }
     }
-    public unsafe int CountItemsExisting(Frame f) {
-        int numOfItems = 0;
-        foreach ((var _, var foundItem) in f.Unsafe.GetComponentBlockIterator<CoinItem>()) {
-            if (f.FindAsset(foundItem->Scriptable) == this) {
-                numOfItems++;
-            }
-        }
-        return numOfItems;
-    }
-    public unsafe int CountPlayersWithState(Frame f) {
+
+    public virtual int CountPlayersWithState(Frame f) {
         int playersWithPower = 0;
-        foreach ((var _, var otherPlayer) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+        foreach ((_, var otherPlayer) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
             // check if another player matches the powerUP state
             if (otherPlayer->CurrentPowerupState == State) {
                 playersWithPower++;
@@ -61,9 +53,10 @@ public class PowerupAsset : CoinItemAsset, ISoundOverrideProvider {
         }
         return playersWithPower;
     }
-    public unsafe int CountPlayersWithReserve(Frame f) {
+
+    public virtual int CountPlayersWithReserve(Frame f) {
         int playersWithPower = 0;
-        foreach ((var _, var otherPlayer) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+        foreach ((_, var otherPlayer) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
             // check if the powerUP asset in reserve matches us
             if (otherPlayer->ReserveItem == this) {
                 playersWithPower++;
@@ -71,15 +64,19 @@ public class PowerupAsset : CoinItemAsset, ISoundOverrideProvider {
         }
         return playersWithPower;
     }
-    public override bool SpecialSpawnConditions(Frame f) {
-        var existingItems = CountItemsExisting(f);
-        if (MaxNumberOfItems > 0 && existingItems >= MaxNumberOfItems) { return false; }
 
-        var playersWithState = CountPlayersWithState(f);
-        if (MaxMatchingPowerStates > 0 && playersWithState >= MaxMatchingPowerStates) { return false; }
+    public override bool CanSpawn(Frame f, bool fromRouletteBlock) {
+        if (MaxNumberOfItems > 0 && CountItemsExisting(f) >= MaxNumberOfItems) {
+            return false;
+        }
 
-        var playersWithReserve = CountPlayersWithReserve(f);
-        if (MaxMatchingReserveState > 0 && playersWithReserve >= MaxMatchingReserveState) { return false; }
+        if (MaxMatchingPowerStates > 0 && CountPlayersWithState(f) >= MaxMatchingPowerStates) {
+            return false;
+        }
+
+        if (MaxMatchingReserveState > 0 && CountPlayersWithReserve(f) >= MaxMatchingReserveState) {
+            return false;
+        }
 
         return true;
     }

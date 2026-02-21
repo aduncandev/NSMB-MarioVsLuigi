@@ -1,12 +1,18 @@
 using Photon.Deterministic;
 using Quantum;
 
-public class StarmanPowerupAsset : PowerupAsset {
+public unsafe class StarmanPowerupAsset : PowerupAsset {
 
     public FP StarmanDuration = 10;
 
-    public override bool SpecialSpawnConditions(Frame f) {
-        return true; // no restrictions
+    public override int CountPlayersWithState(Frame f) {
+        int count = 0;
+        foreach ((_, var marioPlayer) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+            if (marioPlayer->IsStarmanInvincible) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public override unsafe PowerupReserveResult Collect(Frame f, EntityRef marioEntity) {

@@ -34,7 +34,7 @@ namespace Quantum {
             f.Events.PlayComboSound(entity, 0);
         }
 
-        public readonly void Kill(Frame f, EntityRef bobombEntity, EntityRef killerEntity, KillReason reason) {
+        public readonly void Kill(Frame f, EntityRef bobombEntity, EntityRef killerEntity, EnemyKillReason reason) {
             var enemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(bobombEntity);
             var bobombTransform = f.Unsafe.GetPointer<Transform2D>(bobombEntity);

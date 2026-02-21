@@ -31,7 +31,7 @@ namespace NSMB {
 
         public void Start() {
 #if UNITY_WEBGL || UNITY_WSA
-        enabled = false;
+            enabled = false;
 #endif
 
             Initialize();
@@ -40,8 +40,8 @@ namespace NSMB {
 
         private bool Initialize() {
 #if UNITY_WEBGL || UNITY_WSA
-        enabled = false;
-        return false;
+            enabled = false;
+            return false;
 #endif
 
             lastInitializeTime = Time.time;
@@ -92,7 +92,7 @@ namespace NSMB {
             }
 
             if (!Settings.Instance.GeneralDiscordIntegration) {
-                activityManager.ClearActivity(res => { });
+                activityManager.ClearActivity(null);
                 return;
             }
 
@@ -131,7 +131,7 @@ namespace NSMB {
                         }
                     }
                     var stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
-                    var gamemode = f.FindAsset<GamemodeAsset>(f.Global->Rules.Gamemode);
+                    var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
 
                     activity.Assets = new ActivityAssets {
                         LargeImage = !string.IsNullOrWhiteSpace(stage.DiscordStageImage) ? stage.DiscordStageImage : "mainmenu",
@@ -141,10 +141,10 @@ namespace NSMB {
                     };
 
                     long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                    if (f.Global->Rules.TimerMinutes > 0) {
-                        activity.Timestamps = new() { End = now + (f.Global->Timer * 1000).AsLong };
+                    if (f.Global->Rules.IsTimerEnabled) {
+                        activity.Timestamps = new() { End = now + (long) (f.Global->Timer.AsFloat * 1000) };
                     } else {
-                        activity.Timestamps = new() { Start = now - ((f.Number - f.Global->StartFrame) * f.DeltaTime * 1000).AsLong };
+                        activity.Timestamps = new() { Start = now - ((long) (f.Number - f.Global->StartFrame) * (1000 / f.UpdateRate)) };
                     }
                 }
             } else {
@@ -153,7 +153,7 @@ namespace NSMB {
                 activity.Assets = new() { LargeImage = "mainmenu" };
             }
 
-            activityManager.UpdateActivity(activity, (res) => { });
+            activityManager.UpdateActivity(activity, null);
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

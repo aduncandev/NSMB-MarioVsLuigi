@@ -72,7 +72,7 @@ namespace Quantum {
 
             bool groundpounded = attackedFromAbove && mario->IsGroundpoundActive && mario->CurrentPowerupState != PowerupState.MiniMushroom;
             if (mario->InstakillsEnemies(marioPhysicsObject, true) || groundpounded) {
-                goomba->Kill(f, goombaEntity, marioEntity, groundpounded ? KillReason.Groundpounded : KillReason.Special);
+                goomba->Kill(f, goombaEntity, marioEntity, groundpounded ? EnemyKillReason.Groundpounded : EnemyKillReason.Special);
                 mario->DoEntityBounce |= mario->IsDrilling;
                 return;
             }
@@ -81,11 +81,11 @@ namespace Quantum {
                 if (mario->CurrentPowerupState == PowerupState.MiniMushroom) {
                     if (mario->IsGroundpounding) {
                         mario->IsGroundpounding = false;
-                        goomba->Kill(f, goombaEntity, marioEntity, KillReason.Normal);
+                        goomba->Kill(f, goombaEntity, marioEntity, EnemyKillReason.Normal);
                     }
                     mario->DoEntityBounce = true;
                 } else {
-                    goomba->Kill(f, goombaEntity, marioEntity, KillReason.Normal);
+                    goomba->Kill(f, goombaEntity, marioEntity, EnemyKillReason.Normal);
                     mario->DoEntityBounce = !mario->IsGroundpounding;
                 }
 
@@ -109,7 +109,7 @@ namespace Quantum {
             if (iceBlock->IsSliding
                 && upDot < Constants.PhysicsGroundMaxAngleCos) {
 
-                goomba->Kill(f, goombaEntity, iceBlockEntity, KillReason.Special);
+                goomba->Kill(f, goombaEntity, iceBlockEntity, EnemyKillReason.Special);
             }
             return false;
         }
@@ -120,7 +120,7 @@ namespace Quantum {
             switch (projectileAsset.Effect) {
             case ProjectileEffectType.KillEnemiesAndSoftKnockbackPlayers:
             case ProjectileEffectType.Fire: {
-                f.Unsafe.GetPointer<Goomba>(goombaEntity)->Kill(f, goombaEntity, projectileEntity, KillReason.Special);
+                f.Unsafe.GetPointer<Goomba>(goombaEntity)->Kill(f, goombaEntity, projectileEntity, EnemyKillReason.Special);
                 break;
             }
             case ProjectileEffectType.Freeze: {
@@ -141,31 +141,31 @@ namespace Quantum {
                 return;
             }
 
-            goomba->Kill(f, entity, bumpOwner, KillReason.Special);
+            goomba->Kill(f, entity, bumpOwner, EnemyKillReason.Special);
         }
 
         public void OnBobombExplodeEntity(Frame f, EntityRef bobomb, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Goomba* goomba)) {
-                goomba->Kill(f, entity, bobomb, KillReason.Special);
+                goomba->Kill(f, entity, bobomb, EnemyKillReason.Special);
             }
         }
 
         public void OnIceBlockBroken(Frame f, EntityRef brokenIceBlock, IceBlockBreakReason breakReason) {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(brokenIceBlock);
             if (f.Unsafe.TryGetPointer(iceBlock->Entity, out Goomba* goomba)) {
-                goomba->Kill(f, iceBlock->Entity, brokenIceBlock, KillReason.Special);
+                goomba->Kill(f, iceBlock->Entity, brokenIceBlock, EnemyKillReason.Special);
             }
         }
 
         public void OnEnemyKilledByStageReset(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Goomba* goomba)) {
-                goomba->Kill(f, entity, EntityRef.None, KillReason.InWall);
+                goomba->Kill(f, entity, EntityRef.None, EnemyKillReason.InWall);
             }
         }
 
         public void OnEntityCrushed(Frame f, EntityRef entity) {
             if (f.Unsafe.TryGetPointer(entity, out Goomba* goomba)) {
-                goomba->Kill(f, entity, EntityRef.None, KillReason.InWall);
+                goomba->Kill(f, entity, EntityRef.None, EnemyKillReason.InWall);
             }
         }
 

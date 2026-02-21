@@ -11,7 +11,7 @@ namespace Quantum {
 #else
     public unsafe class PrePhysicsObjectSystem : SystemMainThreadEntity<PhysicsObject> {
         public override void Update(Frame f) {
-            foreach ((var _, var component) in f.Unsafe.GetComponentBlockIterator<PhysicsObject>()) {
+            foreach ((_, var component) in f.Unsafe.GetComponentBlockIterator<PhysicsObject>()) {
                 component->WasBeingCrushed = component->IsBeingCrushed;
                 component->IsBeingCrushed = false;
             }

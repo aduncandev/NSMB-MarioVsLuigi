@@ -61,7 +61,7 @@ namespace Quantum {
                 int validPlayers = 0;
                 int loadedPlayers = 0;
 
-                foreach (var (_, data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
+                foreach ((_, var data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                     if (!f.RuntimeConfig.IsRealGame) {
                         data->IsLoaded = true;
                         data->IsSpectator = false;
@@ -334,10 +334,10 @@ namespace Quantum {
                 break;
             case GameState.Starting:
                 // Fixes spectators being able to take over old players' objects.
-                foreach (var (k, v) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
-                    if (v->PlayerRef == player) {
-                        v->Disconnected = true;
-                        v->PlayerRef = PlayerRef.None;
+                foreach ((_, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+                    if (mario->PlayerRef == player) {
+                        mario->Disconnected = true;
+                        mario->PlayerRef = PlayerRef.None;
                     }
                 }
                 goto case GameState.Playing;
@@ -363,7 +363,7 @@ namespace Quantum {
             int teamCount = 0;
 
             int playerCount = 0;
-            foreach (var (_, data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
+            foreach ((_, var data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                 if (!data->IsLoaded) {
                     // Force spectator, didn't load in time
                     data->IsSpectator = true;
@@ -432,7 +432,7 @@ namespace Quantum {
             }
             f.Global->UsedStarSpawns.ClearAll();
 
-            foreach (var (_, data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
+            foreach ((_, var data) in f.Unsafe.GetComponentBlockIterator<PlayerData>()) {
                 data->IsLoaded = false;
                 data->IsReady = false;
                 data->IsSpectator = data->ManualSpectator;

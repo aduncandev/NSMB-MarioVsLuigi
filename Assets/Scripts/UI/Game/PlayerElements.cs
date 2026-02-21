@@ -71,6 +71,7 @@ namespace NSMB.UI.Game {
             Settings.Controls.UI.Next.performed += SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed += SpectatePreviousPlayer;
             Settings.Controls.UI.Submit.performed += OnSubmit;
+            Settings.OnNametagVisibilityChanged += OnNametagVisibilityChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
@@ -82,6 +83,7 @@ namespace NSMB.UI.Game {
             Settings.Controls.UI.Next.performed -= SpectateNextPlayer;
             Settings.Controls.UI.Previous.performed -= SpectatePreviousPlayer;
             Settings.Controls.UI.Submit.performed -= OnSubmit;
+            Settings.OnNametagVisibilityChanged -= OnNametagVisibilityChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
         }
 
@@ -286,6 +288,10 @@ namespace NSMB.UI.Game {
                     UpdateSpectateUI();
                 }
             }
+        }
+
+        private void OnNametagVisibilityChanged() {
+            nametagCanvas.SetActive(Settings.Instance.GraphicsPlayerNametags);
         }
 
         private void OnLanguageChanged(TranslationManager tm) {

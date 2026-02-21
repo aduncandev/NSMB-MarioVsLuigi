@@ -292,6 +292,10 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             }
         }
 
+        public void RemoveReplayByPath(string path) {
+            RemoveReplay(replays.First(rle => rle.ReplayFile.FilePath == path));
+        }
+
         private async Awaitable FindReplays() {
             try {
                 await Awaitable.MainThreadAsync();
@@ -654,28 +658,30 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             return Mathf.Max(1, max - index);
         }
 
-        public List<ReplayListEntry> GetTemporaryReplaysToDelete() {
+        public List<string> GetTemporaryReplaysToDelete() {
             if (Settings.Instance.generalMaxTempReplays <= 0) {
                 return null;
             }
 
-            List<ReplayListEntry> replaysToDelete = new();
-
-            foreach (var replay in temporaryReplays) {
-                if (GetReplaysUntilDeletion(replay) == 1) {
-                    replaysToDelete.Add(replay);
-                }
-            }
-
-            return replaysToDelete;
+            return Directory.EnumerateFiles(TempDirectory, "*.mvlreplay")
+                .OrderBy(path => {
+                    try {
+                        return File.GetLastWriteTime(path);
+                    } catch {
+                        return default;
+                    }
+                })
+                .Skip(Settings.Instance.generalMaxTempReplays)
+                .ToList();
         }
 
         public class ReplayDateComparer : IComparer<ReplayListEntry> {
             public int Compare(ReplayListEntry x, ReplayListEntry y) {
-                if (x.ReplayFile.Header.UnixTimestamp == y.ReplayFile.Header.UnixTimestamp) {
+                try {
+                    return File.GetLastWriteTime(x.ReplayFile.FilePath).CompareTo(y.ReplayFile.FilePath);
+                } catch {
                     return 0;
                 }
-                return x.ReplayFile.Header.UnixTimestamp < y.ReplayFile.Header.UnixTimestamp ? 1 : -1;
             }
         }
     }

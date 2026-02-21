@@ -8,7 +8,7 @@ namespace Quantum {
             physicsObject->Gravity = FPVector2.Zero;
         }
 
-        public readonly void Kill(Frame f, EntityRef booEntity, EntityRef killerEntity, KillReason reason) {
+        public readonly void Kill(Frame f, EntityRef booEntity, EntityRef killerEntity, EnemyKillReason reason) {
             var enemy = f.Unsafe.GetPointer<Enemy>(booEntity);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(booEntity);
 

@@ -72,7 +72,7 @@ namespace NSMB.Entities.Enemies {
                 return;
             }
 
-            if (e.KillReason == KillReason.Groundpounded) {
+            if (e.KillReason == EnemyKillReason.Groundpounded) {
                 Instantiate(specialKillParticle, transform.position + Vector3.up * 0.2f, Quaternion.identity);
             }
         }

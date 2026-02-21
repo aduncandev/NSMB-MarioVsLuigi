@@ -96,7 +96,7 @@ namespace NSMB.Entities.Enemies {
                 return;
             }
 
-            if (e.KillReason == KillReason.Special || e.KillReason == KillReason.Groundpounded) {
+            if (e.KillReason == EnemyKillReason.Special || e.KillReason == EnemyKillReason.Groundpounded) {
                 Instantiate(specialKillParticles, transform.position, Quaternion.identity);
             } else {
                 // sfx.PlayOneShot(SoundEffect.Enemy_Generic_Stomp);
