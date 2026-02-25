@@ -36,6 +36,7 @@ namespace Quantum {
         public void ParentToPlayer(Frame f, EntityRef thisEntity, EntityRef playerToFollow) {
             Initialize(f, thisEntity, 60, PowerupSpawnReason.Coins);
             ParentMarioPlayer = playerToFollow;
+            IgnorePlayerFrames = 60;
 
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(playerToFollow);
             var marioCamera = f.Unsafe.GetPointer<CameraController>(playerToFollow);
