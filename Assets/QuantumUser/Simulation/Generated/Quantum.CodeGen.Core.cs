@@ -1273,7 +1273,7 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct _globals_ {
-    public const Int32 SIZE = 3184;
+    public const Int32 SIZE = 3160;
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(0)]
     public Int32 PlayerConnectedCount;
@@ -1291,57 +1291,57 @@ namespace Quantum {
     public RNGSession RngSession;
     [FieldOffset(152)]
     public FrameMetaData FrameMetaData;
-    [FieldOffset(200)]
+    [FieldOffset(168)]
     public BitSet1024 Systems;
-    [FieldOffset(328)]
+    [FieldOffset(296)]
     public PhysicsSceneSettings PhysicsSettings;
-    [FieldOffset(656)]
+    [FieldOffset(632)]
     [FramePrinter.FixedArrayAttribute(typeof(Input), 10)]
     private fixed Byte _input_[1200];
-    [FieldOffset(1856)]
+    [FieldOffset(1832)]
     public BitSet10 PlayerLastConnectionState;
-    [FieldOffset(1872)]
+    [FieldOffset(1848)]
     public UInt16 BigStarSpawnTimer;
-    [FieldOffset(1920)]
+    [FieldOffset(1896)]
     public EntityRef MainBigStar;
-    [FieldOffset(1912)]
+    [FieldOffset(1888)]
     public BitSet64 UsedStarSpawns;
-    [FieldOffset(1936)]
+    [FieldOffset(1912)]
     public GameRules Rules;
-    [FieldOffset(1866)]
+    [FieldOffset(1842)]
     public GameState GameState;
-    [FieldOffset(1880)]
+    [FieldOffset(1856)]
     public Int32 StartFrame;
-    [FieldOffset(1884)]
+    [FieldOffset(1860)]
     public Int32 TotalGamesPlayed;
-    [FieldOffset(1874)]
+    [FieldOffset(1850)]
     public UInt16 GameStartFrames;
-    [FieldOffset(1876)]
+    [FieldOffset(1852)]
     public UInt16 PlayerLoadFrames;
-    [FieldOffset(1868)]
+    [FieldOffset(1844)]
     public UInt16 AutomaticStageRefreshInterval;
-    [FieldOffset(1870)]
+    [FieldOffset(1846)]
     public UInt16 AutomaticStageRefreshTimer;
-    [FieldOffset(1984)]
+    [FieldOffset(1960)]
     [FramePrinter.FixedArrayAttribute(typeof(PlayerInformation), 10)]
     private fixed Byte _PlayerInfo_[1200];
-    [FieldOffset(1864)]
+    [FieldOffset(1840)]
     public Byte RealPlayers;
-    [FieldOffset(1865)]
+    [FieldOffset(1841)]
     public Byte TotalMarios;
-    [FieldOffset(1888)]
+    [FieldOffset(1864)]
     public Int32 WinningTeam;
-    [FieldOffset(1896)]
+    [FieldOffset(1872)]
     public QBoolean HasWinner;
-    [FieldOffset(1892)]
+    [FieldOffset(1868)]
     public PlayerRef Host;
-    [FieldOffset(1900)]
+    [FieldOffset(1876)]
     [AllocateOnComponentAdded()]
     public QDictionaryPtr<PlayerRef, EntityRef> PlayerDatas;
-    [FieldOffset(1904)]
+    [FieldOffset(1880)]
     [AllocateOnComponentAdded()]
     public QListPtr<BannedPlayerInfo> BannedPlayerIds;
-    [FieldOffset(1928)]
+    [FieldOffset(1904)]
     public FP Timer;
     public readonly FixedArray<Input> input {
       get {

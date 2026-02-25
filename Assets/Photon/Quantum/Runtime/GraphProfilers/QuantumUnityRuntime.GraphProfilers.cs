@@ -3,6 +3,7 @@
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphPlayerLoopUtility.cs
 
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using System;
   using System.Collections.Generic;
   using UnityEngine;
@@ -215,6 +216,7 @@ namespace Quantum.Profiling {
       Debug.LogError("====================================================================================================");
     }
   }
+#endif
 }
 
 #endregion
@@ -223,6 +225,7 @@ namespace Quantum.Profiling {
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphPool.cs
 
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using System.Collections.Generic;
   using System.Runtime.CompilerServices;
 
@@ -275,9 +278,8 @@ namespace Quantum.Profiling {
       }
     }
   }
+#endif
 }
-
-
 
 #endregion
 
@@ -285,6 +287,7 @@ namespace Quantum.Profiling {
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphProfiler.cs
 
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using UnityEngine;
 
   /// <summary>
@@ -421,6 +424,7 @@ namespace Quantum.Profiling {
       OnRestore();
     }
   }
+#endif
 }
 
 #endregion
@@ -429,6 +433,7 @@ namespace Quantum.Profiling {
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphProfilerMarkerSeries.cs
 
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   /// <summary>
   /// A graph profiler that records a series of markers.
   /// </summary>
@@ -463,6 +468,7 @@ namespace Quantum.Profiling {
       Graph.SetValues(Values, _offset, _samples);
     }
   }
+#endif
 }
 
 #endregion
@@ -471,6 +477,7 @@ namespace Quantum.Profiling {
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphProfilers.cs
 
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using UnityEngine;
   using UnityEngine.PlayerLoop;
 
@@ -547,6 +554,7 @@ namespace Quantum.Profiling {
       QuantumGraphPlayerLoopUtility.RemovePlayerLoopSystems(typeof(QuantumGraphProfilers));
     }
   }
+#endif
 }
 
 #endregion
@@ -555,6 +563,7 @@ namespace Quantum.Profiling {
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphProfilersUtility.cs
 
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using Photon.Client;
 
   /// <summary>
@@ -574,6 +583,7 @@ namespace Quantum.Profiling {
       return null;
     }
   }
+#endif
 }
 
 
@@ -583,6 +593,7 @@ namespace Quantum.Profiling {
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphProfilerValueSeries.cs
 
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
 
   /// <summary>
   /// Records a series of values for a graph profiler.
@@ -648,6 +659,7 @@ namespace Quantum.Profiling {
       Graph.SetValues(Values, _offset, _samples);
     }
   }
+#endif
 }
 
 #endregion
@@ -656,6 +668,7 @@ namespace Quantum.Profiling {
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphSeries.cs
 
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using System;
   using UnityEngine;
   using UnityEngine.UI;
@@ -822,7 +835,7 @@ namespace Quantum.Profiling {
       }
 
       for (int i = 0; i < _valueDimensions; ++i) {
-        for (int j = 0; j < _samples; ++j, ++offset) {
+        for (int j = 0; j < samples && j < _samples; ++j, ++offset) {
           offset %= _samples;
           if (IsValueDimensionEnabled(i)) {
             _values[i][j] = values[i][offset];
@@ -847,6 +860,7 @@ namespace Quantum.Profiling {
       OnRestore();
     }
   }
+#endif
 }
 
 #endregion
@@ -855,6 +869,7 @@ namespace Quantum.Profiling {
 #region Assets/Photon/Quantum/Runtime/GraphProfilers/QuantumGraphTimer.cs
 
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using System;
   using System.Diagnostics;
   using System.Runtime.CompilerServices;
@@ -1183,6 +1198,7 @@ namespace Quantum.Profiling {
       ++_counter;
     }
   }
+#endif
 }
 
 #endregion

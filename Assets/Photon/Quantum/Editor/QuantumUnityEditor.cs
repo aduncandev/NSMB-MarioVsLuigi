@@ -1132,8 +1132,7 @@ namespace Quantum.Editor {
 #region Assets/Photon/Quantum/Editor/CustomEditors/QuantumEditorSettingsEditor.cs
 
 namespace Quantum.Editor {
-  using System;
-  using System.Linq;
+  using System.Runtime.InteropServices;
   using UnityEditor;
   using UnityEditor.Build;
   using UnityEngine;
@@ -1149,32 +1148,29 @@ namespace Quantum.Editor {
       EditorGUILayout.Space();
       EditorGUILayout.LabelField("Build Features", EditorStyles.boldLabel);
 
-      DrawScriptingDefineToggle(new GUIContent("Enable DebugDraw in Dev Builds", "Toggles QUANTUM_DRAW_SHAPES scripting define for the current platform to enable/disable debug draw in development builds."), "QUANTUM_DRAW_SHAPES", false);
+      DrawScriptingDefineToggle(new GUIContent("Enable DebugDraw in Development Builds (current platform only)", "Toggles QUANTUM_DRAW_SHAPES scripting define for the current platform to enable/disable debug draw in development builds."), "QUANTUM_DRAW_SHAPES", allPlatforms: false);
       
       EditorGUI.BeginChangeCheck();
-      DrawScriptingDefineToggle(new GUIContent("Enable Remote Task Profiler", "Toggles QUANTUM_ENABLE_REMOTE_PROFILER scripting define for the current platform"), "QUANTUM_ENABLE_REMOTE_PROFILER");
+      DrawScriptingDefineToggle(new GUIContent("Enable Remote Task Profiler (current platform only)", "Toggles QUANTUM_ENABLE_REMOTE_PROFILER scripting define for the current platform"), "QUANTUM_ENABLE_REMOTE_PROFILER", allPlatforms: false);
       if (EditorGUI.EndChangeCheck()) {
         // remove legacy define
         AssetDatabaseExt.UpdateScriptingDefineSymbol("QUANTUM_REMOTE_PROFILER", false);
       }
-      
+
+      DrawScriptingDefineToggle(new GUIContent("Enable Quantum Graph Profiler (all platforms)", "Toggles QUANTUM_DISABLE_GRAPHPROFILER scripting define to enable/disable Quantum graph profiler code."), "QUANTUM_DISABLE_GRAPHPROFILER", allPlatforms: true, invertDefine: true);
+
       EditorGUILayout.Space();
       EditorGUILayout.LabelField("Quantum 2D", EditorStyles.boldLabel);
 
       DrawScriptingDefineToggle(
-        new GUIContent(
-          "Enable Quantum XY", 
-          "Toggles QUANTUM_XY scripting define to enable/disable Quantum XY."),
-      "QUANTUM_XY",
-        true
-        );
+        new GUIContent("Enable Quantum XY  (all platforms)", "Toggles QUANTUM_XY scripting define to enable/disable Quantum XY."), "QUANTUM_XY", allPlatforms: true);
 
       EditorGUILayout.Space();
       EditorGUILayout.LabelField("Log", EditorStyles.boldLabel);
       _logSettingsDrawer.DrawLayout(this, true);
     }
 
-    private static bool DrawScriptingDefineToggle(GUIContent label, string define, bool allPlatforms = false) {
+    private static bool DrawScriptingDefineToggle(GUIContent label, string define, bool allPlatforms = false, bool invertDefine = false) {
       bool? hasDefine;
       NamedBuildTarget buildTarget = default;
       if (allPlatforms) {
@@ -1184,10 +1180,17 @@ namespace Quantum.Editor {
         hasDefine = AssetDatabaseExt.HasScriptingDefineSymbol(buildTarget, define);
       }
 
+      var value = hasDefine ?? false;
+
+      if (invertDefine) value = !value;
+
       EditorGUI.BeginChangeCheck();
-      EditorGUI.showMixedValue = hasDefine == null;
-      bool value = EditorGUILayout.Toggle(label, hasDefine == true);
-      EditorGUI.showMixedValue = false;
+
+      var rect = EditorGUILayout.GetControlRect();
+      value = EditorGUI.ToggleLeft(rect, label, value);
+
+      if (invertDefine) value = !value;
+
       if (EditorGUI.EndChangeCheck()) {
         if (allPlatforms) {
           AssetDatabaseExt.UpdateScriptingDefineSymbol(define, value);
@@ -9244,7 +9247,7 @@ namespace Quantum.Editor {
       .Select(x => x.assetPath))
       .ToArray());
     
-    private static bool IsPackageHidden(UnityEditor.PackageManager.PackageInfo info) => info.type == "module" || info.type == "feature" && info.source != PackageSource.Embedded;
+    private static bool IsPackageHidden(UnityEditor.PackageManager.PackageInfo info) => info.type == "module" || (info.type == "feature" && info.source != PackageSource.Embedded);
     
     // ReSharper disable once InconsistentNaming
     internal static Type GetMainAssetTypeFromGUID(GUID guid) {
@@ -18651,6 +18654,7 @@ namespace Quantum.Editor {
 
 #if QUANTUM_ENABLE_AI && !QUANTUM_DISABLE_AI
 namespace Quantum.Editor {
+  using System;
   using System.Linq;
   using UnityEditor;
   using UnityEditor.AI;
@@ -18659,20 +18663,25 @@ namespace Quantum.Editor {
   [CustomPropertyDrawer(typeof(UnityNavMeshAreaAttribute))]
   [QuantumPropertyDrawerMeta(HasFoldout = false)]
   internal class UnityNavMeshAreaDrawer : PropertyDrawerWithErrorHandling {
+    readonly Lazy<string[]> AreaNames = new(() => GetNavMeshAreaNames().Concat(new[] { "", "Open Area Settings..." }).ToArray());
+    int _areaIndex = -1;
+
     protected override void OnGUIInternal(Rect position, SerializedProperty property, GUIContent label) {
       using (new QuantumEditorGUI.PropertyScope(position, label, property)) {
-        var areaNames = GetNavMeshAreaNames();
-        var areaIndex = areaNames.Select(name => GetNavMeshAreaFromName(name)).Single(index => index == property.intValue);
-        
-        ArrayUtility.Add(ref areaNames, "");
-        ArrayUtility.Add(ref areaNames, "Open Area Settings...");
+        var areaNames = AreaNames.Value;
 
-        areaIndex = EditorGUI.Popup(position, property.displayName, areaIndex, areaNames);
+        if (_areaIndex < 0) {
+          _areaIndex = areaNames.Select(name => GetNavMeshAreaFromName(name)).Single(index => index == property.intValue);
+        }
+
+        EditorGUI.BeginChangeCheck();
+
+        _areaIndex = EditorGUI.Popup(position, property.displayName, _areaIndex, areaNames);
 
         if (EditorGUI.EndChangeCheck()) {
-          if (areaIndex >= 0 && areaIndex < areaNames.Length - 2)
-            property.intValue = GetNavMeshAreaFromName(areaNames[areaIndex]);
-          else if (areaIndex == areaNames.Length - 1)
+          if (_areaIndex >= 0 && _areaIndex < areaNames.Length - 2)
+            property.intValue = GetNavMeshAreaFromName(areaNames[_areaIndex]);
+          else if (_areaIndex == areaNames.Length - 1)
             NavMeshEditorHelpers.OpenAreaSettings();
         }
       }
@@ -22151,7 +22160,7 @@ namespace Quantum.Editor {
         var copy = DeterministicSessionConfig.FromByteArray(DeterministicSessionConfig.ToByteArray(instance.Config));
 
         // Calculate fixed size
-        var stream = new FrameSerializer(DeterministicFrameSerializeMode.Serialize, null, 1024);
+        var stream = new FrameSerializer(null, 1024);
         stream.Writing = true;
         stream.InputMode = true;
         Quantum.Input.Write(stream, new Quantum.Input());
@@ -22342,7 +22351,6 @@ namespace Quantum.Editor {
 #region Assets/Photon/Quantum/Editor/QuantumEditorMenuProfilers.cs
 
 namespace Quantum.Editor {
-  using Quantum.Profiling;
   using UnityEditor;
   using UnityEngine;
   using static UnityEngine.Object;
@@ -22352,7 +22360,9 @@ namespace Quantum.Editor {
   /// Utility methods to create and set up a Quantum Unity scene.
   /// </summary>
   public static class QuantumEditorMenuProfilers {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
     const string ProfilerPrefabGuid = "e7b1355f609cb304da5529115986eb8b";
+#endif
     const string QuantumStatsPrefabGuid = "9e5addbaa78b7264889bf147e593db91";
 
     /// <summary>
@@ -22360,7 +22370,8 @@ namespace Quantum.Editor {
     /// </summary>
     [MenuItem("Tools/Quantum/Profilers/Add Graph Profilers Prefab", false, (int)QuantumEditorMenuPriority.Profilers + 0)]
     public static void AddGraphProfilersToCurrentScene() {
-      var profiler = FindAnyObjectByType<QuantumGraphProfilingTools>();
+#if !QUANTUM_DISABLE_GRAPHPROFILER
+      var profiler = FindAnyObjectByType<Quantum.Profiling.QuantumGraphProfilingTools>();
       if (profiler != null) {
         Debug.LogWarning("QuantumGraphProfilers already exist in the scene.", profiler);
         return;
@@ -22381,6 +22392,10 @@ namespace Quantum.Editor {
           so.ApplyModifiedProperties();
         }
       }
+#else
+      QuantumEditorSettings.TryGetGlobal(out var editorSettings);
+      QuantumEditorLog.Warn("Quantum graph profiler code is disabled, use the QuantumEditorSettings inspector to toggle or remove the QUANTUM_DISABLE_GRAPHPROFILER scripting define", editorSettings);
+#endif
     }
 
     /// <summary>
@@ -24695,7 +24710,7 @@ namespace Quantum.Editor {
         using (new GUI.GroupScope(areaRect)) {
           if (Event.current.isMouse || Event.current.isScrollWheel) {
             bool doingSelect = Event.current.button == 0 && !Event.current.modifiers.HasFlag(EventModifiers.Alt);
-            bool doingDragScroll = Event.current.button == 2 || Event.current.button == 0 && !doingSelect;
+            bool doingDragScroll = Event.current.button == 2 || (Event.current.button == 0 && !doingSelect);
             bool doingZoom = Event.current.button == 1 && Event.current.modifiers.HasFlag(EventModifiers.Alt);
             var inRect = r.ZeroXY().Contains(Event.current.mousePosition);
 

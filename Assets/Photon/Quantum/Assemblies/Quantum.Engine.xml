@@ -618,6 +618,22 @@
             </summary>
             <param name="vtable">The source allocation methods.</param>
         </member>
+        <member name="M:Quantum.Allocator.LayoutUtils.SizeOf``1">
+            <summary>
+            A type's size is the number of bytes between successive elements in an array, including trailing alignment padding.
+            It's always a multiple of the type's alignment.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Quantum.Allocator.LayoutUtils.AlignOf``1">
+            <summary>
+            A type's alignment limits where it can be stored. A value with 8-byte alignment must be stored at a memory address that is a multiple of 8.
+            Alignment is always a power-of-two.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
         <member name="T:Quantum.Allocator.Heap">
             <summary>
             The Quantum heap is a custom memory allocator that contains rollback-able memory allocations by Quantum user or internal systems.
@@ -3984,6 +4000,11 @@
             Former name of the type.
             </summary>
         </member>
+        <member name="T:Quantum.Core.ComponentDataTable">
+            <summary>
+            A struct-of-arrays data structure divided into fixed-capacity segments.
+            </summary>
+        </member>
         <member name="T:Quantum.Core.FrameBase">
             <summary>
              The Frame class is the container for all the transient and static game state data, including the API for entities, physics, assets and others.
@@ -4941,6 +4962,42 @@
             <example><code>var entity = f.Create();</code></example>
             \ingroup EntityApi
         </member>
+        <member name="M:Quantum.Core.FrameBase.DeferredAdd``1(Quantum.EntityRef,``0)">
+            <summary>
+            Queues a component to be added to an entity. Commit deferred adds using <see cref="M:Quantum.Core.FrameBase.FrameBaseUnsafe.CommitDeferred"/>.
+            </summary>
+            <typeparam name="T">Component type</typeparam>
+            <param name="entity">Entity ref</param>
+            <param name="value">Value of the component to be added</param>
+        </member>
+        <member name="M:Quantum.Core.FrameBase.DeferredAdd(Quantum.EntityRef,System.Int32,System.Void*)">
+            <summary>
+            Queues a component to be added to an entity. Commit deferred adds using <see cref="M:Quantum.Core.FrameBase.FrameBaseUnsafe.CommitDeferred"/>.
+            </summary>
+            <param name="entity">Entity ref</param>
+            <param name="componentIndex">Index of component type
+            Use <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to get the index of a component type.
+            </param>
+            <param name="value">Value of the component to be added</param>
+        </member>
+        <member name="M:Quantum.Core.FrameBase.DeferredSet``1(Quantum.EntityRef,``0)">
+            <summary>
+            Queues a component to be set on an entity. Commit deferred sets using <see cref="M:Quantum.Core.FrameBase.FrameBaseUnsafe.CommitDeferred"/>.
+            </summary>
+            <typeparam name="T">Component type</typeparam>
+            <param name="entity">Entity ref</param>
+            <param name="value">Value of the component to be added</param>
+        </member>
+        <member name="M:Quantum.Core.FrameBase.DeferredSet(Quantum.EntityRef,System.Int32,System.Void*)">
+            <summary>
+            Queues a component to be set on an entity. Commit deferred sets using <see cref="M:Quantum.Core.FrameBase.FrameBaseUnsafe.CommitDeferred"/>.
+            </summary>
+            <param name="entity">Entity ref</param>
+            <param name="componentIndex">Index of component type
+            Use <see cref="M:Quantum.ComponentTypeId.GetComponentIndex(System.Type)"/> or <see cref="F:Quantum.ComponentTypeId`1.Id"/> to get the index of a component type.
+            </param>
+            <param name="value">Value of the component to be added</param>
+        </member>
         <member name="M:Quantum.Core.FrameBase.GetSingleton``1">
             <summary>
             Gets the instance of the specified singleton component.
@@ -5420,7 +5477,12 @@
         </member>
         <member name="M:Quantum.Core.FrameBase.FrameBaseUnsafe.CommitAllCommands">
             <summary>
-            Trigger the execution of entity and component deletion.
+            Trigger the execution of entity and component deletion and deferred component adds and sets.
+            </summary>
+        </member>
+        <member name="M:Quantum.Core.FrameBase.FrameBaseUnsafe.CommitDeferred">
+            <summary>
+            Trigger the execution of deferred component adds and sets.
             </summary>
         </member>
         <member name="M:Quantum.Core.FrameBase.FrameBaseUnsafe.GetPointerSingleton``1">
@@ -6736,6 +6798,24 @@
             </summary>
             <returns><see langword="true"/> if the iterator is still in the boundaries of the <see cref="T:Quantum.Collections.QHashSet`1"/>.</returns>
         </member>
+        <member name="F:Quantum.Collections.QListInternal.SIZE">
+            <summary>Total size of the struct in bytes.</summary>
+        </member>
+        <member name="F:Quantum.Collections.QListInternal.WORD_COUNT">
+            <summary>Total word count of the struct (4-byte words).</summary>
+        </member>
+        <member name="F:Quantum.Collections.QListInternal.BYTE_OF__COUNT">
+            <summary>Byte offset of <see cref="F:Quantum.Collections.QListInternal._count"/>.</summary>
+        </member>
+        <member name="F:Quantum.Collections.QListInternal.BYTE_COUNT_OF__COUNT">
+            <summary>Byte size of <see cref="F:Quantum.Collections.QListInternal._count"/>.</summary>
+        </member>
+        <member name="F:Quantum.Collections.QListInternal.BYTE_OF__ITEMS">
+            <summary>Byte offset of <see cref="F:Quantum.Collections.QListInternal._items"/>.</summary>
+        </member>
+        <member name="F:Quantum.Collections.QListInternal.BYTE_COUNT_OF__ITEMS">
+            <summary>Byte size of <see cref="F:Quantum.Collections.QListInternal._items"/>.</summary>
+        </member>
         <member name="T:Quantum.Collections.QListPtr`1">
             <summary>
             Stores a <see cref="T:Quantum.Ptr"/> which points to the memory location of a <see cref="T:Quantum.Collections.QList`1"/> inside the frame heap.
@@ -7128,6 +7208,12 @@
             <param name="blockSize">The number of elements each allocated block can hold.</param>
             <typeparam name="T">Element type, which must be unmanaged.</typeparam>
         </member>
+        <member name="M:Quantum.QHashCollectionList.GetHashCode">
+            <summary>
+            Overrides the hash code generation of this type.
+            </summary>
+            <returns>A hash code of the current state of this instance.</returns>
+        </member>
         <member name="T:Quantum.BitSetRef">
             <summary>
             A variable sized bitmask.
@@ -7282,6 +7368,11 @@
             Size of each component type in bytes. Index 0 is reserved for null.
             </summary>
         </member>
+        <member name="F:Quantum.ComponentTypeId.Layout">
+            <summary>
+            Layout of each component type. Index 0 is reserved for null.
+            </summary>
+        </member>
         <member name="F:Quantum.ComponentTypeId.Flags">
             <summary>
             Flags for each component type. Index 0 is reserved for null.
@@ -7337,6 +7428,12 @@
         <member name="M:Quantum.ComponentTypeId.GetComponentSize(System.Int32)">
             <summary>
             Returns the size of the component type identified by the index.
+            </summary>
+            <param name="index">The index of a type</param>
+        </member>
+        <member name="M:Quantum.ComponentTypeId.GetComponentLayout(System.Int32)">
+            <summary>
+            Returns the layout of the component type identified by the index.
             </summary>
             <param name="index">The index of a type</param>
         </member>
@@ -9108,6 +9205,11 @@
         <member name="M:Quantum.ComponentSet.Create(System.ReadOnlySpan{Quantum.ComponentTypeRef})">
             <inheritdoc cref="M:Quantum.ComponentSet.Create``1"/>
         </member>
+        <member name="P:Quantum.ComponentSet.Count">
+            <summary>
+            Returns the number of components in the set.
+            </summary>
+        </member>
         <member name="P:Quantum.ComponentSet.IsEmpty">
             <summary>
             Returns true if the set is empty.
@@ -9231,6 +9333,11 @@
         <member name="M:Quantum.ComponentSet.GetHashCode">
             <inheritdoc cref="M:Quantum.CodeDocHelper.GetHashCode"/>
         </member>
+        <member name="P:Quantum.ComponentSet256.Count">
+            <summary>
+            Returns the number of components in the set.
+            </summary>
+        </member>
         <member name="P:Quantum.ComponentSet256.IsEmpty">
             <summary>
             Returns true if the set is empty.
@@ -9343,6 +9450,11 @@
         </member>
         <member name="M:Quantum.ComponentSet256.GetHashCode">
             <inheritdoc cref="M:Quantum.CodeDocHelper.GetHashCode"/>
+        </member>
+        <member name="P:Quantum.ComponentSet64.Count">
+            <summary>
+            Returns the number of components in the set.
+            </summary>
         </member>
         <member name="P:Quantum.ComponentSet64.IsEmpty">
             <summary>
@@ -9466,6 +9578,11 @@
         <member name="F:Quantum.ComponentTypeId`1.Size">
             <summary>
             Component type size in bytes.
+            </summary>
+        </member>
+        <member name="F:Quantum.ComponentTypeId`1.Layout">
+            <summary>
+            Component type memory layout.
             </summary>
         </member>
         <member name="F:Quantum.ComponentTypeId`1.Flags">
@@ -10931,12 +11048,6 @@
             <summary>
             Resets the checksum to 0.
             </summary>
-        </member>
-        <member name="M:Quantum.FrameMetaData.QHashCollectionList.GetHashCode">
-            <summary>
-            Overrides the hash code generation of this type.
-            </summary>
-            <returns>A hash code of the current state of this instance.</returns>
         </member>
         <member name="M:Quantum.FrameMetaData.GetHashCode">
             <summary>
@@ -14876,26 +14987,26 @@
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.Raycast(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.Raycast(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.Raycast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
-            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.Raycast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.Raycast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.Raycast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.Linecast(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.Linecast(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.Linecast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
-            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.Linecast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.Linecast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.Linecast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.RaycastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.RaycastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.RaycastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
-            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.RaycastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.RaycastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.RaycastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.LinecastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.LinecastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.LinecastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
-            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.LinecastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.LinecastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.LinecastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.ShapeCast(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCast(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
@@ -14903,8 +15014,8 @@
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.ShapeCast(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCast(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.ShapeCast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
-            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.ShapeCast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.ShapeCastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
@@ -14912,17 +15023,17 @@
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.ShapeCastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.ShapeCastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
-            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.ShapeCastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Transform2DVertical,Quantum.Shape2D,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Transform2DVertical,Quantum.Shape2D,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Transform2DVertical,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Transform2DVertical,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Shape2D,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Shape2D,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
-            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ThreadSafeApi.OverlapShape(Quantum.Transform2D,Quantum.Transform2DVertical,Quantum.Shape2D,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Transform2D,Quantum.Transform2DVertical,Quantum.Shape2D,System.Int32,Quantum.QueryOptions)"/>
@@ -15403,7 +15514,7 @@
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.Raycast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.Raycast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
             <summary>
             Queries the 2D physics scene with a ray cast and adds the closest hit to the ray origin, if any, to a persistent collection of hits.
             </summary>
@@ -15418,6 +15529,7 @@
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
             <param name="verticalPosition">The position of the query on the vertical axis, on a 2.5D context.</param>
             <param name="verticalHeight">The height of the query from the vertical position on the positive sense of the vertical axis.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
@@ -15437,7 +15549,7 @@
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.Linecast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.Linecast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
             <summary>
             Queries the 2D physics scene with a line cast and adds the closest hit to the line start, if any, to a persistent collection of hits.
             </summary>
@@ -15451,6 +15563,7 @@
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
             <param name="verticalPosition">The position of the query on the vertical axis, on a 2.5D context.</param>
             <param name="verticalHeight">The height of the query from the vertical position on the positive sense of the vertical axis.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
@@ -15471,7 +15584,7 @@
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.RaycastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.RaycastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
             <summary>
             Queries the 2D physics scene with a ray cast, adding all hits to a persistent collection.
             </summary>
@@ -15486,6 +15599,7 @@
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
             <param name="verticalPosition">The position of the query on the vertical axis, on a 2.5D context.</param>
             <param name="verticalHeight">The height of the query from the vertical position on the positive sense of the vertical axis.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
@@ -15505,7 +15619,7 @@
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.LinecastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.LinecastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
             <summary>
             Queries the 2D physics scene with a line cast, adding all hits to a persistent collection.
             </summary>
@@ -15519,6 +15633,7 @@
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
             <param name="verticalPosition">The position of the query on the vertical axis, on a 2.5D context.</param>
             <param name="verticalHeight">The height of the query from the vertical position on the positive sense of the vertical axis.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
@@ -15562,7 +15677,7 @@
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCast(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCast(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCast(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
             <summary>
             Queries the 2D physics scene with a shape cast and adds the hit with the shortest <see cref="F:Quantum.Physics2D.Hit.CastDistanceNormalized"/>, if any, to a persistent collection of hits.
             </summary>
@@ -15576,6 +15691,7 @@
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query. By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
             <param name="verticalPosition">The position of the query on the vertical axis, on a 2.5D context.</param>
             <param name="verticalHeight">The height of the query from the vertical position on the positive sense of the vertical axis.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <returns>A nullable <see cref="T:Quantum.Physics2D.Hit"/> with the smallest <see cref="F:Quantum.Physics2D.Hit.CastDistanceNormalized"/>, if any.</returns>
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
@@ -15599,7 +15715,7 @@
         <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
             <inheritdoc cref="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCastAll(Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)"/>
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.ShapeCastAll(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D*,Photon.Deterministic.FPVector2,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
             <summary>
             Queries the 2D physics scene with a shape cast, adding all hits to a persistent collection.
             </summary>
@@ -15613,6 +15729,7 @@
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query. By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
             <param name="verticalPosition">The position of the query on the vertical axis, on a 2.5D context.</param>
             <param name="verticalHeight">The height of the query from the vertical position on the positive sense of the vertical axis.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <returns>A temporary <see cref="T:Quantum.Physics2D.HitCollection"/> with the query hits, automatically freed when the current frame simulation ends.</returns>
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
@@ -15665,7 +15782,7 @@
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Transform2DVertical,Quantum.Shape2D,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Transform2DVertical,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 2D physics scene with a shape overlap.
             </summary>
@@ -15678,11 +15795,12 @@
             By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query.
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <exception cref="T:System.InvalidOperationException">Thrown if the hit collection is not persistent.</exception>
             <remarks>When using vertical transform, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Shape2D,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Quantum.Transform2D,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 2D physics scene with a shape overlap.
             </summary>
@@ -15694,10 +15812,11 @@
             By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query.
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <exception cref="T:System.InvalidOperationException">Thrown if the hit collection is not persistent.</exception>
             \ingroup Physics2dApi
         </member>
-        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP)">
+        <member name="M:Quantum.Physics2D.PhysicsEngine2D.Api.OverlapShape(Quantum.Physics2D.HitCollection*,Photon.Deterministic.FPVector2,Photon.Deterministic.FP,Quantum.Shape2D,System.Int32,Quantum.QueryOptions,Photon.Deterministic.FP,Photon.Deterministic.FP,System.Boolean)">
             <summary>
             Queries the 2D physics scene with a shape overlap.
             </summary>
@@ -15712,6 +15831,7 @@
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
             <param name="verticalPosition">The position of the query on the vertical axis, on a 2.5D context.</param>
             <param name="verticalHeight">The height of the query from the vertical position on the positive sense of the vertical axis.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <exception cref="T:System.InvalidOperationException">Thrown if the hit collection is not persistent.</exception>
             <remarks>If using vertical position and/or height, make sure "Use Vertical Transform" is set on the Simulation Config.</remarks>
             \ingroup Physics2dApi
@@ -17852,6 +17972,15 @@
             If the collision should be ignored by the physics engine.
             </summary>
         </member>
+        <member name="P:Quantum.CollisionInfo2D.IsSpeculativeCcdCollision">
+            <summary>
+            True if this is a CCD-enabled collision check AND the time-of-impact happens AFTER the first non-trigger collision of one of the entities involved.
+            This means that this collision is not guaranteed to have happened, since the trajectory of bodies
+            might change after the first non-trigger collision and the remainder movement is not CCD-checked.
+            Enable <see cref="F:Quantum.PhysicsCommon.Config.InvokeSpeculativeCallbacks">InvokeSpeculativeCallbacks</see> in the Simulation Config
+            in order to receive speculative CCD collision callbacks.
+            </summary>
+        </member>
         <member name="F:Quantum.CollisionInfo2D.ContactPoints">
             <summary>
             Data about the contact points of the collision.
@@ -18191,12 +18320,12 @@
             The size of the struct in bytes.
             </summary>
         </member>
-        <member name="F:Quantum.Shape2D.CapsuleShape.Radius">
+        <member name="P:Quantum.Shape2D.CapsuleShape.Radius">
             <summary>
             The radius of the capsule's top and bottom semi-spheres.
             </summary>
         </member>
-        <member name="F:Quantum.Shape2D.CapsuleShape.Extent">
+        <member name="P:Quantum.Shape2D.CapsuleShape.Extent">
             <summary>
             The distance from the capsule's centroid to the center of the top or bottom semi-sphere.
             <seealso cref="P:Quantum.Shape2D.CapsuleShape.Height"/> 
@@ -18204,7 +18333,7 @@
         </member>
         <member name="P:Quantum.Shape2D.CapsuleShape.Diameter">
             <summary>
-            Twice the value of the capsule <see cref="F:Quantum.Shape2D.CapsuleShape.Radius"/>.
+            Twice the value of the capsule <see cref="P:Quantum.Shape2D.CapsuleShape.Radius"/>.
             </summary>
         </member>
         <member name="P:Quantum.Shape2D.CapsuleShape.Height">
@@ -18584,6 +18713,15 @@
             If the collision should be ignored by the physics engine.
             </summary>
         </member>
+        <member name="P:Quantum.TriggerInfo2D.IsSpeculativeCcdCollision">
+            <summary>
+            True if this is a CCD-enabled trigger check AND the trigger happens AFTER the first non-trigger collision of one of the entities involved.
+            This means that this overlap is not guaranteed to have happened, since the trajectory of bodies
+            might change after the first non-trigger collision and the remainder movement is not CCD-checked.
+            Enable <see cref="F:Quantum.PhysicsCommon.Config.InvokeSpeculativeCallbacks">InvokeSpeculativeCallbacks</see> in the Simulation Config
+            in order to receive speculative CCD collision callbacks.
+            </summary>
+        </member>
         <member name="P:Quantum.TriggerInfo2D.IsStatic">
             <summary>
             If the <see cref="P:Quantum.TriggerInfo2D.Entity"/> is touching a static trigger collider.
@@ -18748,26 +18886,26 @@
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.Raycast(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.Raycast(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.Raycast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.Raycast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.Raycast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.Raycast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.Linecast(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.Linecast(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.Linecast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.Linecast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.Linecast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.Linecast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.RaycastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.RaycastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.RaycastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.RaycastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.RaycastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.RaycastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.LinecastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.LinecastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.LinecastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.LinecastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.LinecastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.LinecastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
         <member name="P:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.SceneMesh">
             <inheritdoc cref="P:Quantum.Physics3D.PhysicsEngine3D.Api.SceneMesh"/>
@@ -18778,8 +18916,8 @@
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.ShapeCast(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCast(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.ShapeCast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.ShapeCast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.ShapeCastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
@@ -18787,14 +18925,14 @@
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.ShapeCastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.ShapeCastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.ShapeCastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics3D.HitCollection3D*,Quantum.Transform3D,Quantum.Shape3D,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.OverlapShape(Quantum.Physics3D.HitCollection3D*,Quantum.Transform3D,Quantum.Shape3D,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics3D.HitCollection3D*,Quantum.Transform3D,Quantum.Shape3D,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.OverlapShape(Quantum.Physics3D.HitCollection3D*,Quantum.Transform3D,Quantum.Shape3D,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,System.Int32,Quantum.QueryOptions)">
-            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.OverlapShape(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,System.Int32,Quantum.QueryOptions)"/>
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.OverlapShape(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,System.Int32,Quantum.QueryOptions,System.Boolean)">
+            <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.OverlapShape(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,System.Int32,Quantum.QueryOptions,System.Boolean)"/>
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ThreadSafeApi.OverlapShape(Quantum.Transform3D,Quantum.Shape3D,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.OverlapShape(Quantum.Transform3D,Quantum.Shape3D,System.Int32,Quantum.QueryOptions)"/>
@@ -19163,7 +19301,7 @@
             <returns>A nullable <see cref="T:Quantum.Physics3D.Hit3D"/> with the closest hit to the ray origin, if any.</returns>
             \ingroup Physics3dApi
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.Raycast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.Raycast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 3D physics scene with a ray cast and adds the closest hit to the ray origin, if any, to a persistent collection of hits.
             </summary>
@@ -19176,6 +19314,7 @@
             By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query.
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             \ingroup Physics3dApi
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.Linecast(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
@@ -19191,7 +19330,7 @@
             <returns>A nullable <see cref="T:Quantum.Physics3D.Hit3D"/> with the closest hit to the line start, if any.</returns>
             \ingroup Physics3dApi
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.Linecast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.Linecast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 3D physics scene with a line cast and adds the closest hit to the line start, if any, to a persistent collection of hits.
             </summary>
@@ -19203,6 +19342,7 @@
             By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query.
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             \ingroup Physics3dApi
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.RaycastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)">
@@ -19219,7 +19359,7 @@
             <returns>A temporary <see cref="T:Quantum.Physics3D.HitCollection3D"/> with the query hits, automatically freed when the current frame simulation ends.</returns>
             \ingroup Physics3dApi
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.RaycastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.RaycastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,Photon.Deterministic.FP,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 3D physics scene with a ray cast, adding all hits to a persistent collection.
             </summary>
@@ -19232,6 +19372,7 @@
             By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query.
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             \ingroup Physics3dApi
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.LinecastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
@@ -19247,7 +19388,7 @@
             <returns>A temporary <see cref="T:Quantum.Physics3D.HitCollection3D"/> with the query hits, automatically freed when the current frame simulation ends.</returns>
             \ingroup Physics3dApi
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.LinecastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.LinecastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 3D physics scene with a line cast, returning all hits.
             </summary>
@@ -19259,6 +19400,7 @@
             By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query.
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             \ingroup Physics3dApi
         </member>
         <member name="P:Quantum.Physics3D.PhysicsEngine3D.Api.SceneMesh">
@@ -19302,7 +19444,7 @@
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCast(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCast(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCast(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 3D physics scene with a shape cast and adds the hit with the shortest <see cref="F:Quantum.Physics3D.Hit3D.CastDistanceNormalized"/>, if any, to a persistent collection of hits.
             </summary>
@@ -19314,6 +19456,7 @@
             <param name="translation">The cast direction and distance, from the cast start point.</param>
             <param name="layerMask">A mask that specifies which layers will be checked against. By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query. By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             \ingroup Physics3dApi
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
@@ -19332,7 +19475,7 @@
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
             <inheritdoc cref="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCastAll(Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)"/>
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.ShapeCastAll(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D*,Photon.Deterministic.FPVector3,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 3D physics scene with a shape cast, adding all hits to a persistent collection.
             </summary>
@@ -19344,6 +19487,7 @@
             <param name="translation">The cast direction and distance, from the cast start point.</param>
             <param name="layerMask">A mask that specifies which layers will be checked against. By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query. By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             \ingroup Physics3dApi
         </member>
         <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.AddOverlapShapeQuery(Quantum.Transform3D,Quantum.Shape3D,System.Int32,Quantum.QueryOptions)">
@@ -19375,7 +19519,7 @@
             <returns>The index of the injected query, to be used when retrieving the results with GetQueryHits.</returns>
             \ingroup Physics3dApi
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.OverlapShape(Quantum.Physics3D.HitCollection3D*,Quantum.Transform3D,Quantum.Shape3D,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.OverlapShape(Quantum.Physics3D.HitCollection3D*,Quantum.Transform3D,Quantum.Shape3D,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 3D physics scene with a shape overlap.
             </summary>
@@ -19387,10 +19531,11 @@
             By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query.
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <exception cref="T:System.InvalidOperationException">Thrown if the hit collection is not persistent.</exception>
             \ingroup Physics3dApi
         </member>
-        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.OverlapShape(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,System.Int32,Quantum.QueryOptions)">
+        <member name="M:Quantum.Physics3D.PhysicsEngine3D.Api.OverlapShape(Quantum.Physics3D.HitCollection3D*,Photon.Deterministic.FPVector3,Photon.Deterministic.FPQuaternion,Quantum.Shape3D,System.Int32,Quantum.QueryOptions,System.Boolean)">
             <summary>
             Queries the 3D physics scene with a shape overlap.
             </summary>
@@ -19403,6 +19548,7 @@
             By default, all layers are considered. To create a layer mask, see <see cref="M:Quantum.LayerInfo.GetLayerMask(System.String)"/> and overloads on the <see cref="P:Quantum.Core.FrameBase.Layers">frame.Layers</see> property.</param>
             <param name="options">The <see cref="T:Quantum.QueryOptions"/> used by the query.
             By default, all types of colliders are checked against and detailed info (hit point, penetration and normal) is not computed.</param>
+            <param name="resetHitCollection">If enabled, the hit <paramref name="collection"/> will be reset before the query is resolved.</param>
             <exception cref="T:System.InvalidOperationException">Thrown if the hit collection is not persistent.</exception>
             \ingroup Physics3dApi
         </member>
@@ -22037,6 +22183,9 @@
             If this triangle collision should be ignored by the physics engine.
             </summary>
         </member>
+        <member name="P:Quantum.CollisionInfo3D.TriangleCollisionInfo.IsSpeculativeCcdCollision">
+            <inheritdoc cref="P:Quantum.CollisionInfo2D.IsSpeculativeCcdCollision"/>
+        </member>
         <member name="F:Quantum.CollisionInfo3D.TriangleCollisionInfo.ContactPoints">
             <summary>
             Data about the contact points of the triangle collision.
@@ -22062,6 +22211,9 @@
             <summary>
             If the collision should be ignored by the physics engine.
             </summary>
+        </member>
+        <member name="P:Quantum.CollisionInfo3D.IsSpeculativeCcdCollision">
+            <inheritdoc cref="P:Quantum.CollisionInfo2D.IsSpeculativeCcdCollision"/>
         </member>
         <member name="F:Quantum.CollisionInfo3D.ContactPoints">
             <summary>
@@ -22704,6 +22856,9 @@
             If the collision should be ignored by the physics engine.
             </summary>
         </member>
+        <member name="P:Quantum.TriggerInfo3D.IsSpeculativeCcdCollision">
+            <inheritdoc cref="P:Quantum.TriggerInfo2D.IsSpeculativeCcdCollision"/>
+        </member>
         <member name="P:Quantum.TriggerInfo3D.IsStatic">
             <summary>
             If the <see cref="P:Quantum.TriggerInfo3D.Entity"/> is touching a static trigger collider.
@@ -22961,9 +23116,23 @@
             Amount of angular velocity below which a physics body might be considered as standing still for sleeping detection.
             </summary>
         </member>
+        <member name="F:Quantum.PhysicsCommon.Config.WakeUpDistance">
+            <summary>
+            The minimum distance below which waking one sleeping object also wakes the other. 
+            </summary>
+        </member>
         <member name="F:Quantum.PhysicsCommon.Config.AllowCCD">
             <summary>
             Allows CCD to be performed if the Physics Body has CCD enabled on its Config flags. Default is <see langword="false"/>.
+            </summary>
+        </member>
+        <member name="F:Quantum.PhysicsCommon.Config.InvokeSpeculativeCallbacks">
+            <summary>
+            Allows Callbacks involving CCD-enabled entities to be called even if the collision happens after the first non-trigger collision.
+            <see cref="P:Quantum.CollisionInfo3D.IsSpeculativeCcdCollision">IsSpeculativeCcdCollision</see> property in collision
+            info structs can be used to check if the collision is speculative in the callback listener.
+            Speculative collisions are NOT guaranteed to have happened, since the trajectory of the body might change
+            after the first non-trigger collision and the remainder movement is not CCD-checked.
             </summary>
         </member>
         <member name="F:Quantum.PhysicsCommon.Config.CCDLinearVelocityThreshold">
@@ -23290,6 +23459,11 @@
             <summary>
             For Ray and Shape casts, the query will consider other colliders that may be overlapping with the cast
             feature at the cast origin. By default, such overlaps are not considered hits.
+            </summary>
+        </member>
+        <member name="F:Quantum.QueryOptions.SleepingOnly">
+            <summary>
+            When used in combination with HitDynamics flag, causes awaken bodies to be ignored by the query.
             </summary>
         </member>
         <member name="T:Quantum.CharacterMovementType">
@@ -24350,6 +24524,42 @@
         <member name="F:Quantum.SpaceAfterAttribute.Height">
             <summary>
             Height of the space.
+            </summary>
+        </member>
+        <member name="T:Quantum.StructExplicitAttribute">
+            <summary>
+            Marks a struct for automatic generation of fixed layout constants and [StructLayout(LayoutKind.Explicit, Size = ...)]. 
+            Fields must have [FieldOffset].
+            </summary>
+            <param name="Size"><seealso cref="F:System.Runtime.InteropServices.StructLayoutAttribute.Size"/></param>
+        </member>
+        <member name="M:Quantum.StructExplicitAttribute.#ctor(System.Int32)">
+            <summary>
+            Marks a struct for automatic generation of fixed layout constants and [StructLayout(LayoutKind.Explicit, Size = ...)]. 
+            Fields must have [FieldOffset].
+            </summary>
+            <param name="Size"><seealso cref="F:System.Runtime.InteropServices.StructLayoutAttribute.Size"/></param>
+        </member>
+        <member name="P:Quantum.StructExplicitAttribute.Size">
+            <summary> <seealso cref="F:System.Runtime.InteropServices.StructLayoutAttribute.Size"/> </summary>
+        </member>
+        <member name="P:Quantum.StructExplicitAttribute.Pack">
+            <summary> <seealso cref="F:System.Runtime.InteropServices.StructLayoutAttribute.Pack"/> </summary>
+        </member>
+        <member name="P:Quantum.StructExplicitAttribute.AllowOversizing">
+            <summary>If true, allows for the struct to be larger than its contents.</summary>
+        </member>
+        <member name="P:Quantum.StructExplicitAttribute.EmitWordOffsets">
+            <summary>If true, emits word offsets for each field not marked with <seealso cref="T:Quantum.FieldNotWordAlignedAttribute"/>.</summary>
+        </member>
+        <member name="P:Quantum.StructExplicitAttribute.WordCountName">
+            <summary>Custom name for the WORD_COUNT constant. Default is "WORD_COUNT".</summary>
+        </member>
+        <member name="T:Quantum.FieldNotWordAlignedAttribute">
+            <summary>
+            Marks a field as not word-aligned. Fields with this attribute will be skipped
+            when generating word-based constants (WORD_OF_*, WORD_COUNT_OF_*) and byte-based
+            field constants (BYTE_OF_*, BYTE_COUNT_OF_*).
             </summary>
         </member>
         <member name="T:Quantum.ToggleLeftAttribute">
@@ -28049,7 +28259,7 @@
             <param name="folder">Path to folder</param>
             <returns><see langword="true"/> if the path is relative to the folder</returns>
         </member>
-        <member name="M:Quantum.PathUtils.MakeSane(System.String)">
+        <member name="M:Quantum.PathUtils.Normalize(System.String)">
             <summary>
             Unify path separators and replacing all different amounts of slashes to one forward slash.
             </summary>
@@ -36686,11 +36896,10 @@
             Frees the resources used by the frame.
             </summary>
         </member>
-        <member name="M:Photon.Deterministic.DeterministicFrame.Serialize(Photon.Deterministic.DeterministicFrameSerializeMode)">
+        <member name="M:Photon.Deterministic.DeterministicFrame.Serialize">
             <summary>
             Save all frame data.
             </summary>
-            <param name="mode">The serialization mode.</param>
             <returns>The serialized frame.</returns>
         </member>
         <member name="M:Photon.Deterministic.DeterministicFrame.Deserialize(System.Byte[])">
@@ -37650,6 +37859,11 @@
             Runner is the wrapper for session/game that can be attached to Unity, a .Net console app, or a Quantum Custom Server Plugin. 
             </summary>
         </member>
+        <member name="P:Photon.Deterministic.DeterministicSession.SnapshotProvider">
+            <summary>
+            Returns the assigned snapshot provider.
+            </summary>
+        </member>
         <member name="P:Photon.Deterministic.DeterministicSession.OnDestroyed">
             <summary>
             Is executed in the end of <see cref="M:Photon.Deterministic.DeterministicSession.Destroy"/>. Is used by the server simulation.
@@ -37808,6 +38022,12 @@
         <member name="F:Photon.Deterministic.DeterministicSessionArgs.Game">
             <summary>
             Gets or sets the deterministic game interface.
+            </summary>
+        </member>
+        <member name="F:Photon.Deterministic.DeterministicSessionArgs.SnapshotProvider">
+            <summary>
+            Optional external snapshot packaging (for e.g. async).
+            Can be null to use default single threaded implementation.
             </summary>
         </member>
         <member name="F:Photon.Deterministic.DeterministicSessionArgs.Communicator">
@@ -38983,6 +39203,36 @@
         <member name="P:Photon.Deterministic.IDeterministicReplayProvider.LocalActorNumber">
             <summary>
             Setting the correct local actor number makes <see cref="M:Photon.Deterministic.DeterministicSession.IsLocalPlayer(Quantum.PlayerRef)"/> work in replays similar to normal Quantum sessions.
+            </summary>
+        </member>
+        <member name="T:Photon.Deterministic.IDeterministicSnapshotProvider">
+            <summary>
+            An interface that can be added to the Quantum session to overwrite the default snapshot sending for late-joiners.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IDeterministicSnapshotProvider.ExtraHeapCount">
+            <summary>
+            Return the number of additional frame heaps required for this tool to work.
+            </summary>
+        </member>
+        <member name="P:Photon.Deterministic.IDeterministicSnapshotProvider.IsCompleted">
+            <summary>
+            Returns <see langword="true"/> when a snapshot is read to be completed.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IDeterministicSnapshotProvider.Init(Photon.Deterministic.DeterministicSession,System.IDisposable)">
+            <summary>
+            Initializing the snapshot provider for this Quantum session. Used to create a frame container.
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IDeterministicSnapshotProvider.RequestSnapshot(Photon.Deterministic.DeterministicSession,System.Int32)">
+            <summary>
+            Requesting a snapshot, use to CopyFrom and start async computation. 
+            </summary>
+        </member>
+        <member name="M:Photon.Deterministic.IDeterministicSnapshotProvider.GetSnapshot">
+            <summary>
+            Returns the completed encoded snapshot.
             </summary>
         </member>
         <member name="T:Photon.Deterministic.IDeterministicStreamReplayInputProvider">

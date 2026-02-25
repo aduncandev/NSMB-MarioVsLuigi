@@ -332,7 +332,7 @@ namespace NSMB.Networking {
                 sb.Append("Frame info ").Append(i + 1).AppendLine(":");
                 sb.AppendLine(e.Frames[i].DumpFrame());
                 sb.AppendLine();
-                sb.AppendLine(Convert.ToBase64String(e.Frames[i].Serialize(DeterministicFrameSerializeMode.Serialize)));
+                sb.AppendLine(Convert.ToBase64String(e.Frames[i].Serialize()));
                 sb.AppendLine();
                 sb.AppendLine("-----");
             }

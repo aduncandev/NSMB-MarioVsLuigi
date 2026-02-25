@@ -2667,6 +2667,7 @@ namespace Quantum {
             mario->IsDrilling = false;
             mario->IsCrouching = false;
             mario->IsGroundpounding = false;
+            mario->IsGroundpoundActive = false;
             mario->IsSliding = false;
 
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Holdable* holdable)) {

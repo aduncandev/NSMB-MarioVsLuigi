@@ -923,14 +923,12 @@ namespace Quantum {
       return Context.InPredictionArea(this, position);
     }
 
-
     /// <summary>
     /// Serializes the frame using a temporary buffer (20MB).
     /// </summary>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    public override Byte[] Serialize(DeterministicFrameSerializeMode mode) {
-      return Serialize(mode, new byte[1024 * 1024 * 20], allocOutput: true).Array;
+    /// <returns>Serialized frame</returns>
+    public override Byte[] Serialize() {
+      return Serialize(new byte[1024 * 1024 * 20], allocOutput: true).Array;
     }
 
     /// <summary>
@@ -945,19 +943,18 @@ namespace Quantum {
     /// <see cref="IAssetSerializer.SerializeAssets(Stream, AssetObject[])"/> is also going
     /// to allocate when serializing DynamicAssetDB, but how much depends on the serializer itself and the number of dynamic assets.
     /// </summary>
-    /// <param name="mode"></param>
-    /// <param name="buffer"></param>
-    /// <param name="offset"></param>
-    /// <param name="allocOutput"></param>
+    /// <param name="buffer">The buffer to use for serialization</param>
+    /// <param name="offset">The offset to write into the buffer</param>
+    /// <param name="allocOutput">If true, allocate new memory when returning a result</param>
     /// <returns>Segment of <paramref name="buffer"/> where the serialized frame is stored</returns>
     /// <remarks>Do not serialize during GameStart callback because systems have not been initialized, yet. Rather use CallbackSimulateFinished to wait for the first update.</remarks>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ArraySegment<byte> Serialize(DeterministicFrameSerializeMode mode, byte[] buffer, int offset = 0, bool allocOutput = false) {
-      return Serialize(mode, buffer, out _, offset, allocOutput);
+    public ArraySegment<byte> Serialize(byte[] buffer, int offset = 0, bool allocOutput = false) {
+      return Serialize(buffer, out _, offset, allocOutput);
     }
 
-    public ArraySegment<byte> Serialize(DeterministicFrameSerializeMode mode, byte[] buffer, out FrameSerializer serializer, int offset = 0, bool allocOutput = false) {
-      offset = ByteUtils.AddValueBlock((int)mode, buffer, offset);
+    public ArraySegment<byte> Serialize(byte[] buffer, out FrameSerializer serializer, int offset = 0, bool allocOutput = false) {
+      offset = ByteUtils.AddValueBlock((int)0, buffer, offset); // used to be DeterministicFrameSerializeMode.Serialize (0)
       offset = ByteUtils.AddValueBlock(Number, buffer, offset);
       offset = ByteUtils.AddValueBlock(CalculateChecksum(false), buffer, offset);
 
@@ -979,7 +976,7 @@ namespace Quantum {
         offset = ByteUtils.BeginByteBlockHeader(buffer, offset, out var blockOffset);
 
         stream.SetBuffer(buffer, buffer.Length - offset, offset);
-        serializer = new FrameSerializer(mode, this, stream) {
+        serializer = new FrameSerializer(this, stream) {
           Writing = true
         };
 
@@ -1013,10 +1010,30 @@ namespace Quantum {
       }
     }
 
+    #region Legacy_DeterministicFrameSerializeMode
+
+    [Obsolete("Removed DeterministicFrameSerializeMode, use Serialize() instead")]
+    public Byte[] Serialize(DeterministicFrameSerializeMode mode) {
+      return Serialize(mode, new byte[1024 * 1024 * 20], allocOutput: true).Array;
+    }
+
+    [Obsolete("Removed DeterministicFrameSerializeMode, use Serialize(byte[], int, bool) instead")]
+    public ArraySegment<byte> Serialize(DeterministicFrameSerializeMode mode, byte[] buffer, int offset = 0, bool allocOutput = false) {
+      return Serialize(mode, buffer, out _, offset, allocOutput);
+    }
+
+    [Obsolete("Removed DeterministicFrameSerializeMode, use Serialize(byte[], out FrameSerializer, int, bool) instead")]
+    public ArraySegment<byte> Serialize(DeterministicFrameSerializeMode mode, byte[] buffer, out FrameSerializer serializer, int offset = 0, bool allocOutput = false) {
+      return Serialize(buffer, out serializer, offset, allocOutput);
+    }
+
+    #endregion // Legacy_DeterministicFrameSerializeMode
+
     public override void Deserialize(Byte[] data) {
       var blocks = ByteUtils.ReadByteBlocks(Compression.DecompressBytes(data)).ToArray();
 
-      var mode = (DeterministicFrameSerializeMode)BitConverter.ToInt32(blocks[0], 0);
+      // Used to be DeterministicFrameSerializeMode.Serialize
+      var mode = BitConverter.ToInt32(blocks[0], 0);
 
       Number = BitConverter.ToInt32(blocks[1], 0);
 
@@ -1026,7 +1043,7 @@ namespace Quantum {
       DeserializeDynamicAssetDB(blocks[5]);
 
       FrameSerializer serializer;
-      serializer = new FrameSerializer(mode, this, blocks[4]);
+      serializer = new FrameSerializer(this, blocks[4]);
       serializer.Reading = true;
 
       SerializeState(serializer);
@@ -1234,7 +1251,7 @@ namespace Quantum {
         frameSerializer = Context.SharedChecksumSerializer;
         Assert.Check(frameSerializer != null);
       } else {
-        frameSerializer = new FrameSerializer(DeterministicFrameSerializeMode.Serialize, this, new FrameChecksumerBitStream());
+        frameSerializer = new FrameSerializer(this, new FrameChecksumerBitStream());
       }
       return CalculateChecksumInternal(frameSerializer);
     }
@@ -1243,10 +1260,6 @@ namespace Quantum {
 
       if (serializer == null) {
         throw new ArgumentNullException(nameof(serializer));
-      }
-
-      if (serializer.Mode != DeterministicFrameSerializeMode.Serialize) {
-        throw new ArgumentException($"Serializer needs to be in {nameof(DeterministicFrameSerializeMode.Serialize)} mode", nameof(serializer));
       }
 
       if (serializer.Stream is FrameChecksumerBitStream checksumStream) {
@@ -3711,6 +3724,11 @@ namespace Quantum {
           heapConfig.ExtraHeapCount++;
         }
 
+        // additional frames required by snapshot provider tool
+        if (Session.SnapshotProvider != null) {
+          heapConfig.ExtraHeapCount += Session.SnapshotProvider.ExtraHeapCount;
+        }
+
         heapConfig.ExtraHeapCount += Math.Max(0, HeapExtraCount);
         heapConfig.ExtraHeapCount += SnapshotsCreateBuffers(Session.SessionConfig.UpdateFPS,
           Session.IsOnline ? Session.SessionConfig.ChecksumInterval : 0, Configurations.Simulation.ChecksumSnapshotHistoryLengthSeconds,
@@ -3866,7 +3884,7 @@ namespace Quantum {
       }
 
       if (_inputSerializerWrite == null) {
-        _inputSerializerWrite = new FrameSerializer(DeterministicFrameSerializeMode.Serialize, null, new Byte[1024]);
+        _inputSerializerWrite = new FrameSerializer(null, new Byte[1024]);
       }
 
       // clear old data
@@ -4177,7 +4195,7 @@ namespace Quantum {
     /// </summary>
     /// <returns>Serialized input size</returns>
     public Int32 GetInputSerializedFixedSize() {
-      var stream = new FrameSerializer(DeterministicFrameSerializeMode.Serialize, null, 1024);
+      var stream = new FrameSerializer(null, 1024);
       stream.Writing = true;
       stream.InputMode = true;
       Input.Write(stream, new Input());
@@ -4249,7 +4267,7 @@ namespace Quantum {
     public void DeserializeInputInto(int player, byte[] data, byte* buffer, bool verified) {
       if (_inputSerializerRead == null) {
         _inputStreamReadZeroArray = new Byte[1024];
-        _inputSerializerRead = new FrameSerializer(DeterministicFrameSerializeMode.Serialize, null, new Byte[1024]);
+        _inputSerializerRead = new FrameSerializer(null, new Byte[1024]);
       }
 
       _inputSerializerRead.Reset();
@@ -4328,7 +4346,7 @@ namespace Quantum {
           // verified heap tracker must have been hooked to the context tracker
           Assert.Check(Frames.Verified.Heap.Tracker.Equals(_context.HeapTracker));
 
-          Frames.Verified.Serialize(DeterministicFrameSerializeMode.Serialize, new byte[20 * 1024 * 1024], out var frameSerializer);
+          Frames.Verified.Serialize(new byte[20 * 1024 * 1024], out var frameSerializer);
           Frames.Verified.Heap.Tracker.CheckAllocationsDebug(frameSerializer.GetSerializedPtrs());
           break;
 
@@ -4558,7 +4576,7 @@ namespace Quantum {
         DeterministicConfig = Frames.Verified.SessionConfig,
         RuntimeConfigData = QuantumJsonFriendlyDataBlob.Encode(AssetSerializer.ConfigToByteArray(Frames.Verified.RuntimeConfig, compress: true), isCompressed: false, asBase64String: true),
         LastTick = Frames.Verified.Number,
-        InitialFrameData = Frames.Verified.Serialize(DeterministicFrameSerializeMode.Serialize),
+        InitialFrameData = Frames.Verified.Serialize(),
         LocalActorNumber = Session.GetActorNumber()
       };
 
@@ -4975,14 +4993,6 @@ namespace Quantum {
     /// The local player slot the input is polled for (this is not the global player number).
     /// </summary>
     public Int32 PlayerSlot;
-    /// <summary>
-    /// Obsolete, renamed to PlayerSlot.
-    /// </summary>
-    [Obsolete("Renamed to PlayerSlot because it's the local player slot instead of a global player.")]
-    public Int32 Player {
-      get { return PlayerSlot; }
-      set { Frame = PlayerSlot; }
-    }
 
     /// <summary>
     /// Set the polled input result.
@@ -5323,7 +5333,7 @@ namespace Quantum {
         if (!_frame.Item0) {
           _frame = QTuple.Create(true, (Frame)null);
           if (_frameToOverride != null) {
-            var originalFrameData = _frameToOverride.Serialize(DeterministicFrameSerializeMode.Serialize);
+            var originalFrameData = _frameToOverride.Serialize();
             try {
               _frameToOverride.Deserialize(FrameData);
               _frame = QTuple.Create(true, _frameToOverride);
@@ -6119,199 +6129,6 @@ namespace Quantum {
         get => Parameters.GameFlags;
         set => Parameters.GameFlags = value;
       }
-    }
-  }
-}
-
-
-#endregion
-
-
-#region Assets/Photon/Quantum/Simulation/Legacy/SessionContainer.cs
-
-namespace Quantum {
-  using System;
-  using Photon.Deterministic;
-  
-  [Obsolete("Has been replaced by SessionRunner class.")]
-  public class SessionContainer {
-    public static Boolean _loadedAllStatics = false;
-    public static readonly Object _lock = new Object();
-
-    DeterministicSessionConfig _sessionConfig;
-    RuntimeConfig _runtimeConfig;
-    QuantumGame _game;
-    DeterministicSession _session;
-    long _startGameTimeoutInMiliseconds = -1;
-    DateTime _startGameTimestamp;
-
-    public QuantumGame QuantumGame => _game;
-    public IDeterministicGame Game => _game;
-    public DeterministicSession Session => _session;
-    public RuntimeConfig RuntimeConfig => _runtimeConfig;
-    public DeterministicSessionConfig DeterministicConfig => _sessionConfig;
-
-    /// <summary>
-    /// Check this when the container reconnects into a running game and handle accordingly.
-    /// </summary>
-    public bool HasGameStartTimedOut => _startGameTimeoutInMiliseconds > 0 && Session != null && Session.IsPaused && DateTime.Now > _startGameTimestamp + TimeSpan.FromMilliseconds(_startGameTimeoutInMiliseconds);
-    /// <summary>
-    /// Default is infinity (-1). Set this when the you expect to connect to a running game and wait for a snapshot.
-    /// </summary>
-    public long GameStartTimeoutInMiliseconds {
-      get { 
-        return _startGameTimeoutInMiliseconds; 
-      } 
-      set {
-        _startGameTimeoutInMiliseconds = value;
-      }
-    }
-    
-    /// <summary>
-    /// Start the simulation as a replay by providing an input provider.
-    /// </summary>
-    /// <param name="startParams">Game start parameters</param>
-    /// <param name="provider">Input provider</param>
-    /// <param name="clientId">Optional client id</param>
-    /// <param name="logInitForConsole">Optionally disable setting up the console as log output (required on the Quantum plugin)</param>
-    /// <param name="taskRunner">Task runner</param>
-    [Obsolete("Use SessionRunner class")]
-    public void StartReplay(QuantumGame.StartParameters startParams, IDeterministicReplayProvider provider, string clientId = "server", bool logInitForConsole = true, IDeterministicPlatformTaskRunner taskRunner = null) {
-      DeterministicSessionArgs sessionArgs;
-      sessionArgs.Mode = DeterministicGameMode.Replay;
-      sessionArgs.Game = null;
-      sessionArgs.Replay = provider;
-      sessionArgs.Communicator = null;
-      sessionArgs.PlatformInfo = null;
-      sessionArgs.InitialTick = 0;
-      sessionArgs.FrameData = null;
-      sessionArgs.SessionConfig = null;
-      sessionArgs.RuntimeConfig = null;
-      sessionArgs.DisableInterpolatableStates = (startParams.GameFlags & QuantumGameFlags.DisableInterpolatableStates) == QuantumGameFlags.DisableInterpolatableStates;
-      Start(startParams, sessionArgs, clientId, logInitForConsole, taskRunner);
-    }
-
-    /// <summary>
-    /// Start the simulation as a spectator.
-    /// </summary>
-    /// <param name="startParams">Game start parameters</param>
-    /// <param name="networkCommunicator">Quantum network communicator (has to have a peer that is connected to a room</param>
-    /// <param name="frameData">Optionally the frame to start from</param>
-    /// <param name="initialTick">The tick that the frame data is based on</param>
-    /// <param name="clientId">Optional client id</param>
-    /// <param name="logInitForConsole">Optionally disable setting up the console as log output (required on the Quantum plugin)</param>
-    /// <param name="taskRunner">Task runner</param>
-    [Obsolete("Use SessionRunner class")]
-    public void StartSpectator(QuantumGame.StartParameters startParams, ICommunicator networkCommunicator, byte[] frameData = null, int initialTick = 0, string clientId = "observer", bool logInitForConsole = true, IDeterministicPlatformTaskRunner taskRunner = null) {
-      DeterministicSessionArgs sessionArgs;
-      sessionArgs.Mode = DeterministicGameMode.Multiplayer;
-      sessionArgs.Game = null;
-      sessionArgs.Replay = null;
-      sessionArgs.Communicator = networkCommunicator;
-      sessionArgs.PlatformInfo = null;
-      sessionArgs.InitialTick = initialTick;
-      sessionArgs.FrameData = frameData;
-      sessionArgs.SessionConfig = null;
-      sessionArgs.RuntimeConfig = null;
-      sessionArgs.DisableInterpolatableStates = (startParams.GameFlags & QuantumGameFlags.DisableInterpolatableStates) == QuantumGameFlags.DisableInterpolatableStates;
-      Start(startParams, sessionArgs, clientId, logInitForConsole, taskRunner);
-    }
-
-
-    [Obsolete("Use Start signature without playerSlots arguments")]
-    public void Start(QuantumGame.StartParameters startParams, DeterministicSessionArgs sessionArgs, int playerSlots, string clientId = "server", bool logInitForConsole = true, IDeterministicPlatformTaskRunner taskRunner = null) {
-      Start(startParams, sessionArgs, clientId, logInitForConsole, taskRunner);
-    }
-
-    /// <summary>
-    /// Start the simulation in a custom way.
-    /// </summary>
-    /// <param name="startParams">Game start parameters</param>
-    /// <param name="sessionArgs">Game session args</param>
-    /// <param name="clientId">Optional client id</param>
-    /// <param name="logInitForConsole">Optionally disable setting up the console as log output (required on the Quantum plugin)</param>
-    /// <param name="taskRunner">Task runner</param>
-    [Obsolete("Use SessionRunner class")]
-    public void Start(QuantumGame.StartParameters startParams, DeterministicSessionArgs sessionArgs, string clientId = "server", bool logInitForConsole = true, IDeterministicPlatformTaskRunner taskRunner = null) {
-        if (!_loadedAllStatics) {
-        lock (_lock) {
-          if (!_loadedAllStatics) {
-            // console first
-            if (logInitForConsole) {
-              Log.InitializeForConsole(new LogSettings(LogLevel.Info, default));
-            }
-          }
-
-          _loadedAllStatics = true;
-        }
-      }
-
-      _game = new QuantumGame(startParams);
-
-      DeterministicPlatformInfo info;
-      info = new DeterministicPlatformInfo();
-      info.Architecture = DeterministicPlatformInfo.Architectures.x86;
-      info.RuntimeHost = DeterministicPlatformInfo.RuntimeHosts.PhotonServer;
-      info.Runtime = DeterministicPlatformInfo.Runtimes.NetFramework;
-      info.TaskRunner = taskRunner ?? new DotNetTaskRunner();
-
-      switch (Environment.OSVersion.Platform) {
-        case PlatformID.Unix:
-          info.Platform = DeterministicPlatformInfo.Platforms.Linux;
-          break;
-
-        case PlatformID.MacOSX:
-          info.Platform = DeterministicPlatformInfo.Platforms.OSX;
-          break;
-
-        default:
-          info.Platform = DeterministicPlatformInfo.Platforms.Windows;
-          break;
-      }
-
-      sessionArgs.Game = _game;
-      sessionArgs.PlatformInfo = info;
-      sessionArgs.SessionConfig = _sessionConfig;
-      sessionArgs.RuntimeConfig = startParams.AssetSerializer.ConfigToByteArray(_runtimeConfig, compress: true);
-
-      _session = new DeterministicSession(sessionArgs);
-      _session.Join(clientId);
-
-      _startGameTimestamp = DateTime.Now;
-    }
-
-    /// <summary>
-    /// Update the session.
-    /// </summary>
-    /// <param name="dt">Optionally provide a custom delta time</param>
-    public void Service(double? dt = null) {
-      _session.Update(dt);
-    }
-
-    /// <summary>
-    /// Destroy the session.
-    /// </summary>
-    public void Destroy() {
-      _session?.Destroy();
-      _session = null;
-    }
-
-    /// <summary>
-    /// Use other constructors that provide the session and runtime config.
-    /// </summary>
-    public SessionContainer() {
-      _sessionConfig = null;
-      _runtimeConfig = null;
-    }
-
-    public SessionContainer(ReplayFile replayFile) {
-      _sessionConfig = replayFile.DeterministicConfig;
-      _runtimeConfig = replayFile.RuntimeConfig;
-    }
-
-    public SessionContainer(DeterministicSessionConfig sessionConfig, RuntimeConfig runtimeConfig) {
-      _sessionConfig = sessionConfig;
-      _runtimeConfig = runtimeConfig;
     }
   }
 }
@@ -8072,7 +7889,7 @@ namespace Quantum {
       }
 
       tick = _runner.Session.FramePredicted.Number;
-      data = _runner.Session.FramePredicted.Serialize(DeterministicFrameSerializeMode.Serialize);
+      data = _runner.Session.FramePredicted.Serialize();
       return true;
     }
 
@@ -8160,6 +7977,12 @@ namespace Quantum {
       /// The replay provider injects recorded inputs and rpcs into the game which is required to run the game as a replay. InputProvider is an implementation of the replay provider. See usages of QuantumGame.RecordedInputs and QuantumRunnerLocalReplay.InputProvider.
       /// </summary>
       public IDeterministicReplayProvider ReplayProvider;
+      /// <summary>
+      /// Optional experimental external snapshot serialization (for e.g. async).
+      /// Can be null to use default single threaded implementation.
+      /// See QuantumSnapshotProviderDemo
+      /// </summary>
+      public IDeterministicSnapshotProvider SnapshotProvider;
       /// <summary>
       /// The game mode (default is Multiplayer). 
       /// Local mode is for testing only, the simulation is not connected online. It does not go into prediction nor does it perform rollbacks.
@@ -8800,6 +8623,7 @@ namespace Quantum {
           PlatformInfo = arguments.RunnerFactory.CreatePlatformInfo,
           SessionConfig = deterministicConfig,
           Replay = arguments.ReplayProvider,
+          SnapshotProvider = arguments.SnapshotProvider,
           DisableInterpolatableStates = (arguments.GameFlags & QuantumGameFlags.DisableInterpolatableStates) == QuantumGameFlags.DisableInterpolatableStates
         };
         

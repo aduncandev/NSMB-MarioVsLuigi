@@ -148,7 +148,7 @@ namespace Quantum {
       var childrenEntries = entry.GetChildren();
       var children = new List<SystemBase>(childrenEntries.Count);
       for (int i = 0; i < childrenEntries.Count; i++) {
-        children.Add(CreateSystems<SystemBase>(childrenEntries[i]) as SystemBase);
+        children.Add(CreateSystems<SystemBase>(childrenEntries[i]));
       }
 
       var result = Create(type, children.ToArray());

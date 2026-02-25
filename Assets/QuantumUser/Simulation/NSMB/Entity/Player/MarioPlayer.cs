@@ -265,7 +265,8 @@ namespace Quantum {
             }
 
             // OnSpinner = null;
-            CurrentPipe = default;
+            DoEntityBounce = false;
+            CurrentPipe = EntityRef.None;
             IsInShell = false;
             IsPropellerFlying = false;
             PropellerLaunchFrames = 0;
@@ -424,6 +425,7 @@ namespace Quantum {
             IsDead = true;
             f.Unsafe.GetPointer<Freezable>(entity)->FrozenCubeEntity = EntityRef.None;
             IsRespawning = true;
+            DoEntityBounce = false;
             FacingRight = true;
             WallslideLeft = false;
             WallslideRight = false;

@@ -49,6 +49,104 @@ Disclaimer: The Quantum SDK 3.1.0 development snapshots are not intended to be u
 - `QuantumUnityDB` does not throw exceptions in `TryGet*` methods if the DB was failed to be loaded
 - `QuantumCallbackHandler_UnityCallbacks.LoadAddressableScenePathsAsync` is now static
 
+### Build 1994 (Feb 20, 2026)
+
+**Bug Fixes**
+
+- Fixed: Recurrent allocations in Debug asserts when acquiring names of component sets
+
+### Build 1990 (Feb 17, 2026)
+
+**What's New**
+
+- An experimental feature to use a customized `SessionRunner.Arguments.SnapshotProvider` for buddy snapshots that can run on a background thread, only advised to used without changes to `FrameContext`
+
+**Bug Fixes**
+
+- Fixed: An issue exporting Quantum DotNet project with dotnet version `10.0.2`
+
+### Build 1986 (Feb 13, 2026)
+
+**Changes**
+
+- Adding table components to an entity (or committing their removal) while a filter is iterating that entity's current table now throws an exception. To work around this, use the new `frame.DeferredAdd(entity, component)` and `frame.DeferredSet(entity, component)` methods to enqueue changes, then optionally call `frame.Unsafe.CommitDeferred()` outside the filter loop to commit them. If not committed manually, they'll be committed at the usual point together with entity destroys and component removes
+
+**Bug Fixes**
+
+- Fixed: An editor peformance issue with `UnityNavMeshArea` drawer attribute
+
+### Build 1981 (Feb 11, 2026)
+
+**Bug Fixes**
+
+- Fixed: An issue in `DelaunayTriangulation` that could lead to less flipped edges
+
+### Build 1978 (Feb 10, 2026)
+
+**Bug Fixes**
+
+- Fixed: An issue that could cause commands to be missing on verified frames using the Quantum debug dlls
+
+### Build 1974 (Feb 04, 2026)
+
+**What's New**
+
+- `InvokeSpeculativeCallbacks` setting in the Simulation Config (enabled by default) that allows CCD callbacks to be called even after the first non-trigger collision. `IsSpeculativeCcdCollision` property in callback info structs can be used to check this condition if the setting is enabled
+
+### Build 1972 (Feb 03, 2026)
+
+**Bug Fixes**
+
+- Fixed: An issue that caused commands to be mispredicted way too often because sending them was delayed frequently
+
+### Build 1971 (Jan 31, 2026)
+
+**Removed**
+
+- `DeterministicFrameSerializeMode` is obsolete now, affecting `Frame.Serialize()` methods, remove the mode parameter to migrate to
+
+### Build 1968 (Jan 29, 2026)
+
+**What's New**
+
+- `QueryOption.SleepingOnly` is a new physics query option that, when used in combination with `HitDynamics` flag, causes awaken bodies to be ignored by the query
+
+**Improvements**
+
+- When awakened by dynamic collisions, physics bodies will now wake up other sleeping bodies that are in the same collision island in that same frame. Prevents issues with wake-ups not propagating over multiple frames in case the collision is not persistent
+
+**Changes**
+
+- 2D and 3D Physics Queries API that receive an external hit collection now have an optional parameter to reset those collections before resolving the query (used to be mandatory)
+
+**Removed**
+
+- Legacy `SessionContainer` class
+
+**Bug Fixes**
+
+- Fixed: An issue in `DelaunayTriangulation` that could lead to less flipped edges
+
+### Build 1966 (Jan 27, 2026)
+
+**What's New**
+
+- Quantum graph profiler code can now be disabled to reduce the final build size by using the `QUANTUM_DISABLE_GRAPHPROFILER` scripting define
+
+**Changes**
+
+- Moved all GraphProfiler files to the `GraphProfiler` subfolder, this is not strictly required to migrate to
+
+**Bug Fixes**
+
+- Fixed: Issue in 2D and 3D PhysicsBody causing GravityScale to not be applied correctly
+
+### Build 1962 (Jan 20, 2026)
+
+**Bug Fixes**
+
+- Fixed: The 2D Linecast query was detecting hits at the cast origin even when 'detectOverlapsAtCastOrigin' was disabled
+
 ### Build 1960 (Jan 13, 2026)
 
 **Changes**

@@ -2092,14 +2092,13 @@
             <param name="position"></param>
             <returns></returns>
         </member>
-        <member name="M:Quantum.Frame.Serialize(Photon.Deterministic.DeterministicFrameSerializeMode)">
+        <member name="M:Quantum.Frame.Serialize">
             <summary>
             Serializes the frame using a temporary buffer (20MB).
             </summary>
-            <param name="mode"></param>
-            <returns></returns>
+            <returns>Serialized frame</returns>
         </member>
-        <member name="M:Quantum.Frame.Serialize(Photon.Deterministic.DeterministicFrameSerializeMode,System.Byte[],System.Int32,System.Boolean)">
+        <member name="M:Quantum.Frame.Serialize(System.Byte[],System.Int32,System.Boolean)">
             <summary>
             Serializes the frame using <paramref name="buffer"/> as a buffer for temporary data. 
             
@@ -2112,10 +2111,9 @@
             <see cref="M:Quantum.IAssetSerializer.SerializeAssets(System.IO.Stream,Quantum.AssetObject[])"/> is also going
             to allocate when serializing DynamicAssetDB, but how much depends on the serializer itself and the number of dynamic assets.
             </summary>
-            <param name="mode"></param>
-            <param name="buffer"></param>
-            <param name="offset"></param>
-            <param name="allocOutput"></param>
+            <param name="buffer">The buffer to use for serialization</param>
+            <param name="offset">The offset to write into the buffer</param>
+            <param name="allocOutput">If true, allocate new memory when returning a result</param>
             <returns>Segment of <paramref name="buffer"/> where the serialized frame is stored</returns>
             <remarks>Do not serialize during GameStart callback because systems have not been initialized, yet. Rather use CallbackSimulateFinished to wait for the first update.</remarks>
         </member>
@@ -2522,6 +2520,13 @@
         <member name="F:Quantum.SessionRunner.Arguments.ReplayProvider">
             <summary>
             The replay provider injects recorded inputs and rpcs into the game which is required to run the game as a replay. InputProvider is an implementation of the replay provider. See usages of QuantumGame.RecordedInputs and QuantumRunnerLocalReplay.InputProvider.
+            </summary>
+        </member>
+        <member name="F:Quantum.SessionRunner.Arguments.SnapshotProvider">
+            <summary>
+            Optional experimental external snapshot serialization (for e.g. async).
+            Can be null to use default single threaded implementation.
+            See QuantumSnapshotProviderDemo
             </summary>
         </member>
         <member name="F:Quantum.SessionRunner.Arguments.GameMode">
@@ -2966,64 +2971,6 @@
         <member name="M:Quantum.InactiveTaskRunner.Dispose">
             <summary>
             Dispose the object.
-            </summary>
-        </member>
-        <member name="P:Quantum.SessionContainer.HasGameStartTimedOut">
-            <summary>
-            Check this when the container reconnects into a running game and handle accordingly.
-            </summary>
-        </member>
-        <member name="P:Quantum.SessionContainer.GameStartTimeoutInMiliseconds">
-            <summary>
-            Default is infinity (-1). Set this when the you expect to connect to a running game and wait for a snapshot.
-            </summary>
-        </member>
-        <member name="M:Quantum.SessionContainer.StartReplay(Quantum.QuantumGame.StartParameters,Photon.Deterministic.IDeterministicReplayProvider,System.String,System.Boolean,Photon.Deterministic.IDeterministicPlatformTaskRunner)">
-            <summary>
-            Start the simulation as a replay by providing an input provider.
-            </summary>
-            <param name="startParams">Game start parameters</param>
-            <param name="provider">Input provider</param>
-            <param name="clientId">Optional client id</param>
-            <param name="logInitForConsole">Optionally disable setting up the console as log output (required on the Quantum plugin)</param>
-            <param name="taskRunner">Task runner</param>
-        </member>
-        <member name="M:Quantum.SessionContainer.StartSpectator(Quantum.QuantumGame.StartParameters,Photon.Deterministic.ICommunicator,System.Byte[],System.Int32,System.String,System.Boolean,Photon.Deterministic.IDeterministicPlatformTaskRunner)">
-            <summary>
-            Start the simulation as a spectator.
-            </summary>
-            <param name="startParams">Game start parameters</param>
-            <param name="networkCommunicator">Quantum network communicator (has to have a peer that is connected to a room</param>
-            <param name="frameData">Optionally the frame to start from</param>
-            <param name="initialTick">The tick that the frame data is based on</param>
-            <param name="clientId">Optional client id</param>
-            <param name="logInitForConsole">Optionally disable setting up the console as log output (required on the Quantum plugin)</param>
-            <param name="taskRunner">Task runner</param>
-        </member>
-        <member name="M:Quantum.SessionContainer.Start(Quantum.QuantumGame.StartParameters,Photon.Deterministic.DeterministicSessionArgs,System.String,System.Boolean,Photon.Deterministic.IDeterministicPlatformTaskRunner)">
-            <summary>
-            Start the simulation in a custom way.
-            </summary>
-            <param name="startParams">Game start parameters</param>
-            <param name="sessionArgs">Game session args</param>
-            <param name="clientId">Optional client id</param>
-            <param name="logInitForConsole">Optionally disable setting up the console as log output (required on the Quantum plugin)</param>
-            <param name="taskRunner">Task runner</param>
-        </member>
-        <member name="M:Quantum.SessionContainer.Service(System.Nullable{System.Double})">
-            <summary>
-            Update the session.
-            </summary>
-            <param name="dt">Optionally provide a custom delta time</param>
-        </member>
-        <member name="M:Quantum.SessionContainer.Destroy">
-            <summary>
-            Destroy the session.
-            </summary>
-        </member>
-        <member name="M:Quantum.SessionContainer.#ctor">
-            <summary>
-            Use other constructors that provide the session and runtime config.
             </summary>
         </member>
         <member name="T:Quantum.ShutdownConnectionOptions">
@@ -3621,11 +3568,6 @@
             The local player slot the input is polled for (this is not the global player number).
             </summary>
         </member>
-        <member name="P:Quantum.CallbackPollInput.Player">
-            <summary>
-            Obsolete, renamed to PlayerSlot.
-            </summary>
-        </member>
         <member name="M:Quantum.CallbackPollInput.SetInput(Quantum.Input,Photon.Deterministic.DeterministicInputFlags)">
             <summary>
             Set the polled input result.
@@ -4057,6 +3999,28 @@
         <member name="F:Quantum.CallbackTaskProfilerReportGenerated.Report">
             <summary>
             The profiler report.
+            </summary>
+        </member>
+        <member name="F:Quantum.CommandTestSettings.WorkloadEnabled">
+            <summary>
+            When true, the system performs artificial workload. When false, it skips processing.
+            </summary>
+        </member>
+        <member name="F:Quantum.CommandTestSettings.LogWorkload">
+            <summary>
+            When true, logs workload information to the console.
+            </summary>
+        </member>
+        <member name="F:Quantum.CommandTestSettings.OuterIterations">
+            <summary>
+            Number of iterations for the outer loop. Each iteration performs InnerIterations of work.
+            Increase for heavier workload.
+            </summary>
+        </member>
+        <member name="F:Quantum.CommandTestSettings.InnerIterations">
+            <summary>
+            Number of iterations for the inner loop per outer iteration.
+            Total work = OuterIterations * InnerIterations math operations.
             </summary>
         </member>
         <member name="T:Quantum.ISignalOnCollision2D">

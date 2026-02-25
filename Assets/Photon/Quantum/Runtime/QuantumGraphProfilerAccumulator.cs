@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using Quantum.Core;
   using System.Diagnostics;
 
@@ -109,4 +110,5 @@ namespace Quantum.Profiling {
       }
     }
   }
+#endif
 }

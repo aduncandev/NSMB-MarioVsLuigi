@@ -3642,6 +3642,38 @@
             Is only called internally.
             </summary>
         </member>
+        <member name="T:Quantum.Experimental.QuantumSnapshotProviderDemo">
+            <summary>
+            An example to customize requested snapshot uploading.
+            This is marked experimental because it requires additional work when saving data on frame contex.
+            </summary>
+        </member>
+        <member name="P:Quantum.Experimental.QuantumSnapshotProviderDemo.ExtraHeapCount">
+            <summary>
+            The frame is copied before being serialized in on a worked thread.
+            This requires an extra frame heap.
+            </summary>
+        </member>
+        <member name="M:Quantum.Experimental.QuantumSnapshotProviderDemo.GetSnapshot">
+            <summary>
+            Returns the completed encoded snapshot.
+            </summary>
+        </member>
+        <member name="P:Quantum.Experimental.QuantumSnapshotProviderDemo.IsCompleted">
+            <summary>
+            Returns <see langword="true"/> when a snapshot is read to be completed.
+            </summary>
+        </member>
+        <member name="M:Quantum.Experimental.QuantumSnapshotProviderDemo.Init(Photon.Deterministic.DeterministicSession,System.IDisposable)">
+            <summary>
+            Initializing the snapshot provider for this Quantum session. Used to create a frame container.
+            </summary>
+        </member>
+        <member name="M:Quantum.Experimental.QuantumSnapshotProviderDemo.RequestSnapshot(Photon.Deterministic.DeterministicSession,System.Int32)">
+            <summary>
+            Requesting a snapshot, use to CopyFrom and start async computation. 
+            </summary>
+        </member>
         <member name="T:Quantum.UnityCallbackId">
             <summary>
             IDs for Unity-specific callbacks.

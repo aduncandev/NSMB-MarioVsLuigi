@@ -7,8 +7,9 @@ Graphs and their values are based on Unity update rate, single value in graph eq
 
 ## Setup
 
-* Drag & drop Prefabs/Profilers into your scene
-* Add EventSystem and InputModule if needed
+* Drag & drop Prefabs/Profilers into your scene or use the menu shortcut Tools > Quantum > Profilers > Add Graphs Profilers Prefab
+* Add `EventSystem` and `InputModule` if needed
+* To disable all of the graph profiler code, for example for build size optimization, set the scripting define `QUANTUM_DISABLE_GRAPHPROFILER` or toggle it using the `QuantumEditorSettings` inspector.
 
 ## Graphs
 

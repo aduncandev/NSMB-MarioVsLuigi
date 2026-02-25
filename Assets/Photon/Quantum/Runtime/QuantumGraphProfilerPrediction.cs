@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   /// <summary>
   /// A Quantum graph profiler that shows how far the simulation is in predicting.
   /// </summary>
@@ -16,4 +17,5 @@ namespace Quantum.Profiling {
       AddValue(predictedFrames);
     }
   }
+#endif
 }

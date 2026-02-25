@@ -209,10 +209,10 @@ namespace Quantum.Editor {
       ZipFile.ExtractToDirectory(string.Format(DependencyArchivePath, "Release"), $"{settings.ProjectBasePath}/Lib/Release", true);
 
       // Create the solution file
-      if (File.Exists($"{settings.ProjectBasePath}/{settings.ProjectBasePath}.sln") == false) {
+      if (new[] { "sln", "slnx" }.Any(ext => File.Exists($"{settings.ProjectBasePath}/{settings.ProjectBasePath}.{ext}")) == false) { 
         RunDotnetCommand($" new sln --output {settings.ProjectBasePath}", settings.DotnetCommandPath);
-        RunDotnetCommand($" sln {settings.ProjectBasePath}/{settings.ProjectBasePath}.sln add {settings.ProjectBasePath}/Quantum.Simulation.Dotnet", settings.DotnetCommandPath);
-        RunDotnetCommand($" sln {settings.ProjectBasePath}/{settings.ProjectBasePath}.sln add {settings.ProjectBasePath}/Quantum.Runner.Dotnet", settings.DotnetCommandPath);
+        RunDotnetCommand($" sln {settings.ProjectBasePath} add {settings.ProjectBasePath}/Quantum.Simulation.Dotnet", settings.DotnetCommandPath);
+        RunDotnetCommand($" sln {settings.ProjectBasePath} add {settings.ProjectBasePath}/Quantum.Runner.Dotnet", settings.DotnetCommandPath);
       }
 
       if (showPopup) {

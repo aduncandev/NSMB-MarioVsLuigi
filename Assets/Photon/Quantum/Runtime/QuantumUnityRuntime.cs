@@ -7289,7 +7289,6 @@ namespace Quantum {
 namespace Quantum {
   using System;
   using System.IO;
-  using System.Linq;
   using System.Runtime.ExceptionServices;
   using UnityEditor;
   using UnityEngine;
@@ -7377,16 +7376,6 @@ namespace Quantum {
     private void LoadInternal(bool synchronous) {
       Assert.Check(_state == null);
       try {
-#if UNITY_EDITOR
-        var allAssets = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(AssetBundleName, AssetName[..AssetName.LastIndexOf('.')])
-          .SelectMany(AssetDatabase.LoadAllAssetsAtPath);
-        foreach (var asset in allAssets) {
-          if (asset && asset is T && (string.IsNullOrEmpty(NestedAssetName) || asset.name == NestedAssetName)) {
-            _state = asset;
-            return;
-          }
-        }
-#endif
         // load the bundle, if not yet loaded
         var bundle = GetAssetBundle(AssetBundleName);
         if (bundle == null) {
@@ -7552,7 +7541,7 @@ namespace Quantum {
 #endregion
 
 
-        #region QuantumAssetSourceResource.cs
+#region QuantumAssetSourceResource.cs
 
 namespace Quantum {
   using System;
@@ -22529,19 +22518,19 @@ namespace Quantum {
         bool bcd = IsTriangleOrientedClockwise(b, c, d);
         bool cad = IsTriangleOrientedClockwise(c, a, d);
 
-        if (abc && abd && bcd & !cad) {
+        if (abc && abd && bcd && !cad) {
           isConvex = true;
-        } else if (abc && abd && !bcd & cad) {
+        } else if (abc && abd && !bcd && cad) {
           isConvex = true;
-        } else if (abc && !abd && bcd & cad) {
+        } else if (abc && !abd && bcd && cad) {
           isConvex = true;
         }
         //The opposite sign, which makes everything inverted
-        else if (!abc && !abd && !bcd & cad) {
+        else if (!abc && !abd && !bcd && cad) {
           isConvex = true;
-        } else if (!abc && !abd && bcd & !cad) {
+        } else if (!abc && !abd && bcd && !cad) {
           isConvex = true;
-        } else if (!abc && abd && !bcd & !cad) {
+        } else if (!abc && abd && !bcd && !cad) {
           isConvex = true;
         }
 
@@ -23412,7 +23401,7 @@ namespace Quantum {
     public static ref SessionRunner.Arguments InitForInstantReplay(this ref SessionRunner.Arguments arguments, QuantumGame game, Frame snapshot, IDeterministicReplayProvider replayProvider) {
       arguments.Init(game.Configurations.Runtime);
 
-      arguments.FrameData = snapshot.Serialize(DeterministicFrameSerializeMode.Serialize);
+      arguments.FrameData = snapshot.Serialize();
       arguments.InitialTick = snapshot.Number;
       arguments.SessionConfig = game.Session.SessionConfig;
       arguments.ReplayProvider = replayProvider;
@@ -23691,6 +23680,90 @@ namespace Quantum {
     }
   }
 }
+
+#endregion
+
+
+#region Assets/Photon/Quantum/Runtime/QuantumSnapshotProviderDemo.cs
+
+namespace Quantum.Experimental {
+  using Photon.Deterministic;
+  using Photon.Deterministic.Protocol;
+  using System;
+  using System.Threading;
+  using System.Threading.Tasks;
+
+  /// <summary>
+  /// An example to customize requested snapshot uploading.
+  /// This is marked experimental because it requires additional work when saving data on frame contex.
+  /// </summary>
+  public class QuantumSnapshotProviderDemo : IDeterministicSnapshotProvider {
+    private DeterministicFrame _frame;
+    private Task<FrameSnapshot[]> _task;
+    private CancellationTokenSource _cancel;
+
+    /// <summary>
+    /// The frame is copied before being serialized in on a worked thread.
+    /// This requires an extra frame heap.
+    /// </summary>
+    public int ExtraHeapCount => 1;
+
+    /// <summary>
+    /// Returns the completed encoded snapshot.
+    /// </summary>
+    public FrameSnapshot[] GetSnapshot() {
+      Assert.Always(IsCompleted);
+      var result = _task.Result;
+      _task = null;
+      return result;
+    }
+
+    /// <summary>
+    /// Returns <see langword="true"/> when a snapshot is read to be completed.
+    /// </summary>
+    public bool IsCompleted => _task != null && _task.IsCompleted;
+
+    /// <summary>
+    /// Initializing the snapshot provider for this Quantum session. Used to create a frame container.
+    /// </summary>
+    public void Init(DeterministicSession session, IDisposable frameContext) {
+      _frame = session.Game.CreateFrame(frameContext);
+      _frame.IsVerified = true;
+      _cancel = new CancellationTokenSource();
+    }
+
+    /// <summary>
+    /// Requesting a snapshot, use to CopyFrom and start async computation. 
+    /// </summary>
+    public void RequestSnapshot(DeterministicSession session, int referenceTick) {
+      Assert.Always(_task == null, "Already running");
+
+      var frame = session.FrameVerified;
+      _frame.CopyFrom(frame);
+
+      _task = Task.Run(() => PrepareAndSendSnapshot(_frame), _cancel.Token);
+    }
+
+    private static FrameSnapshot[] PrepareAndSendSnapshot(DeterministicFrame frame) {
+      var data = frame.Serialize();
+      var number = frame.Number;
+      return FrameSnapshot.Encode(number, data);
+    }
+
+    public void Dispose() {
+      if (_task != null) {
+        _cancel?.Cancel();
+        _cancel?.Dispose();
+      }
+      _cancel = null;
+      _task = null;
+
+      _frame?.Free();
+      _frame = null;
+    }
+  }
+}
+
 
 #endregion
 

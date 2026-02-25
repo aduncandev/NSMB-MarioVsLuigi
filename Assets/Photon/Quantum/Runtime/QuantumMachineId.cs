@@ -33,8 +33,12 @@ namespace Quantum {
     /// <returns>A random id that only changes when <see cref="Bytes"/> changes, e.g this asset is reimported.</returns>
     /// <exception cref="ArgumentException">Too many valid characters.</exception>
     public string CreateReadableId(int length, int offset) {
+      if (ReadableCharacters?.Length <= 0) {
+        throw new ArgumentException($"ReadableCharacters must be set.");
+      }
+
       if (ReadableCharacters.Length > byte.MaxValue) {
-        throw new ArgumentException($"ValidCharacters cannot be larger than {byte.MaxValue} characters.");
+        throw new ArgumentException($"ReadableCharacters cannot be larger than {byte.MaxValue} characters.");
       }
 
       offset = offset % Bytes.Length;

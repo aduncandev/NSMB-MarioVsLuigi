@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using Unity.Profiling;
   using UnityEngine;
   using UnityEngine.UI;
@@ -101,4 +102,5 @@ namespace Quantum.Profiling {
       _setPassCalls.text = _setPassCallsRecorder.Valid == true ? _setPassCallsRecorder.LastValue.ToString() : "---";
     }
   }
+#endif
 }

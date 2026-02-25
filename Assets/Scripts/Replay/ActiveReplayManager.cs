@@ -67,7 +67,7 @@ namespace NSMB.Replay {
 
             Frame f = game.Frames.Verified;
             game.StartRecordingInput(f.Number);
-            initialFrameData = f.Serialize(DeterministicFrameSerializeMode.Serialize);
+            initialFrameData = f.Serialize();
             initialFrame = f.Number;
             currentlyRecordingGame = game;
 
@@ -276,7 +276,7 @@ namespace NSMB.Replay {
                 // Save this frame to the replay cache
                 int index = (f.Number - ReplayStart) / (5 * f.UpdateRate);
                 if (ReplayFrameCache.Count <= index) {
-                    ReplayFrameCache.Add(f.Serialize(DeterministicFrameSerializeMode.Serialize));
+                    ReplayFrameCache.Add(f.Serialize());
                 }
             }
         }

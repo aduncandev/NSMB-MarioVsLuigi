@@ -1,4 +1,5 @@
 namespace Quantum.Profiling {
+#if !QUANTUM_DISABLE_GRAPHPROFILER
   using Photon.Client;
 
   /// <summary>
@@ -47,4 +48,5 @@ namespace Quantum.Profiling {
       AddValues(bytesIn, bytesOut);
     }
   }
+#endif
 }
