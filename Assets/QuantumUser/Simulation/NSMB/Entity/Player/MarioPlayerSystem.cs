@@ -2021,6 +2021,7 @@ namespace Quantum {
             }
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
+            var marioPhysics = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);
             var projectileAsset = f.FindAsset(projectile->Asset);
 
             bool dropStars = true;
@@ -2031,7 +2032,7 @@ namespace Quantum {
             bool damageable = !mario->IsInKnockback
                 && mario->CurrentPowerupState != PowerupState.MegaMushroom
                 && mario->IsDamageable
-                && !((mario->IsCrouchedInShell || mario->IsInShell) && projectileAsset.DoesntEffectBlueShell);
+                && !((mario->IsCrouchedInShell || mario->IsInShell) || (mario->CurrentPowerupState == PowerupState.HammerSuit && marioPhysics->IsTouchingGround && mario->IsCrouching) && projectileAsset.DoesntEffectBlueShell);
 
             if (damageable) {
                 bool didKnockback = false;
@@ -2399,15 +2400,6 @@ namespace Quantum {
                     defenderMario->DoKnockback(f, defender, !fromRight, 0, KnockbackStrength.Groundpound, attacker);
                 }
                 attackerMario->DoEntityBounce = false;
-            } else if (defenderMario->CurrentPowerupState == PowerupState.HammerSuit && defenderPhysicsObject->IsTouchingGround && defenderMario->IsCrouching && !groundpounded) {
-                // Bounce
-                var attackerPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(attacker);
-                if (FPMath.Abs(attackerPhysicsObject->Velocity.X) < 2) {
-                    attackerPhysicsObject->Velocity.X = fromRight ? -2 : 2;
-                }
-                attackerPhysicsObject->Velocity.Y = 4;
-                attackerMario->DoEntityBounce = false;
-                f.Events.EnemyKicked(defender, false);
             } else {
                 // Normal knockbacks
                 if (defenderMario->CurrentPowerupState == PowerupState.MiniMushroom && groundpounded) {
@@ -2578,31 +2570,37 @@ namespace Quantum {
             KnockbackStrength strength = KnockbackStrength.Normal;
             switch (breakReason) {
             case IceBlockBreakReason.HitWall:
-            case IceBlockBreakReason.BlockBump:
-            case IceBlockBreakReason.Fireball:
             case IceBlockBreakReason.Other:
-                // Soft knockback, 1 star
+                // Weak knockback, i-frames.
                 damaged = mario->DoKnockback(f, entity, mario->FacingRight, 1, (strength = KnockbackStrength.FireballBump), brokenIceBlock);
+                mario->DamageInvincibilityFrames = 120;
+                break;
+
+            case IceBlockBreakReason.BlockBump:
+                // Soft knockback, no i-frames.
+                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 0, (strength = KnockbackStrength.Normal), brokenIceBlock);
                 break;
 
             case IceBlockBreakReason.Groundpounded:
-                // Hard knockback, 2 stars
-                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 2, (strength = KnockbackStrength.Normal), brokenIceBlock);
+                // Hard knockback, i-frames.
+                damaged = mario->DoKnockback(f, entity, mario->FacingRight, 2, (strength = KnockbackStrength.Groundpound), brokenIceBlock);
+                mario->DamageInvincibilityFrames = 120;
                 break;
 
             case IceBlockBreakReason.Timer:
-                // Damage holder, if we can.
+                // Damage holder, if we can, and i-frames.
                 var iceBlockHoldable = f.Unsafe.GetPointer<Holdable>(brokenIceBlock);
                 if (f.Unsafe.TryGetPointer(iceBlockHoldable->Holder, out MarioPlayer* holderMario)) {
                     OnMarioMarioInteraction(f, entity, iceBlockHoldable->Holder);
+                    mario->DamageInvincibilityFrames = 120;
                 }
+                mario->DamageInvincibilityFrames = 120;
                 break;
             default:
                 // Fall through.
                 break;
             }
 
-            mario->DamageInvincibilityFrames = 120;
             if (damaged) {
                 FPVector2 particlePos = f.Unsafe.GetPointer<Transform2D>(brokenIceBlock)->Position;
                 particlePos.Y += iceBlock->Size.Y / 2;
