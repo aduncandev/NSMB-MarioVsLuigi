@@ -1852,11 +1852,11 @@ namespace Quantum {
             var mario = filter.MarioPlayer;
             var physicsObject = filter.PhysicsObject;
 
+            mario->IsSpinnerFlying &= !physicsObject->IsTouchingGround;
+
             if (!f.TryResolveList(physicsObject->Contacts, out QList<PhysicsContact> contacts)) {
                 return;
             }
-
-            mario->IsSpinnerFlying &= !physicsObject->IsTouchingGround;
 
             EntityRef currentSpinner = EntityRef.None;
             foreach (var contact in contacts) {

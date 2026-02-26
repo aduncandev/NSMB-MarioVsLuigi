@@ -21,13 +21,13 @@ namespace Quantum {
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var entity = filter.Entity;
             var iceBlock = filter.IceBlock;
-            if (!f.Exists(iceBlock->Entity)) {
+
+            if (!f.Unsafe.TryGetPointer(iceBlock->Entity, out Freezable* childFreezable)) {
                 // Child despawned.
                 Destroy(f, entity, IceBlockBreakReason.None);
             }
 
             var transform = filter.Transform;
-            var childFreezable = f.Unsafe.GetPointer<Freezable>(iceBlock->Entity);
             var physicsObject = filter.PhysicsObject;
 
             if (!physicsObject->IsFrozen && childFreezable->IsCarryable && (f.Number + entity.Index) % 2 == 0 
@@ -81,7 +81,6 @@ namespace Quantum {
                     if (iceBlock->IsFlying && !physicsObject->IsTouchingGround) {
                         physicsObject->IsFrozen = false;
                         iceBlock->AutoBreakFrames = 1;
-
                     } else {
                         Destroy(f, entity, IceBlockBreakReason.Timer);
                         return;
