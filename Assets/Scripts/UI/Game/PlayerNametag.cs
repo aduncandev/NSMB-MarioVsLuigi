@@ -37,7 +37,7 @@ namespace NSMB.UI.Game {
             this.parent = parent;
 
             var mario = f.Unsafe.GetPointer<MarioPlayer>(Entity);
-            this.character = f.FindAsset(mario->CharacterAsset);
+            character = f.FindAsset(mario->CharacterAsset);
             stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
             UpdateCachedNickname(f, mario);
 
@@ -46,6 +46,7 @@ namespace NSMB.UI.Game {
             gameObject.SetActive(true);
 
             UpdateText(f);
+            Settings.OnColorblindModeChanged += OnColorblindModeChanged;
         }
 
         public void Start() {
@@ -62,7 +63,11 @@ namespace NSMB.UI.Game {
                 UpdateText(game.Frames.Predicted);
             }
         }
-        
+
+        public void OnDestroy() {
+            Settings.OnColorblindModeChanged -= OnColorblindModeChanged;
+        }
+
         public unsafe void LateUpdate() {
             // If our parent object despawns, we also die.
             if (!parent) {
@@ -111,10 +116,14 @@ namespace NSMB.UI.Game {
 
             stringBuilder.Clear();
 
-            if (f.Global->Rules.TeamsEnabled && Settings.Instance.GraphicsColorblind && mario->GetTeam(f) is byte teamIndex) {
-                var teams = f.SimulationConfig.Teams;
-                TeamAsset team = f.FindAsset(teams[teamIndex % teams.Length]);
-                stringBuilder.Append(team.textSpriteColorblindBig);
+            if (Settings.Instance.GraphicsColorblind) {
+                if (f.Global->Rules.TeamsEnabled && mario->GetTeam(f) is byte teamIndex) {
+                    var teams = f.SimulationConfig.Teams;
+                    TeamAsset team = f.FindAsset(teams[teamIndex % teams.Length]);
+                    stringBuilder.Append(team.textSpriteColorblindBig);
+                } else {
+                    stringBuilder.Append(Utils.GetPlayerIcon(f, mario->PlayerRef));
+                }
             }
             stringBuilder.AppendLine(cachedNickname);
 
@@ -185,6 +194,10 @@ namespace NSMB.UI.Game {
                 UpdateCachedNickname(f, mario);
             }
             UpdateText(f);
+        }
+
+        private void OnColorblindModeChanged() {
+            UpdateText(QuantumRunner.DefaultGame.Frames.Predicted);
         }
     }
 }

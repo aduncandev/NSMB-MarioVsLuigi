@@ -594,7 +594,7 @@ namespace NSMB.Entities.Player {
             }
 
             // Hit flash
-            float remainingDamageInvincibility = mario->DamageInvincibilityFrames / f.UpdateRate;
+            float remainingDamageInvincibility = mario->DamageInvincibilityFrames / 60f;
             models.SetActive(f.Global->GameState >= GameState.Playing && (mario->KnockbackGetupFrames > 0 || mario->MegaMushroomStartFrames > 0 || (!mario->IsRespawning && (mario->IsDead || !(remainingDamageInvincibility > 0 && (f.Number * f.DeltaTime.AsFloat) * (remainingDamageInvincibility <= 0.75f ? 5 : 2) % 0.2f < 0.1f)))));
 
             // Model changing
@@ -681,10 +681,6 @@ namespace NSMB.Entities.Player {
                 providers.AddRange(extraProviders);
             }
             sfx.PlayOneShot(soundEffect, providers, variant, volume);
-        }
-
-        public GameObject SpawnParticle(string particle, Vector3 worldPos, Quaternion? rot = null) {
-            return Instantiate(Resources.Load(particle), worldPos, rot ?? Quaternion.identity) as GameObject;
         }
 
         public GameObject SpawnParticle(GameObject particle, Vector3 worldPos, Quaternion? rot = null) {
@@ -791,14 +787,12 @@ namespace NSMB.Entities.Player {
                 return;
             }
 
-            if (e.AttackerPosition != default) {
-                // Technically, does not work if the attacker is at (0,0)
-                // Will probably NEVER happen.
-                SpawnParticle("Prefabs/Particle/PlayerBounce", e.AttackerPosition.ToUnityVector3());
+            if (e.AttackerPosition.HasValue) {
+                SpawnParticle(Enums.PrefabParticle.Player_PlayerBump.GetGameObject(), e.AttackerPosition.Value.ToUnityVector3());
             }
 
             KnockbackStrength strength = e.Strength;
-            PlaySound(strength is KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
+            PlaySound((strength is KnockbackStrength.FireballBump or KnockbackStrength.CollisionBump) ? SoundEffect.Player_Sound_Collision_Fireball : SoundEffect.Player_Sound_Collision);
 
             if (IsMarioLocal(e.Entity)) {
                 float rumbleStrength = strength switch {

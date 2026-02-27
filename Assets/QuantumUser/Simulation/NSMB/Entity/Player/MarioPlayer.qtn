@@ -280,5 +280,5 @@ event PlayKnockbackEffect {
 	EntityRef Entity;
 	EntityRef Attacker;
 	KnockbackStrength Strength;
-	nothashed FPVector2 AttackerPosition;
+	nothashed FPVector2? AttackerPosition;
 }

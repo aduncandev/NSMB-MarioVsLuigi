@@ -67,8 +67,7 @@ MonoBehaviour:
     B: 153
     A: 255
   HidePlayersOnMinimap: 0
-  BannedPowerUPs:
-  - {fileID: 11400000, guid: 2f5b677c66fff0c409c7e88879d71249, type: 2}
+  BannedCoinItems: []
   SfxOverrides: []
   MainMusic:
   - Id:

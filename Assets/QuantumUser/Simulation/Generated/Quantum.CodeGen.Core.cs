@@ -68,7 +68,7 @@ namespace Quantum {
     Playing,
     Ended,
   }
-  [System.Flags()]
+  [Flags()]
   public enum InteractionDirection : byte {
     None = 0,
     Up = 1,

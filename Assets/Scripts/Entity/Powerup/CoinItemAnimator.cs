@@ -1,6 +1,5 @@
 using NSMB.Utilities.Extensions;
 using Quantum;
-using Quantum.Prototypes;
 using UnityEngine;
 using static NSMB.Utilities.QuantumViewUtils;
 
@@ -8,7 +7,7 @@ namespace NSMB.Entities.CoinItems {
     public unsafe class CoinItemAnimator : QuantumEntityViewComponent {
 
         //---Serialized
-        [SerializeField] private Transform graphicsRoot;
+        [SerializeField] private Transform graphicsRoot, moveBehindBlocksRoot;
         [SerializeField] private new Renderer renderer;
         [SerializeField] private Animator childAnimator;
         [SerializeField] private Animation childAnimation;
@@ -53,6 +52,12 @@ namespace NSMB.Entities.CoinItems {
                 }
             } else if (coinItem->BlockSpawn) {
                 // Block spawn
+                if (moveBehindBlocksRoot) {
+                    Vector3 pos = moveBehindBlocksRoot.localPosition;
+                    pos.z = 1;
+                    moveBehindBlocksRoot.localPosition = pos;
+                }
+
                 renderer.sortingOrder = -1000;
                 if (!IsReplayFastForwarding) {
                     sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
@@ -62,6 +67,12 @@ namespace NSMB.Entities.CoinItems {
                 }
             } else if (coinItem->LaunchSpawn) {
                 // Spawn with velocity
+                if (moveBehindBlocksRoot) {
+                    Vector3 pos = moveBehindBlocksRoot.localPosition;
+                    pos.z = 1;
+                    moveBehindBlocksRoot.localPosition = pos;
+                }
+
                 renderer.sortingOrder = -1000;
                 if (!IsReplayFastForwarding) {
                     sfx.PlayOneShot(scriptable.BlockSpawnSoundEffect);
@@ -80,10 +91,6 @@ namespace NSMB.Entities.CoinItems {
 
         public override void OnUpdateView() {
             Frame f = PredictedFrame;
-            if (!f.Exists(EntityRef)) {
-                return;
-            }
-
             if (!f.Unsafe.TryGetPointer(EntityRef, out CoinItem* coinItem)) {
                 return;
             }
@@ -103,7 +110,7 @@ namespace NSMB.Entities.CoinItems {
         }
 
         private void HandleSpawningAnimation(Frame f, CoinItem* coinItem) {
-            if (f.Exists(coinItem->ParentMarioPlayer) && coinItem->SpawnAnimationFrames > 0) {
+            if (coinItem->SpawnAnimationFrames > 0) {
                 float timeRemaining = coinItem->SpawnAnimationFrames / 60f;
                 float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
                 graphicsRoot.localScale = Vector3.one * (1 + adjustment);
@@ -117,6 +124,12 @@ namespace NSMB.Entities.CoinItems {
                 renderer.transform.localScale = Vector3.one;
                 inSpawnAnimation = false;
                 renderer.sortingOrder = 15;
+
+                if (moveBehindBlocksRoot) {
+                    Vector3 pos = moveBehindBlocksRoot.localPosition;
+                    pos.z = 0;
+                    moveBehindBlocksRoot.localPosition = pos;
+                }
 
                 mpb.SetFloat("WaveEnabled", 1);
                 renderer.SetPropertyBlock(mpb);

@@ -643,7 +643,7 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventPlayKnockbackEffect PlayKnockbackEffect(EntityRef Entity, EntityRef Attacker, KnockbackStrength Strength, FPVector2 AttackerPosition) {
+      public EventPlayKnockbackEffect PlayKnockbackEffect(EntityRef Entity, EntityRef Attacker, KnockbackStrength Strength, NullableFPVector2 AttackerPosition) {
         var ev = _f.Context.AcquireEvent<EventPlayKnockbackEffect>(EventPlayKnockbackEffect.ID);
         ev.Entity = Entity;
         ev.Attacker = Attacker;
@@ -2585,7 +2585,7 @@ namespace Quantum {
     public EntityRef Entity;
     public EntityRef Attacker;
     public KnockbackStrength Strength;
-    public FPVector2 AttackerPosition;
+    public NullableFPVector2 AttackerPosition;
     protected EventPlayKnockbackEffect(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
