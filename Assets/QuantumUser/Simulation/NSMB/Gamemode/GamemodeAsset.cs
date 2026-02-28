@@ -188,7 +188,7 @@ namespace Quantum {
 
             int min = 0xFFFFFF;
             foreach (int objectiveCount in teamObjectives) {
-                if (objectiveCount < min) {
+                if (objectiveCount < min && objectiveCount != -1) {
                     min = objectiveCount;
                 }
             }
