@@ -658,9 +658,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             return Mathf.Max(1, max - index);
         }
 
-        public List<string> GetTemporaryReplaysToDelete() {
+        public IList<string> GetTemporaryReplaysToDelete() {
             if (Settings.Instance.generalMaxTempReplays <= 0) {
-                return null;
+                return Array.Empty<string>();
             }
 
             return Directory.EnumerateFiles(TempDirectory, "*.mvlreplay")
