@@ -14,6 +14,7 @@ public class CharacterAsset : AssetObject, ISoundOverrideProvider {
     public Sprite LoadingSmallSprite;
     public Sprite LoadingLargeSprite;
     public Sprite ReadySprite;
+    public Sprite SilhouetteSprite;
 
     public Sprite SelectionSprite;
     public Color SelectionColor = Color.white;

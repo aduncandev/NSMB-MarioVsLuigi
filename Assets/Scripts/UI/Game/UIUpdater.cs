@@ -29,7 +29,7 @@ namespace NSMB.UI.Game {
         [SerializeField] private TrackIcon playerTrackTemplate, starTrackTemplate, starCoinTrackTemplate, objectiveCoinTrackTemplate;
         [SerializeField] private Sprite storedItemNull;
         [SerializeField] private TMP_Text uiTeamObjective, uiMainObjective, uiCoins, uiDebug, uiLives, uiCountdown;
-        [SerializeField] private Image itemReserve, itemColor, deathFade;
+        [SerializeField] private Image itemReserve, itemColor;
         [SerializeField] private GameObject boos, reserveItemBox;
         [SerializeField] private Animation reserveAnimation;
 
@@ -233,26 +233,18 @@ namespace NSMB.UI.Game {
             if (e.Entity != Target) {
                 return;
             }
-            StartCoroutine(FadeOutThenInCoroutine());
-        }
 
-        private IEnumerator FadeOutThenInCoroutine() {
-            yield return FadeCoroutine(1, 0.25f);
-            yield return new WaitForSeconds(0.1f);
-            yield return FadeCoroutine(0, 0.25f);
-        }
-
-        private IEnumerator FadeCoroutine(float target, float duration) {
-            float totalDuration = duration;
-            Color color = deathFade.color;
-            float startAlpha = color.a;
-
-            while (duration > 0) {
-                duration -= Time.deltaTime;
-                color.a = Mathf.Lerp(target, startAlpha, duration / totalDuration);
-                deathFade.color = color;
-                yield return null;
-            }
+            // do bowser death anim -> set sprite to character's silhouette -> do respawn anim
+            GlobalController.Instance.fader.Fade(AnimatedFader.FadeStyle.Respawn, AnimatedFader.FadeStyle.Respawn, () =>
+            {
+                GlobalController.Instance.fader.SetRespawnStyleSilhouetteSprite
+                (
+                    e.Game.Frames.Predicted.Unsafe.TryGetPointer(Target, out MarioPlayer* mario) &&
+                    QuantumUnityDB.TryGetGlobalAsset(mario->CharacterAsset, out CharacterAsset character)
+                        ? character.SilhouetteSprite
+                        : null
+                );
+            });
         }
 
         private void OnTimerExpired(EventTimerExpired e) {

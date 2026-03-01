@@ -1929,7 +1929,7 @@ namespace Quantum {
                 f.Events.StartCameraFadeIn(entity);
                 return true;
 
-            } else if (mario->PreRespawnFrames == 20) {
+            } else if (mario->PreRespawnFrames == 80) {
                 f.Events.StartCameraFadeOut(entity);
                 return true;
             }

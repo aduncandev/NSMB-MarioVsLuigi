@@ -27,6 +27,7 @@ MonoBehaviour:
     type: 3}
   ReadySprite: {fileID: 7263181891274304025, guid: 70672da71d9d71a4daaf5f3fc58531e6,
     type: 3}
+  SilhouetteSprite: {fileID: 21300000, guid: e52d82a4d5d0ae845bb4726a3600bc62, type: 3}
   SelectionSprite: {fileID: -1589787217, guid: 66a50f8ce62e8954a977cf86df786637, type: 3}
   SelectionColor: {r: 0.8867924, g: 0.23843002, b: 0.23843002, a: 1}
   SelectionOrder: -2000

@@ -32,6 +32,7 @@ namespace NSMB {
         public TranslationManager translationManager;
         public DiscordController discordController;
         public RumbleManager rumbleManager;
+        public AnimatedFader fader;
         public AddonManager addonManager;
         public PauseOptionMenuManager optionsManager;
         public AudioMixerManager audioMixerManager;

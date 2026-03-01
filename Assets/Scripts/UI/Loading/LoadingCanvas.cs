@@ -72,6 +72,8 @@ namespace NSMB.UI.Loading {
             mario.Initialize(character);
             readyImage.sprite = character.ReadySprite;
 
+            GlobalController.Instance.fader.SetRespawnStyleSilhouetteSprite(character.SilhouetteSprite);
+
             readyGroup.gameObject.SetActive(false);
             gameObject.SetActive(true);
 
@@ -182,6 +184,10 @@ namespace NSMB.UI.Loading {
 
         public void EndAnimation() {
             gameObject.SetActive(false);
+        }
+
+        public void AfterReadyFadeTakeover() {
+            GlobalController.Instance.fader.Fade(AnimatedFader.FadeStyle.Dissolve, AnimatedFader.FadeStyle.Respawn, EndAnimation);
         }
 
         private void OnError(string key, bool network) {
