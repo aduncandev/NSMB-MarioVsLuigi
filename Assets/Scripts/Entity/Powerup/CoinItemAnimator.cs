@@ -110,7 +110,8 @@ namespace NSMB.Entities.CoinItems {
         }
 
         private void HandleSpawningAnimation(Frame f, CoinItem* coinItem) {
-            if (coinItem->SpawnAnimationFrames > 0) {
+            if (f.Exists(coinItem->ParentMarioPlayer) && coinItem->SpawnAnimationFrames > 0) {
+                // Following player
                 float timeRemaining = coinItem->SpawnAnimationFrames / 60f;
                 float adjustment = Mathf.PingPong(timeRemaining, scaleRate) / scaleRate * scaleSize;
                 graphicsRoot.localScale = Vector3.one * (1 + adjustment);

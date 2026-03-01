@@ -351,6 +351,7 @@ namespace Quantum.Prototypes {
     public FPVector2 Spawnpoint;
     public QBoolean IgnorePlayerWhenRespawning;
     public QBoolean DisableRespawning;
+    public QBoolean StayAtHomeWhenOffscreen;
     partial void MaterializeUser(Frame frame, ref Quantum.Enemy result, in PrototypeMaterializationContext context);
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.Enemy component = default;
@@ -361,6 +362,7 @@ namespace Quantum.Prototypes {
         result.Spawnpoint = this.Spawnpoint;
         result.IgnorePlayerWhenRespawning = this.IgnorePlayerWhenRespawning;
         result.DisableRespawning = this.DisableRespawning;
+        result.StayAtHomeWhenOffscreen = this.StayAtHomeWhenOffscreen;
         MaterializeUser(frame, ref result, in context);
     }
   }

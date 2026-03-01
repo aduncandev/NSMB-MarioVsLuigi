@@ -2079,6 +2079,8 @@ namespace Quantum {
     public QBoolean IgnorePlayerWhenRespawning;
     [FieldOffset(0)]
     public QBoolean DisableRespawning;
+    [FieldOffset(20)]
+    public QBoolean StayAtHomeWhenOffscreen;
     [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean IsActive;
@@ -2094,6 +2096,7 @@ namespace Quantum {
         hash = hash * 31 + Spawnpoint.GetHashCode();
         hash = hash * 31 + IgnorePlayerWhenRespawning.GetHashCode();
         hash = hash * 31 + DisableRespawning.GetHashCode();
+        hash = hash * 31 + StayAtHomeWhenOffscreen.GetHashCode();
         hash = hash * 31 + IsActive.GetHashCode();
         hash = hash * 31 + IsDead.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
@@ -2107,6 +2110,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IgnorePlayerWhenRespawning, serializer);
         QBoolean.Serialize(&p->IsActive, serializer);
         QBoolean.Serialize(&p->IsDead, serializer);
+        QBoolean.Serialize(&p->StayAtHomeWhenOffscreen, serializer);
         FPVector2.Serialize(&p->Spawnpoint, serializer);
     }
   }
@@ -3407,6 +3411,9 @@ namespace Quantum {
   public unsafe partial interface ISignalOnEnemyTurnaround : ISignal {
     void OnEnemyTurnaround(Frame frame, EntityRef entity);
   }
+  public unsafe partial interface ISignalOnEnemyReturnedHome : ISignal {
+    void OnEnemyReturnedHome(Frame frame, EntityRef entity);
+  }
   public unsafe partial interface ISignalOnEntityFreeze : ISignal {
     void OnEntityFreeze(Frame frame, EntityRef entity, EntityRef iceBlock);
   }
@@ -3478,6 +3485,7 @@ namespace Quantum {
   }
   public static unsafe partial class Constants {
     public const Int32 MaxStarSpawns = 64;
+    public const Int32 EnemyHomeRadius = 12;
     public const Int32 MaxPlayers = 10;
     /// <summary>8.5</summary>
     public static FP _8_50 {
@@ -3775,6 +3783,7 @@ namespace Quantum {
     private ISignalOnEnemyEnemyCollision[] _ISignalOnEnemyEnemyCollisionSystems;
     private ISignalOnEnemyKilledByStageReset[] _ISignalOnEnemyKilledByStageResetSystems;
     private ISignalOnEnemyTurnaround[] _ISignalOnEnemyTurnaroundSystems;
+    private ISignalOnEnemyReturnedHome[] _ISignalOnEnemyReturnedHomeSystems;
     private ISignalOnEntityFreeze[] _ISignalOnEntityFreezeSystems;
     private ISignalOnLoadingComplete[] _ISignalOnLoadingCompleteSystems;
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
@@ -3820,6 +3829,7 @@ namespace Quantum {
       _ISignalOnEnemyEnemyCollisionSystems = BuildSignalsArray<ISignalOnEnemyEnemyCollision>();
       _ISignalOnEnemyKilledByStageResetSystems = BuildSignalsArray<ISignalOnEnemyKilledByStageReset>();
       _ISignalOnEnemyTurnaroundSystems = BuildSignalsArray<ISignalOnEnemyTurnaround>();
+      _ISignalOnEnemyReturnedHomeSystems = BuildSignalsArray<ISignalOnEnemyReturnedHome>();
       _ISignalOnEntityFreezeSystems = BuildSignalsArray<ISignalOnEntityFreeze>();
       _ISignalOnLoadingCompleteSystems = BuildSignalsArray<ISignalOnLoadingComplete>();
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
@@ -4085,6 +4095,15 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnEnemyTurnaround(_f, entity);
+          }
+        }
+      }
+      public void OnEnemyReturnedHome(EntityRef entity) {
+        var array = _f._ISignalOnEnemyReturnedHomeSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEnemyReturnedHome(_f, entity);
           }
         }
       }

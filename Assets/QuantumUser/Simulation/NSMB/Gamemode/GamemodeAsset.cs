@@ -155,6 +155,11 @@ namespace Quantum {
             return GetTeamObjectiveCount(f, team);
         }
 
+        public readonly struct ObjectiveStatistics {
+            public readonly FP Average;
+            public readonly int Min, Max;
+        }
+
         public virtual int GetTeamObjectiveCount(Frame f, byte team) {
             int sum = 0;
             foreach ((_, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
@@ -186,7 +191,7 @@ namespace Quantum {
             Span<int> teamObjectives = stackalloc int[Constants.MaxPlayers];
             GetAllTeamsObjectiveCounts(f, teamObjectives);
 
-            int min = 0xFFFFFF;
+            int min = int.MaxValue;
             foreach (int objectiveCount in teamObjectives) {
                 if (objectiveCount < min && objectiveCount != -1) {
                     min = objectiveCount;

@@ -18,6 +18,18 @@ public unsafe class MegaMushroomPowerupAsset : PowerupAsset {
         return playersWithPower;
     }
 
+    public override void InitializeFromBlockBump(Frame f, EntityRef entity, ref BlockBumpSystem.Filter blockBumpFilter) {
+        var blockBump = blockBumpFilter.BlockBump;
+        BreakableBrickTile tile = (BreakableBrickTile) f.FindAsset(blockBump->StartTile);
+
+        FPVector2 origin = blockBumpFilter.Transform->Position;
+        origin.Y += tile.BumpSize.Y / 2;
+
+        var coinItem = f.Unsafe.GetPointer<CoinItem>(entity);
+        coinItem->InitializeBlockSpawn(f, entity, 90, origin, origin);
+        coinItem->IgnorePlayerFrames = 85;
+    }
+
     protected override unsafe void OnCollected(Frame f, EntityRef marioEntity) {
         var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
         var marioPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(marioEntity);

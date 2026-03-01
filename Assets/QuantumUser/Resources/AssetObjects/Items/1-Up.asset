@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a77651c98eb177748a49241e377f4457, type: 3}
+  m_Script: {fileID: 11500000, guid: 3e603eeabd17b0d4694ac32ed6f20ecc, type: 3}
   m_Name: 1-Up
   m_EditorClassIdentifier: 
   Identifier:
@@ -26,7 +26,7 @@ MonoBehaviour:
   BelowAverageBonus:
     RawValue: 0
   BlockSpawnSoundEffect: 69
-  Flags: 11
+  Flags: 27
   MaxNumberOfItems: 0
   CameraSpawnOffset:
     X:

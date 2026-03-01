@@ -26,7 +26,7 @@ MonoBehaviour:
   BelowAverageBonus:
     RawValue: -131072
   BlockSpawnSoundEffect: 69
-  Flags: 3
+  Flags: 19
   MaxNumberOfItems: 0
   CameraSpawnOffset:
     X:
@@ -58,7 +58,7 @@ MonoBehaviour:
       RawValue: 0
     EndTime:
       RawValue: 65536
-    Resolution: 32
+    Resolution: 64
     OriginalPreWrapMode: 0
     OriginalPostWrapMode: 0
     Keys: []
@@ -70,7 +70,7 @@ MonoBehaviour:
       RawValue: 0
     EndTime:
       RawValue: 65536
-    Resolution: 32
+    Resolution: 128
     OriginalPreWrapMode: 0
     OriginalPostWrapMode: 0
     Keys: []
