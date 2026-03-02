@@ -119,6 +119,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Laxan3000 *(it-it)*
 * LyroyTheToad *(it-it)*
 * Maestrike *(it-it)*
+* MagMah *(pt-pt)*
 * Maksymilian Król *(pl-pl)*
 * marbo *(pt-br)*
 * Mark19 *(es-es)*
@@ -126,6 +127,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Med Animations *(ar-eg)*
 * Meddourk95 *(ar-eg)*
 * Moddimation *(de-de)*
+* MODSTER_TAFFY *(af-za)*
 * miyavmeow *(tr-tr)*
 * Mr-STF *(es-la)*
 * MUI_Noam *(he-il)*
@@ -133,6 +135,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * ossdekasaihassei *(ja-jp)*
 * Pedro Lunar *(es-la)*
 * pixelated *(he-il)*
+* RmgeodashFR *(cy-gb)*
 * SadeceZinzap *(tr-tr)*
 * SlavaWOW *(ru-ru)*
 * SLG64 *(es-la)*
@@ -142,6 +145,8 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Tombuntu *(ja-jp)*
 * Windows10V *(pt-br)*
 * vlco_o *(es-es, ro-ro)*
+* ZilverLining *(fi-fi)*
+* Zoey Green *(af-za)*
 
 ### QA Testing:
 * AprilShade
