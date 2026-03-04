@@ -1,15 +1,18 @@
 using Photon.Deterministic;
+using UnityEngine.Diagnostics;
 using UnityEngine.UIElements;
 
 namespace Quantum {
     public unsafe partial struct Enemy {
         public readonly bool IsAlive => !IsDead && IsActive;
 
-        public EntityRef findClosestPlayer(Frame f, EntityRef entity) {
+        public EntityRef FindClosestPlayer(Frame f, EntityRef entity, VersusStageData stage = null) {
             var allPlayers = f.Filter<MarioPlayer, Transform2D>();
             allPlayers.UseCulling = false;
 
-            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            if (stage == null) {
+                stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            }
             FP closestDistance = FP.MaxValue;
             EntityRef closestPlayer = EntityRef.None;
             while (allPlayers.NextUnsafe(out EntityRef marioEntity, out MarioPlayer* mario, out Transform2D* marioTransform)) {
@@ -27,11 +30,24 @@ namespace Quantum {
             return closestPlayer;
         }
 
-        public void Respawn(Frame f, EntityRef entity) {
+        /**
+         * <summary>
+         * Sets the respawn data for the enemy
+         * </summary>
+         * <param name="waitTime">How long to wait until the enemy respawns in seconds.</param>
+         * <param name="sparklesTime">When the sparkles will spawn (based off time remaining) also in seconds.</param>
+         */
+        public void SetDelayedRespawn(int waitTime = 420, int sparklesTime = 80) {
+            RespawnTimer = waitTime;
+            RespawnSparklesTimer = sparklesTime;
+        }
+
+        public void Respawn(Frame f, EntityRef entity, bool fromStar) {
             var transform = f.Unsafe.GetPointer<Transform2D>(entity);
 
             IsActive = true;
             IsDead = false;
+            SetDelayedRespawn(0, 0);
             transform->Teleport(f, Spawnpoint);
 
             if (f.Unsafe.TryGetPointer(entity, out PhysicsObject* physicsObject)) {
@@ -42,7 +58,7 @@ namespace Quantum {
 
             // face left by default
             var shouldFaceRight = false;
-            var closestMario = findClosestPlayer(f, entity);
+            var closestMario = FindClosestPlayer(f, entity);
 
             // use closest player and face them
             if (f.Unsafe.TryGetPointer(closestMario, out Transform2D* marioTransform)) {

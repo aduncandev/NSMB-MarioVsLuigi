@@ -2071,25 +2071,31 @@ namespace Quantum {
   }
   [StructLayout(LayoutKind.Explicit)]
   public unsafe partial struct Enemy : Quantum.IComponent {
-    public const Int32 SIZE = 40;
+    public const Int32 SIZE = 48;
     public const Int32 ALIGNMENT = 8;
-    [FieldOffset(24)]
+    [FieldOffset(32)]
     public FPVector2 Spawnpoint;
-    [FieldOffset(8)]
+    [FieldOffset(16)]
     public QBoolean IgnorePlayerWhenRespawning;
-    [FieldOffset(0)]
+    [FieldOffset(8)]
     public QBoolean DisableRespawning;
-    [FieldOffset(20)]
+    [FieldOffset(28)]
     public QBoolean StayAtHomeWhenOffscreen;
-    [FieldOffset(12)]
+    [FieldOffset(20)]
     [ExcludeFromPrototype()]
     public QBoolean IsActive;
-    [FieldOffset(16)]
+    [FieldOffset(24)]
     [ExcludeFromPrototype()]
     public QBoolean IsDead;
-    [FieldOffset(4)]
+    [FieldOffset(12)]
     [ExcludeFromPrototype()]
     public QBoolean FacingRight;
+    [FieldOffset(4)]
+    [ExcludeFromPrototype()]
+    public Int32 RespawnTimer;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public Int32 RespawnSparklesTimer;
     public override readonly Int32 GetHashCode() {
       unchecked { 
         var hash = 11071;
@@ -2100,11 +2106,15 @@ namespace Quantum {
         hash = hash * 31 + IsActive.GetHashCode();
         hash = hash * 31 + IsDead.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
+        hash = hash * 31 + RespawnTimer.GetHashCode();
+        hash = hash * 31 + RespawnSparklesTimer.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Enemy*)ptr;
+        serializer.Stream.Serialize(&p->RespawnSparklesTimer);
+        serializer.Stream.Serialize(&p->RespawnTimer);
         QBoolean.Serialize(&p->DisableRespawning, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
         QBoolean.Serialize(&p->IgnorePlayerWhenRespawning, serializer);
@@ -3414,6 +3424,12 @@ namespace Quantum {
   public unsafe partial interface ISignalOnEnemyReturnedHome : ISignal {
     void OnEnemyReturnedHome(Frame f, EntityRef entity);
   }
+  public unsafe partial interface ISignalOnEnemyRespawnSparkles : ISignal {
+    void OnEnemyRespawnSparkles(Frame f, EntityRef entity);
+  }
+  public unsafe partial interface ISignalOnEnemyAfterDelayedRespawn : ISignal {
+    void OnEnemyAfterDelayedRespawn(Frame f, EntityRef entity);
+  }
   public unsafe partial interface ISignalOnEntityFreeze : ISignal {
     void OnEntityFreeze(Frame f, EntityRef entity, EntityRef iceBlock);
   }
@@ -3784,6 +3800,8 @@ namespace Quantum {
     private ISignalOnEnemyKilledByStageReset[] _ISignalOnEnemyKilledByStageResetSystems;
     private ISignalOnEnemyTurnaround[] _ISignalOnEnemyTurnaroundSystems;
     private ISignalOnEnemyReturnedHome[] _ISignalOnEnemyReturnedHomeSystems;
+    private ISignalOnEnemyRespawnSparkles[] _ISignalOnEnemyRespawnSparklesSystems;
+    private ISignalOnEnemyAfterDelayedRespawn[] _ISignalOnEnemyAfterDelayedRespawnSystems;
     private ISignalOnEntityFreeze[] _ISignalOnEntityFreezeSystems;
     private ISignalOnLoadingComplete[] _ISignalOnLoadingCompleteSystems;
     private ISignalOnGameStarting[] _ISignalOnGameStartingSystems;
@@ -3830,6 +3848,8 @@ namespace Quantum {
       _ISignalOnEnemyKilledByStageResetSystems = BuildSignalsArray<ISignalOnEnemyKilledByStageReset>();
       _ISignalOnEnemyTurnaroundSystems = BuildSignalsArray<ISignalOnEnemyTurnaround>();
       _ISignalOnEnemyReturnedHomeSystems = BuildSignalsArray<ISignalOnEnemyReturnedHome>();
+      _ISignalOnEnemyRespawnSparklesSystems = BuildSignalsArray<ISignalOnEnemyRespawnSparkles>();
+      _ISignalOnEnemyAfterDelayedRespawnSystems = BuildSignalsArray<ISignalOnEnemyAfterDelayedRespawn>();
       _ISignalOnEntityFreezeSystems = BuildSignalsArray<ISignalOnEntityFreeze>();
       _ISignalOnLoadingCompleteSystems = BuildSignalsArray<ISignalOnLoadingComplete>();
       _ISignalOnGameStartingSystems = BuildSignalsArray<ISignalOnGameStarting>();
@@ -4103,6 +4123,24 @@ namespace Quantum {
           var s = array[i];
           if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
             s.OnEnemyReturnedHome(_f, entity);
+          }
+        }
+      }
+      public void OnEnemyRespawnSparkles(EntityRef entity) {
+        var array = _f._ISignalOnEnemyRespawnSparklesSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEnemyRespawnSparkles(_f, entity);
+          }
+        }
+      }
+      public void OnEnemyAfterDelayedRespawn(EntityRef entity) {
+        var array = _f._ISignalOnEnemyAfterDelayedRespawnSystems;
+        for (Int32 i = 0; i < array.Length; ++i) {
+          var s = array[i];
+          if (_f.SystemIsEnabledInHierarchy((SystemBase)s)) {
+            s.OnEnemyAfterDelayedRespawn(_f, entity);
           }
         }
       }

@@ -449,6 +449,8 @@ MonoBehaviour:
     type: 3}
   specialKillParticle: {fileID: 761201321277025702, guid: d0dec86b8ad08184d9da50d1f76fc7bd,
     type: 3}
+  respawnParticle: {fileID: 5191653714546004373, guid: cb33e5df66c9644458081c1ddef24e6c,
+    type: 3}
   legacyAnimation: {fileID: 2072787540995169967}
   sfx: {fileID: 6178880729858591457}
 --- !u!82 &5674404523704379184

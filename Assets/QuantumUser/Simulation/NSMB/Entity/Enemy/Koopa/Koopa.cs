@@ -99,6 +99,7 @@ namespace Quantum {
             IsInShell = false;
             IsKicked = false;
             IsFlipped = false;
+            enemy->SetDelayedRespawn();
 
             f.Events.EnemyKilled(koopaEntity, killerEntity, reason, center);
         }
