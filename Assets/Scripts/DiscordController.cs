@@ -22,24 +22,23 @@ namespace NSMB {
 
         public void OnEnable() {
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+            Settings.OnDiscordIntegrationChanged += OnDiscordIntegrationChanged;
         }
 
         public void OnDisable() {
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
+            Settings.OnDiscordIntegrationChanged -= OnDiscordIntegrationChanged;
+
             discord?.Dispose();
+            discord = null;
         }
 
         public void Start() {
-#if UNITY_WEBGL || UNITY_WSA
-            enabled = false;
-#endif
-
             Initialize();
         }
 
-
         private bool Initialize() {
-#if UNITY_WEBGL || UNITY_WSA
+#if !UNITY_STANDALONE
             enabled = false;
             return false;
 #endif
@@ -51,12 +50,11 @@ namespace NSMB {
                 return false;
             }
             activityManager = discord.GetActivityManager();
-            //activityManager.OnActivityJoinRequest += AskToJoin;
             activityManager.OnActivityJoin += TryJoinGame;
 
             try {
                 string filename = AppDomain.CurrentDomain.ToString();
-                filename = string.Join(" ", filename.Split(" ")[..^2]);
+                filename = string.Join(' ', filename.Split(' ')[..^2]);
                 string dir = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + filename;
                 activityManager.RegisterCommand(dir);
                 Debug.Log($"[Discord] Set launch path to \"{dir}\"");
@@ -74,6 +72,11 @@ namespace NSMB {
                     Initialize();
                 }
                 return;
+            }
+
+            if ((int) (Time.unscaledTime + Time.unscaledDeltaTime) > (int) Time.unscaledTime) {
+                // Update discord status every second
+                UpdateActivity();
             }
 
             try {
@@ -100,13 +103,10 @@ namespace NSMB {
             QuantumRunner runner = QuantumRunner.Default;
             QuantumGame game = QuantumRunner.DefaultGame;
 
-            Room realtimeRoom = null;
-            if (runner && runner.NetworkClient != null) {
-                realtimeRoom = runner.NetworkClient.CurrentRoom;
-            }
-
             Activity activity = new();
-            if (realtimeRoom != null) {
+            if (runner && runner.NetworkClient != null) {
+                Room realtimeRoom = runner.NetworkClient.CurrentRoom;
+
                 activity.Party = new() {
                     Size = new() {
                         CurrentSize = realtimeRoom.PlayerCount,
@@ -118,6 +118,7 @@ namespace NSMB {
                 activity.Details = tm.GetTranslation("discord.online");
                 activity.Secrets = new() { Join = realtimeRoom.Name };
             }
+
             if (game != null) {
                 Frame f = game.Frames.Predicted;
 
@@ -160,20 +161,17 @@ namespace NSMB {
             UpdateActivity();
         }
 
+        private void OnDiscordIntegrationChanged() {
+            UpdateActivity();
+        }
+
         public void TryJoinGame(string secret) {
-            // TODO: test
             Debug.Log($"[Discord] Attempting to join game with secret \"{secret}\"");
             _ = NetworkHandler.JoinRoom(new EnterRoomArgs {
                 RoomName = secret,
             });
         }
 
-        //TODO this doesn't work???
-        public void AskToJoin(ref User user) {
-            //activityManager.SendRequestReply(user.Id, ActivityJoinRequestReply.Yes, (res) => {
-            //    Debug.Log($"[Discord] Ask to Join response: {res}");
-            //});
-        }
 #pragma warning restore CS0162
 #pragma warning restore IDE0079
     }

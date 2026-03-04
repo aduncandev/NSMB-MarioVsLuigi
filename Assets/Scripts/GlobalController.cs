@@ -62,10 +62,6 @@ namespace NSMB {
             Instantiate(Resources.Load("Static/GlobalController"));
         }
 
-        public void OnValidate() {
-            this.SetIfNull(ref discordController);
-        }
-
         public void Awake() {
             Set(this);
 
@@ -95,13 +91,15 @@ namespace NSMB {
 #if UNITY_STANDALONE
             var keyboard = Keyboard.current;
 
+#if !UNITY_EDITOR
             if (Screen.fullScreenMode == FullScreenMode.Windowed && keyboard.leftShiftKey.isPressed && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
                 newWindowHeight = (int) (newWindowWidth * (9f / 16f));
                 Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
             }
+#endif
 
             if (Debug.isDebugBuild) {
-                if (keyboard.f9Key.wasPressedThisFrame) {
+                if (keyboard[Key.F9].wasPressedThisFrame) {
                     if (Profiler.enabled) {
                         Profiler.enabled = false;
                         PlaySound(SoundEffect.Player_Sound_Powerdown);
@@ -115,7 +113,7 @@ namespace NSMB {
                 }
 
                 /*
-                if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha9)) {
+                if (keyboard[Key.Digit9].wasPressedThisFrame) {
                     var canvas = FindFirstObjectByType<MainMenuCanvas>();
                     if (canvas) {
                         var blur = canvas.transform.Find("MainMenu").Find("Blur").gameObject;
@@ -125,15 +123,15 @@ namespace NSMB {
                 */
             }
 
-            if (keyboard.f6Key.wasPressedThisFrame) {
+            if (keyboard[Key.F6].wasPressedThisFrame) {
                 System.Diagnostics.Process.Start(Application.consoleLogPath);
             }
 
-            if (keyboard.f7Key.wasPressedThisFrame) {
+            if (keyboard[Key.F7].wasPressedThisFrame) {
                 System.Diagnostics.Process.Start(ReplayListManager.ReplayDirectory);
             }
 
-            if (keyboard.f8Key.wasPressedThisFrame) {
+            if (keyboard[Key.F8].wasPressedThisFrame) {
                 System.Diagnostics.Process.Start(AddonManager.LocalFolderPath);
             }
 #endif
@@ -144,10 +142,6 @@ namespace NSMB {
                 ResolutionChanged?.Invoke();
             }
 
-            if ((int) (Time.unscaledTime + Time.unscaledDeltaTime) > (int) Time.unscaledTime) {
-                // Update discord every second
-                discordController.UpdateActivity();
-            }
         }
 
 #if IDLE_LOCK_30FPS
@@ -173,7 +167,6 @@ namespace NSMB {
                 }
             }
 
-            discordController.UpdateActivity();
             this.StopCoroutineNullable(ref totalAudioFadeRoutine);
             audioMixerManager.SetFloat(AudioMixerManager.KeyOverride, 0f);
             StartCoroutine(FadeFullscreenImage(0, 1/3f, 0.1f));

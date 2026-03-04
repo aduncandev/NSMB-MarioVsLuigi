@@ -12,8 +12,7 @@ namespace NSMB {
         //---Static Variables
         private static Controls _controls;
         public static Controls Controls => _controls;
-        private Action[] VersionUpdaters;
-        public static event Action OnColorblindModeChanged, OnNametagVisibilityChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged;
+        public static event Action OnColorblindModeChanged, OnNametagVisibilityChanged, OnDisableChatChanged, OnNdsResolutionSettingChanged, OnDiscordIntegrationChanged;
         public static event Action<bool> OnInputDisplayActiveChanged, OnReplaysEnabledChanged;
 
         //---Properties
@@ -57,7 +56,7 @@ namespace NSMB {
             get => _generalDiscordIntegration;
             set {
                 _generalDiscordIntegration = value;
-                GlobalController.Instance.discordController.UpdateActivity();
+                OnDiscordIntegrationChanged?.Invoke();
             }
         }
 
@@ -221,6 +220,9 @@ namespace NSMB {
         public bool controlsFireballSprint, controlsAutoSprint, controlsPropellerJump, controlsAllowGroundpoundWithLeftRight;
 
         public bool miscFilterFullRooms, miscFilterInProgressRooms, miscFilterAddons;
+
+        //---Private Variables
+        private Action[] VersionUpdaters;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
         public static void CreateInstance() {
