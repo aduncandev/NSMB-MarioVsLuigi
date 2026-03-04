@@ -149,13 +149,34 @@ namespace Quantum {
             }
         }
 
+        public EntityRef findClosestPlayer(Frame f, Filter filter) {
+            var allPlayers = f.Filter<MarioPlayer, Transform2D>();
+            allPlayers.UseCulling = false;
+
+            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset);
+            FP closestDistance = FP.MaxValue;
+            EntityRef closestPlayer = EntityRef.None;
+            while (allPlayers.NextUnsafe(out EntityRef marioEntity, out MarioPlayer* mario, out Transform2D* marioTransform)) {
+                if (mario->IsDead) {
+                    continue;
+                }
+
+                FP newDistance = QuantumUtils.WrappedDistance(stage, filter.Enemy->Spawnpoint, marioTransform->Position);
+
+                if (newDistance <= closestDistance) {
+                    closestPlayer = marioEntity;
+                    closestDistance = newDistance;
+                }
+            }
+            return closestPlayer;
+        }
+
         public void OffscreenCheck(Frame f, Filter filter, VersusStageData stage)
         {
             var allPlayersFilter = f.Filter<MarioPlayer, Transform2D>();
             while (allPlayersFilter.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
                 QuantumUtils.WrappedDistance(stage, filter.Transform->Position, marioTransform->Position, out FP distance);
-                QuantumUtils.WrappedDistance(stage, filter.Enemy->Spawnpoint, marioTransform->Position, out FP spawnpointDistance);
-                if (FPMath.Abs(distance) < Constants.EnemyHomeRadius || FPMath.Abs(spawnpointDistance) < Constants.EnemyHomeRadius) return;
+                if (FPMath.Abs(distance) < Constants.EnemyHomeRadius) return;
             }
 
             if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject))
@@ -165,7 +186,16 @@ namespace Quantum {
             }
             if (filter.Transform->Position != filter.Enemy->Spawnpoint) f.Signals.OnEnemyReturnedHome(filter.Entity);
             filter.Transform->Teleport(f, filter.Enemy->Spawnpoint);
-            filter.Enemy->FacingRight = false;
+
+            var shouldFaceRight = false;
+            var closestMario = findClosestPlayer(f, filter);
+
+            // turn to face player while in the shadows...
+            if (f.Unsafe.TryGetPointer(closestMario, out Transform2D* closestMarioTransform)) {
+                QuantumUtils.WrappedDistance(f, filter.Enemy->Spawnpoint, closestMarioTransform->Position, out FP distance);
+                shouldFaceRight = distance < 0;
+            }
+            filter.Enemy->FacingRight = shouldFaceRight;
         }
 
         public void OnStageReset(Frame f, QBoolean full) {
