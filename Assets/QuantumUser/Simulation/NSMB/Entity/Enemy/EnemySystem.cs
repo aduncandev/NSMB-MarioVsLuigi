@@ -40,6 +40,9 @@ namespace Quantum {
 
         public override void Update(FrameThreadSafe f, ref Filter filter) {
             var enemy = filter.Enemy;
+
+            // handle respawning
+            if (enemy->RespawnTimer > 0 &! enemy->DisableRespawning) HandleDelayedRespawn(f, filter, stage);
             if (!enemy->IsActive) {
                 return;
             }
@@ -48,17 +51,15 @@ namespace Quantum {
             var collider = filter.Collider;
 
             // Despawn off bottom of stage
-            VersusStageData stage = f.FindAsset<VersusStageData>(f.Map.UserAsset); // TODO: somehow save between entities.
             if (transform->Position.Y + collider->Shape.Box.Extents.Y + collider->Shape.Centroid.Y < stage.StageWorldMin.Y) {
                 enemy->IsActive = false;
                 enemy->IsDead = true;
-                if (f.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
+                if (!enemy->DisableRespawning) enemy->SetDelayedRespawn();
+                if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
                     physicsObject->IsFrozen = true;
                 }
 
-                lock (despawningEntities) {
-                    despawningEntities.Add(filter.Entity);
-                }
+                f.Signals.OnEnemyDespawned(filter.Entity);
                 return;
             }
 
@@ -102,7 +103,7 @@ namespace Quantum {
             var enemy = filter.Enemy;
 
             // handle respawning
-            if (enemy->RespawnTimer > 0) HandleDelayedRespawn(f, filter, stage);
+            if (enemy->RespawnTimer > 0 &! enemy->DisableRespawning) HandleDelayedRespawn(f, filter, stage);
             if (!enemy->IsActive) {
                 return;
             }
@@ -114,7 +115,7 @@ namespace Quantum {
             if (transform->Position.Y + collider->Shape.Box.Extents.Y + collider->Shape.Centroid.Y < stage.StageWorldMin.Y) {
                 enemy->IsActive = false;
                 enemy->IsDead = true;
-                enemy->SetDelayedRespawn();
+                if (!enemy->DisableRespawning) enemy->SetDelayedRespawn();
                 if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
                     physicsObject->IsFrozen = true;
                 }
@@ -156,7 +157,7 @@ namespace Quantum {
             var enemy = filter.Enemy;
             if (QuantumUtils.Decrement(ref enemy->RespawnTimer)) {
                 enemy->Respawn(f, filter.Entity, false);
-                f.Signals.OnEnemyAfterDelayedRespawn(filter.Entity);
+                f.Events.EnemyAfterDelayedRespawn(filter.Entity);
             }
 
             if (enemy->RespawnTimer == enemy->RespawnSparklesTimer && enemy->RespawnSparklesTimer != 0) {
@@ -164,32 +165,54 @@ namespace Quantum {
             }
         }
 
-        public void OffscreenCheck(Frame f, Filter filter, VersusStageData stage)
-        {
+        public void OffscreenCheck(Frame f, Filter filter, VersusStageData stage) {
             var enemy = filter.Enemy;
             var allPlayersFilter = f.Filter<MarioPlayer, Transform2D>();
+            var transform = filter.Transform;
+            var entity = filter.Entity;
+
+            bool marioInSpawnpoint = false;
+
+            // check if any Mario is near the enemy
             while (allPlayersFilter.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
-                QuantumUtils.WrappedDistance(stage, filter.Transform->Position, marioTransform->Position, out FP distance);
-                if (FPMath.Abs(distance) < Constants.EnemyHomeRadius) return;
+                QuantumUtils.WrappedDistance(stage, transform->Position, marioTransform->Position, out FP distanceToMario);
+                if (FPMath.Abs(distanceToMario) < Constants.EnemyHomeBoxWidth) {
+                    return;
+                }
+
+                QuantumUtils.WrappedDistance(stage, enemy->Spawnpoint, marioTransform->Position, out FP marioDistanceToSpawnpoint);
+                if (FPMath.Abs(marioDistanceToSpawnpoint) < Constants.EnemyHomeBoxBuffer) {
+                    marioInSpawnpoint = true;
+                }
             }
 
-            if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject))
-            {
-                if (physicsObject->IsFrozen) return;
-                physicsObject->Velocity = FPVector2.Zero;
-            }
-            if (filter.Transform->Position != enemy->Spawnpoint) f.Signals.OnEnemyReturnedHome(filter.Entity);
-            filter.Transform->Teleport(f, enemy->Spawnpoint);
+            if (marioInSpawnpoint) {
+                // just teleport if the enemy didn't leave its home
+                if (f.Unsafe.TryGetPointer(filter.Entity, out PhysicsObject* physicsObject)) {
+                    if (physicsObject->IsFrozen) return;
+                    physicsObject->Velocity = FPVector2.Zero;
+                }
 
-            var shouldFaceRight = false;
-            var closestMario = enemy->FindClosestPlayer(f, filter.Entity, stage);
+                // turn to face the player while in the shadows
+                var shouldFaceRight = false;
+                var closestMario = enemy->FindClosestPlayer(f, entity);
 
-            // turn to face player while in the shadows...
-            if (f.Unsafe.TryGetPointer(closestMario, out Transform2D* closestMarioTransform)) {
-                QuantumUtils.WrappedDistance(f, enemy->Spawnpoint, closestMarioTransform->Position, out FP distance);
-                shouldFaceRight = distance < 0;
+                // use closest player and face them
+                if (f.Unsafe.TryGetPointer(closestMario, out Transform2D* closestMarioTransform)) {
+                    QuantumUtils.WrappedDistance(f, enemy->Spawnpoint, closestMarioTransform->Position, out FP xDiff);
+                    shouldFaceRight = xDiff < 0;
+                }
+
+                enemy->FacingRight = shouldFaceRight;
+
+                transform->Teleport(f, enemy->Spawnpoint);
+                f.Signals.OnEnemyReturnedHome(entity);
+            } else {
+                // "kill" the enemy if a Mario is in its spawnpoint
+                enemy->IsActive = false;
+                enemy->IsDead = true;
+                enemy->SetDelayedRespawn();
             }
-            enemy->FacingRight = shouldFaceRight;
         }
 
         public void OnStageReset(Frame f, QBoolean full) {

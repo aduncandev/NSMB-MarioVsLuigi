@@ -1,4 +1,6 @@
-#define EnemyHomeRadius 12
+#define EnemyHomeBoxWidth 8
+#define EnemyHomeBoxBuffer 10
+#define EnemyHomeBoxLeaveWidth 3
 
 component Enemy {
 	FPVector2 Spawnpoint;

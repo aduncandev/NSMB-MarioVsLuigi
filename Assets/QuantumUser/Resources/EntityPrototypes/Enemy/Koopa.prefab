@@ -442,6 +442,9 @@ MonoBehaviour:
   sfx: {fileID: 3464633041449129214}
   sRenderer: {fileID: 8133877121043965814}
   rotation: {fileID: 8088900794427276647}
+  respawnParticle: {fileID: 5191653714546004373, guid: cb33e5df66c9644458081c1ddef24e6c,
+    type: 3}
+  respawnColor: {r: 0.4862745, g: 0.9882354, b: 0, a: 1}
   mirrorSprite: 0
   dontFlip: 0
 --- !u!82 &3399800873378663516

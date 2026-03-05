@@ -442,6 +442,8 @@ MonoBehaviour:
   animator: {fileID: 8735478572021304808}
   explosionPrefab: {fileID: 1674080856964950978, guid: 7ac2c558b7c96304eb065980d84e1c67,
     type: 3}
+  respawnParticle: {fileID: 5191653714546004373, guid: cb33e5df66c9644458081c1ddef24e6c,
+    type: 3}
 --- !u!114 &6162738416106121865
 MonoBehaviour:
   m_ObjectHideFlags: 0

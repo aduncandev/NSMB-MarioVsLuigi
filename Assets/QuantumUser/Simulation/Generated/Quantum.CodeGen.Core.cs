@@ -3501,7 +3501,9 @@ namespace Quantum {
   }
   public static unsafe partial class Constants {
     public const Int32 MaxStarSpawns = 64;
-    public const Int32 EnemyHomeRadius = 12;
+    public const Int32 EnemyHomeBoxWidth = 8;
+    public const Int32 EnemyHomeBoxBuffer = 10;
+    public const Int32 EnemyHomeBoxLeaveWidth = 3;
     public const Int32 MaxPlayers = 10;
     /// <summary>8.5</summary>
     public static FP _8_50 {

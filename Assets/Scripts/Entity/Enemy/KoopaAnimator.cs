@@ -20,9 +20,12 @@ namespace NSMB.Entities.Enemies {
         [SerializeField] private SoundEffectPlayer sfx;
         [SerializeField] private SpriteRenderer sRenderer;
         [SerializeField] private Transform rotation;
+        [SerializeField] private GameObject respawnParticle;
+        [SerializeField] private Color respawnColor;
         [SerializeField] private bool mirrorSprite, dontFlip;
 
         //---Private Variables
+        private GameObject activeRespawnParticle;
         private float dampVelocity;
         private bool facingRight;
 
@@ -35,6 +38,8 @@ namespace NSMB.Entities.Enemies {
         public void Start() {
             QuantumEvent.Subscribe<EventPlayComboSound>(this, OnPlayComboSound, FilterOutReplayFastForward, onlyIfActiveAndEnabled: true);
             QuantumEvent.Subscribe<EventPlayBumpSound>(this, OnPlayBumpSound, FilterOutReplayFastForward, onlyIfActiveAndEnabled: true);
+            QuantumEvent.Subscribe<EventEnemyRespawnSparkles>(this, OnEnemyRespawnSparkles, FilterOutReplayFastForward);
+            QuantumEvent.Subscribe<EventEnemyAfterDelayedRespawn>(this, OnEnemyAfterDelayedRespawn, FilterOutReplayFastForward);
         }
 
         public override unsafe void OnUpdateView() {
@@ -118,6 +123,33 @@ namespace NSMB.Entities.Enemies {
             }
 
             sfx.PlayOneShot(QuantumViewUtils.GetComboSoundEffect(e.Combo));
+        }
+
+        private unsafe void OnEnemyAfterDelayedRespawn(EventEnemyAfterDelayedRespawn e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+            Frame f = PredictedFrame;
+
+            var enemy = f.Unsafe.GetPointer<Enemy>(EntityRef);
+
+            Instantiate(Enums.PrefabParticle.Enemy_Puff.GetGameObject(), enemy->Spawnpoint.ToUnityVector3() + (Vector3.up * 0.25f), Quaternion.identity);
+        }
+
+        private unsafe void OnEnemyRespawnSparkles(EventEnemyRespawnSparkles e) {
+            if (e.Entity != EntityRef) {
+                return;
+            }
+            Frame f = PredictedFrame;
+
+            var enemy = f.Unsafe.GetPointer<Enemy>(EntityRef);
+            activeRespawnParticle = Instantiate(respawnParticle, enemy->Spawnpoint.ToUnityVector3() + (Vector3.up * 0.25f), Quaternion.identity);
+            foreach (ParticleSystem particle in activeRespawnParticle.GetComponentsInChildren<ParticleSystem>()) {
+                var main = particle.main;
+                main.startColor = respawnColor;
+            }
+
+            sfx.PlayOneShot(SoundEffect.Player_Sound_Respawn);
         }
     }
 }

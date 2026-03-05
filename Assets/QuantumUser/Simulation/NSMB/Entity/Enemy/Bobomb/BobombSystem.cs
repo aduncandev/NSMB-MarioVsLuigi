@@ -2,7 +2,7 @@ using Photon.Deterministic;
 
 namespace Quantum {
     public unsafe class BobombSystem : SystemMainThreadEntityFilter<Bobomb, BobombSystem.Filter>, ISignalOnEntityBumped, ISignalOnEnemyRespawned, ISignalOnThrowHoldable, 
-        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed, ISignalOnMarioPlayerBecameInvincible {
+        ISignalOnBobombExplodeEntity, ISignalOnIceBlockBroken, ISignalOnEnemyKilledByStageReset, ISignalOnEntityCrushed, ISignalOnMarioPlayerBecameInvincible, ISignalOnEnemyAfterDelayedRespawn {
         
         public struct Filter {
             public EntityRef Entity;
@@ -122,6 +122,7 @@ namespace Quantum {
 
             enemy->IsDead = true;
             enemy->IsActive = false;
+            enemy->SetDelayedRespawn(180); // three seconds instead of the usual 6
             physicsObject->Velocity = FPVector2.Zero;
             physicsObject->IsFrozen = true;
             f.Events.BobombExploded(filter.Entity);
@@ -357,6 +358,12 @@ namespace Quantum {
             var mario = f.Unsafe.GetPointer<MarioPlayer>(entity);
             if (f.Unsafe.TryGetPointer(mario->HeldEntity, out Bobomb* bobomb)) {
                 bobomb->Kill(f, mario->HeldEntity, entity, EnemyKillReason.Special);
+            }
+        }
+
+        public void OnEnemyAfterDelayedRespawn(Frame f, EntityRef entity) {
+            if (f.Unsafe.TryGetPointer(entity, out Bobomb* bobomb)) {
+                bobomb->Respawn(f, entity);
             }
         }
         #endregion
