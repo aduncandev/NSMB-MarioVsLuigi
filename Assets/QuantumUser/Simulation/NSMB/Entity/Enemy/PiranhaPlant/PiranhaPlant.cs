@@ -34,6 +34,7 @@ namespace Quantum {
             PopupAnimationTime = 0;
             enemy->IsDead = true;
             enemy->IsActive = false;
+            enemy->SetDelayedRespawn();
 
             f.Unsafe.GetPointer<Interactable>(piranhaPlantEntity)->ColliderDisabled = true;
 

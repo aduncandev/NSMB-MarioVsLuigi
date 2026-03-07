@@ -251,6 +251,7 @@ namespace Quantum {
                     PowerupReserveResult result = powerup.Collect(f, marioEntity);
                     koopaEnemy->IsActive = false;
                     koopaEnemy->IsDead = true;
+                    koopaEnemy->SetDelayedRespawn(600); // a little longer...
                     koopaPhysicsObject->IsFrozen = true;
                     f.Events.MarioPlayerCollectedPowerup(marioEntity, result, powerup);
                 } else {
@@ -282,6 +283,7 @@ namespace Quantum {
 
                         koopaEnemy->IsActive = false;
                         koopaEnemy->IsDead = true;
+                        koopaEnemy->SetDelayedRespawn(600); // a little longer...
                         koopaPhysicsObject->IsFrozen = true;
 
                     } else if (mario->CurrentPowerupState != PowerupState.MiniMushroom || mario->IsGroundpoundActive) {
