@@ -1,4 +1,4 @@
-#define EnemyHomeBoxWidth 8
+#define EnemyMaxDistFromMario 8
 #define EnemyHomeBoxBuffer 8
 #define EnemyHomeBoxLeaveWidth 3
 

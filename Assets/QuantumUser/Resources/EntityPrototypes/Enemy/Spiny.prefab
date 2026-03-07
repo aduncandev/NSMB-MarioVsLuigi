@@ -330,7 +330,7 @@ MonoBehaviour:
   rotation: {fileID: 7237572828892493257}
   respawnParticle: {fileID: 5191653714546004373, guid: cb33e5df66c9644458081c1ddef24e6c,
     type: 3}
-  respawnColor: {r: 1, g: 0.9799079, b: 0.2028302, a: 0}
+  respawnColor: {r: 1, g: 0.9799079, b: 0.2028302, a: 1}
   mirrorSprite: 1
   dontFlip: 1
 --- !u!82 &5072740182388110993

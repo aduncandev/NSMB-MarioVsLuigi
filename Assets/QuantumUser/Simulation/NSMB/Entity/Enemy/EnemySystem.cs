@@ -175,10 +175,11 @@ namespace Quantum {
             bool marioInSpawnpoint = false;
 
             // check if any Mario is near the enemy
+            allPlayersFilter.UseCulling = false;
             while (allPlayersFilter.NextUnsafe(out _, out _, out Transform2D* marioTransform)) {
                 // despawn if out of view of Mario
                 QuantumUtils.WrappedDistance(stage, transform->Position, marioTransform->Position, out FP distanceToMario);
-                if (FPMath.Abs(distanceToMario) < Constants.EnemyHomeBoxWidth) {
+                if (FPMath.Abs(distanceToMario) < Constants.EnemyMaxDistFromMario) {
                     return;
                 }
 
@@ -186,7 +187,6 @@ namespace Quantum {
                 QuantumUtils.WrappedDistance(stage, enemy->Spawnpoint, marioTransform->Position, out FP marioDistToSpawnpoint);
                 if (FPMath.Abs(marioDistToSpawnpoint) < Constants.EnemyHomeBoxBuffer) {
                     marioInSpawnpoint = true;
-                    break;
                 }
             }
 

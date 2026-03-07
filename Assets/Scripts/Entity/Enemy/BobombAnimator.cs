@@ -77,7 +77,8 @@ namespace NSMB.Entities.Enemies {
             }
 
             // Bodge...
-            if (!enemy->IsAlive) {
+            // Fuck whoever wrote this, they REALLY wanted to mess UP my respawn code >:(
+            if (!enemy->IsAlive && enemy->RespawnTimer > enemy->RespawnSparklesTimer + 1) {
                 sfx.Stop();
             }
 
