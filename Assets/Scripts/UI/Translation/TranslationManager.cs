@@ -39,10 +39,7 @@ namespace NSMB.UI.Translation {
         }
 
         public string GetTranslation(string key) {
-            if (!TryGetTranslation(key, out var result)) {
-                // Default to returning the key.
-                result = key;
-            }
+            _ = TryGetTranslation(key, out var result);
             return result;
         }
 
@@ -70,7 +67,7 @@ namespace NSMB.UI.Translation {
         }
 
         public string GetSubTranslations(string text) {
-            return Regex.Replace(text, @"{[^{}]}", match => GetTranslation(match.Value[1..^1]));
+            return Regex.Replace(text, @"{[^{}]+}", match => GetTranslation(match.Value[1..^1]));
         }
 
         public bool ChangeLanguage(string locale) {

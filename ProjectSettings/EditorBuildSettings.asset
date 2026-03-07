@@ -33,11 +33,11 @@ EditorBuildSettings:
     path: Assets/Scenes/Levels/CustomSky.unity
     guid: addb28d9cb6d8a6498a3b328a6e57f33
   - enabled: 1
-    path: Assets/Scenes/Levels/CustomBonus.unity
-    guid: ce4cf98f31007b44ea19a2fb2ab0924a
-  - enabled: 1
     path: Assets/Scenes/Levels/CustomVolcano.unity
     guid: 48dfbffbd41b62a41a8135ce450497f5
+  - enabled: 1
+    path: Assets/Scenes/Levels/CustomBonus.unity
+    guid: ce4cf98f31007b44ea19a2fb2ab0924a
   - enabled: 1
     path: Assets/Scenes/Levels/CustomDesert.unity
     guid: 0a445e83695e8424e9e56da3e5b773e4
