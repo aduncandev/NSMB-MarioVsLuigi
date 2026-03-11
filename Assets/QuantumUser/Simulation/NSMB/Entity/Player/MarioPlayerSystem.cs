@@ -338,11 +338,14 @@ namespace Quantum {
                 }
             }
 
-            bool wasInShell = mario->IsInShell;
-            mario->IsInShell |= mario->CurrentPowerupState == PowerupState.BlueShell && physicsObject->IsTouchingGround
-                                && run && !mario->HeldEntity.IsValid
-                                && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * Constants._0_90
-                                && (physicsObject->Velocity.X > 0) == mario->FacingRight;
+            // sliding has a different handler
+            if (!mario->IsSliding) {
+                bool wasInShell = mario->IsInShell;
+                mario->IsInShell |= mario->CurrentPowerupState == PowerupState.BlueShell && physicsObject->IsTouchingGround
+                                    && run && !mario->HeldEntity.IsValid
+                                    && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * Constants._0_90
+                                    && (physicsObject->Velocity.X > 0) == mario->FacingRight;
+            }
 
             // ignore when blue shell
             if (mario->CurrentPowerupState != PowerupState.BlueShell) mario->IsCrouching &= !mario->IsSliding;
@@ -828,7 +831,7 @@ namespace Quantum {
                     (mario->IsCrouching && !f.IsPlayerVerifiedOrLocal(mario->PlayerRef)) // Fixes mispredicted uncrouching
                     || (inputs.Down.IsDown && mario->IsStuckInBlock) // allow Mario to crouch while in a block
                         // this disables crouching when Mario is hip dropping or while he's sliding while not in a Blue Shell
-                    || (physicsObject->IsTouchingGround && inputs.Down.IsDown && !mario->IsGroundpounding && (!mario->IsSliding || mario->CurrentPowerupState == PowerupState.BlueShell))
+                    || (physicsObject->IsTouchingGround && inputs.Down.IsDown && (!mario->IsGroundpounding && !mario->IsSliding || mario->CurrentPowerupState == PowerupState.BlueShell))
                         // if Mario is not touching the ground, freeze him in the crouch if he's GOing UP (and not in blue shell), if he holds down then Mario remains in crouch, also disables crouch while underwater and not touching ground
                     || (!physicsObject->IsTouchingGround && (inputs.Down.IsDown || (physicsObject->Velocity.Y > 0 && mario->CurrentPowerupState != PowerupState.BlueShell)) && mario->IsCrouching && !physicsObject->IsUnderwater)
                 /* || (mario->IsCrouching && ForceCrouchCheck(f, ref filter, physics)) */
@@ -1051,8 +1054,9 @@ namespace Quantum {
                 mario->IsGroundpounding = false;
                 if (mario->CurrentPowerupState == PowerupState.BlueShell && inputs.Sprint.IsDown) {
                     mario->IsInShell = true;
-                    mario->ShellSpeedStage = 2;
+                    mario->ShellSpeedStage = physics.ShellFastSlopeStage;
                     mario->FacingRight = FPMath.Sign(physicsObject->FloorAngle) == 1;
+                    mario->IsSliding = false;
                 } else {
                     mario->IsSliding = true;
                 }
@@ -1120,9 +1124,10 @@ namespace Quantum {
             if (f.IsPlayerVerifiedOrLocal(mario->PlayerRef)) {
                 mario->IsInShell &= inputs.Sprint.IsDown || (inputs.Down.IsDown && !physicsObject->IsTouchingGround);
             }
-
+            
             if (!mario->IsInShell) {
-                mario->ShellSpeedStage = 0;
+                // don't touch the shell speed now
+                mario->ShellSpeedStage = physics.ShellNormalStage;
                 return;
             }
 
@@ -1160,7 +1165,7 @@ namespace Quantum {
                 }
 
                 mario->FacingRight = physicsObject->IsTouchingLeftWall;
-                mario->ShellSpeedStage = 0; // reset speed stage
+                mario->ShellSpeedStage = physics.ShellNormalStage; // reset speed stage
                 f.Events.PlayBumpSound(filter.Entity);
             }
 
@@ -1169,7 +1174,14 @@ namespace Quantum {
 
             // starman is a little faster but not too fast
             if (mario->IsStarmanInvincible) {
-                physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.StarSpeedStage] * physics.WalkBlueShellMultiplier[3] * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60));
+                mario->ShellSpeedStage = physics.ShellStarStage;
+            } else if (mario->ShellSpeedStage == physics.ShellStarStage && physicsObject->IsTouchingGround) {
+                mario->ShellSpeedStage = physics.ShellNormalStage;
+            }
+
+            // use Starman Velocity
+            if (mario->ShellSpeedStage == physics.ShellStarStage) {
+                physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.StarSpeedStage] * physics.WalkBlueShellMultiplier[mario->ShellSpeedStage] * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60));
             } else {
                 physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.RunSpeedStage] * physics.WalkBlueShellMultiplier[mario->ShellSpeedStage] * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60));
             }
@@ -1605,7 +1617,7 @@ namespace Quantum {
             var physicsObject = filter.PhysicsObject;
             bool validFloorAngle = FPMath.Abs(physicsObject->FloorAngle) >= physics.SlideMinimumAngle;
             bool blueShell = mario->CurrentPowerupState == PowerupState.BlueShell;
-            bool movingFastEnough = physicsObject->Velocity.X >= physics.WalkMaxVelocity[physics.RunSpeedStage]; // Blue Shell top speed
+            bool movingFastEnough = (physicsObject->Velocity.X > 0) == (FPMath.Sign(physicsObject->FloorAngle) == 1) && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * FP._0_50; // Blue Shell top speed
 
             if (!blueShell) mario->IsCrouching &= !mario->IsSliding;
 
@@ -1622,8 +1634,9 @@ namespace Quantum {
                 // put Mario in Blue Shell if he's moving fast enough
                 if (blueShell && movingFastEnough && inputs.Sprint.IsDown) {
                     mario->IsInShell = true;
-                    mario->ShellSpeedStage = 1; // little faster
+                    mario->ShellSpeedStage = physics.ShellSlopeStage; // little faster
                     mario->FacingRight = FPMath.Sign(physicsObject->FloorAngle) == 1;
+                    mario->IsSliding = false;
                 } else {
                     mario->IsSliding = true;
                     if (!blueShell) mario->IsCrouching = false;
@@ -2243,6 +2256,8 @@ namespace Quantum {
                 } else if (marioAShell) {
                     // only marioA is spinning in blue shell
                     if (!marioBAbove) {
+                        var marioAPhysicsInfo = f.FindAsset(marioA->PhysicsAsset);
+
                         // Hit them, powerdown them
                         marioB->FacingRight = !fromRight;
                         // powerdown must come before doknockback or it will not occur
@@ -2251,11 +2266,13 @@ namespace Quantum {
                         }
                         marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.Normal, marioAEntity);
                         marioA->FacingRight = !marioA->FacingRight;
-                        marioA->ShellSpeedStage = 0;
+                        marioA->ShellSpeedStage = marioAPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioAEntity);
                         return;
                     }
                 } else if (marioBShell) {
+                    var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
+
                     // only marioB is spinning in blue shell
                     if (!marioAAbove) {
                         // Hit them, powerdown them
@@ -2265,7 +2282,7 @@ namespace Quantum {
                         }
                         marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.Normal, marioBEntity);
                         marioB->FacingRight = !marioB->FacingRight;
-                        marioB->ShellSpeedStage = 0;
+                        marioB->ShellSpeedStage = marioBPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioBEntity);
                         return;
                     }

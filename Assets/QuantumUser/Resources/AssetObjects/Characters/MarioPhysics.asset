@@ -33,9 +33,9 @@ MonoBehaviour:
   - RawValue: 5529600
   WalkBlueShellMultiplier:
   - RawValue: 58982
-  - RawValue: 65536
+  - RawValue: 262144
   - RawValue: 72090
-  - RawValue: 49152
+  - RawValue: 52429
   WalkButtonReleaseDeceleration:
     RawValue: 259200
   SlowTurnaroundAcceleration:

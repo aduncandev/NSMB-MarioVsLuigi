@@ -91,7 +91,7 @@ namespace Quantum {
 
         public readonly bool IsStarmanInvincible => InvincibilityFrames > 0;
         public readonly bool IsWallsliding => WallslideLeft || WallslideRight;
-        public readonly bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && (IsCrouching || (IsGroundpounding && GroundpoundStartFrames == 0)) && !IsInShell;
+        public readonly bool IsCrouchedInShell => CurrentPowerupState == PowerupState.BlueShell && (IsCrouching || IsGroundpounding) && !IsInShell;
         public readonly bool IsDamageable => !IsStarmanInvincible && DamageInvincibilityFrames == 0;
         public readonly bool IsInKnockback => CurrentKnockback != KnockbackStrength.None;
         public readonly bool CanCollectOwnTeamsObjectiveCoins => !IsInKnockback && DamageInvincibilityFrames == 0;
@@ -174,7 +174,7 @@ namespace Quantum {
             return CurrentPowerupState == PowerupState.MegaMushroom
                 || IsStarmanInvincible
                 || IsInShell
-                || (((includeSliding && IsSliding) || IsCrouchedInShell) && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33);
+                || includeSliding && IsSliding && FPMath.Abs(physicsObject->Velocity.X) > FP._0_33;
         }
 
         public readonly int GetSpeedStage(PhysicsObject* physicsObject, MarioPlayerPhysicsInfo physicsInfo) {
