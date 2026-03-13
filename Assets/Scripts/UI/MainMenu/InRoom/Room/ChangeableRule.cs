@@ -184,8 +184,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             }
 #endif
 
-            UpdateLabel();
             try {
+                UpdateLabel();
                 leftArrow.enabled = Editing && CanDecreaseValue;
                 rightArrow.enabled = Editing && CanIncreaseValue;
             } catch { /* bodge */ }

@@ -20,7 +20,7 @@ namespace NSMB.UI.Options.Loaders {
 
             spo.options.AddRange(locales.Select(locale => {
                 tm.TryGetTranslationForLocale(locale, "lang", out string name);
-                if (tm.TryGetTranslationForLocale(locale, "rtl", out string result) && result != "true") {
+                if (tm.TryGetTranslationForLocale(locale, "rtl", out string result) && result != null && result.Equals("true", System.StringComparison.InvariantCultureIgnoreCase)) {
                     // LTR
                     return name;
                 } else {
