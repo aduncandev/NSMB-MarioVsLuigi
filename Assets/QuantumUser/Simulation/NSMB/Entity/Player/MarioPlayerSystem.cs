@@ -1152,7 +1152,12 @@ namespace Quantum {
                 f.Events.PlayBumpSound(filter.Entity);
             }
 
-            physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.RunSpeedStage] * physics.WalkBlueShellMultiplier * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60));
+            // placeholder code
+            if (mario->IsStarmanInvincible) {
+                physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.StarSpeedStage] * Constants._0_85 * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60)); ;
+            } else {
+                physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.RunSpeedStage] * physics.WalkBlueShellMultiplier * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60));
+            }
         }
 
         private bool HandleMegaMushroom(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {
