@@ -2497,7 +2497,6 @@ namespace Quantum {
                 if (groundpounded) {
                     bool dealtKnockback = defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? 3 : 0, KnockbackStrength.Groundpound, attacker);
                     if (dealtKnockback) {
-                        FPVector2 avgPosition = (f.Unsafe.GetPointer<Transform2D>(attacker)->Position + f.Unsafe.GetPointer<Transform2D>(defender)->Position) / 2;
                         f.Events.PlayKnockbackEffect(defender, attacker, KnockbackStrength.Groundpound, avgPosition);
                     }
                     attackerMario->IsGroundpounding = false;
@@ -2520,7 +2519,6 @@ namespace Quantum {
                 // Blue Shell has very strong knockback!!
                 // deal different knockback if it's a teammate
                 KnockbackStrength strength = dropStars ? KnockbackStrength.Groundpound : KnockbackStrength.Normal;
-                FPVector2 avgPosition = (f.Unsafe.GetPointer<Transform2D>(attacker)->Position + f.Unsafe.GetPointer<Transform2D>(defender)->Position) / 2;
                 defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? 1 : 0, strength, attacker);
                 attackerMario->DoEntityBounce = false; // no bounce
                 f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition);
@@ -2552,7 +2550,6 @@ namespace Quantum {
                         KnockbackStrength strength = groundpounded ? KnockbackStrength.Groundpound : KnockbackStrength.Normal;
                         bool dealtKnockback = defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? (groundpounded ? 3 : 1) : 0, strength, attacker);
                         if (dealtKnockback) {
-                            FPVector2 avgPosition = (f.Unsafe.GetPointer<Transform2D>(attacker)->Position + f.Unsafe.GetPointer<Transform2D>(defender)->Position) / 2;
                             f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition);
                         }
                     }
