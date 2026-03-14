@@ -10,7 +10,7 @@ namespace NSMB.UI.Translation {
         protected Dictionary<string, string> loadedTranslations;
 
         public bool TryGetTranslation(string key, out string result) {
-            if (loadedTranslations == null) {
+            if (loadedTranslations == null || key == null) {
                 result = null;
                 return false;
             }

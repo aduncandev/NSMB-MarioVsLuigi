@@ -46,7 +46,6 @@ namespace NSMB.UI.Translation {
         public bool TryGetTranslation(string key, out string result) {
             Initialize();
 
-            key ??= "null";
             if (TryGetTranslationForLocale(CurrentLocale, key, out result)) {
                 return true;
             }
@@ -114,6 +113,9 @@ namespace NSMB.UI.Translation {
         }
 
         public bool TryGetTranslationForLocale(string locale, string key, out string result) {
+            key ??= "null";
+            key = key.ToLowerInvariant();
+
             if (allTranslations.TryGetValue(locale, out var sources)) {
                 for (int i = sources.Count - 1; i >= 0; i--) {
                     // No foreach, we want backwards iteration- later loaded sources have priority.
@@ -123,6 +125,7 @@ namespace NSMB.UI.Translation {
                     }
                 }
             }
+
             // Default to returning the key
             result = key;
             return false;

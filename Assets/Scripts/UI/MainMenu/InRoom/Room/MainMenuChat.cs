@@ -40,6 +40,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             QuantumCallback.Subscribe<CallbackGameDestroyed>(this, OnGameDestroyed);
             QuantumEvent.Subscribe<EventPlayerAdded>(this, OnPlayerAdded);
             QuantumEvent.Subscribe<EventPlayerRemoved>(this, OnPlayerRemoved);
+            QuantumEvent.Subscribe<EventPlayerDataChanged>(this, OnPlayerDataChanged);
         }
 
         public void OnDestroy() {
@@ -210,6 +211,10 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         private void OnPlayerListEntryAddedOrRemoved(int index) {
+            UpdatePlayerColors();
+        }
+
+        private void OnPlayerDataChanged(EventPlayerDataChanged e) {
             UpdatePlayerColors();
         }
     }
