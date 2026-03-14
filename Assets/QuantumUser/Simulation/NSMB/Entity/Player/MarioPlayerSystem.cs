@@ -341,13 +341,18 @@ namespace Quantum {
             // sliding has a different handler
             if (!mario->IsSliding) {
                 bool wasInShell = mario->IsInShell;
+                // only allow Blue Shell sliding if and only if
+                // Mario has the Blue Shell PowerUP, is touching the ground, is "run" (which means sprint is down),
+                // not holding, above or equal to the Blue Shell's speed, has velocity in the right direction (i.e positive and facing right)
+                // and his holding right if he's move right, and holding left if he's moving left
                 mario->IsInShell |= mario->CurrentPowerupState == PowerupState.BlueShell && physicsObject->IsTouchingGround
                                     && run && !mario->HeldEntity.IsValid
-                                    && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * Constants._0_90
-                                    && (physicsObject->Velocity.X > 0) == mario->FacingRight;
+                                    && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * physics.WalkBlueShellMultiplier[physics.ShellNormalStage]
+                                    && (physicsObject->Velocity.X > 0) == mario->FacingRight
+                                    && (mario->FacingRight && inputs.Right.IsDown || !mario->FacingRight && inputs.Left.IsDown);
             }
 
-            // ignore when blue shell
+            // ignore when blue shell, allowing Mario to both "crouch" while sliding
             if (mario->CurrentPowerupState != PowerupState.BlueShell) mario->IsCrouching &= !mario->IsSliding;
             /*
             if (!wasInShell && mario->IsInShell) {
@@ -1179,12 +1184,15 @@ namespace Quantum {
                 mario->ShellSpeedStage = physics.ShellNormalStage;
             }
 
-            // use Starman Velocity
+            FP baseVelocity = 0;
+
+            // use Starman Velocity stage
             if (mario->ShellSpeedStage == physics.ShellStarStage) {
-                physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.StarSpeedStage] * physics.WalkBlueShellMultiplier[mario->ShellSpeedStage] * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60));
+                baseVelocity = physics.WalkMaxVelocity[physics.StarSpeedStage];
             } else {
-                physicsObject->Velocity.X = physics.WalkMaxVelocity[physics.RunSpeedStage] * physics.WalkBlueShellMultiplier[mario->ShellSpeedStage] * (mario->FacingRight ? 1 : -1) * (1 - (((FP) mario->ShellSlowdownFrames) / 60));
+                baseVelocity = physics.WalkMaxVelocity[physics.RunSpeedStage];
             }
+            physicsObject->Velocity.X = baseVelocity * physics.WalkBlueShellMultiplier[mario->ShellSpeedStage] * (mario->FacingRight ? 1 : -1) * (1 - (mario->ShellSlowdownFrames * f.DeltaTime));
         }
 
         private bool HandleMegaMushroom(Frame f, ref Filter filter, MarioPlayerPhysicsInfo physics, VersusStageData stage) {

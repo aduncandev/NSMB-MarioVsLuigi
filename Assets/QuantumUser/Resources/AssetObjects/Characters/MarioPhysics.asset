@@ -31,11 +31,15 @@ MonoBehaviour:
   - RawValue: 230400
   - RawValue: 172800
   - RawValue: 5529600
+  ShellNormalStage: 0
+  ShellSlopeStage: 1
+  ShellFastSlopeStage: 2
+  ShellStarStage: 3
   WalkBlueShellMultiplier:
   - RawValue: 58982
-  - RawValue: 262144
+  - RawValue: 65536
   - RawValue: 72090
-  - RawValue: 52429
+  - RawValue: 58982
   WalkButtonReleaseDeceleration:
     RawValue: 259200
   SlowTurnaroundAcceleration:
