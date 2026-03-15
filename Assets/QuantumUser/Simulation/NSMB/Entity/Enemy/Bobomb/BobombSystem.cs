@@ -167,6 +167,7 @@ namespace Quantum {
             }
             
             var bobomb = f.Unsafe.GetPointer<Bobomb>(bobombEntity);
+            var bobombEnemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
             var bobombTransform = f.Unsafe.GetPointer<Transform2D>(bobombEntity);
             var mario = f.Unsafe.GetPointer<MarioPlayer>(marioEntity);
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(marioEntity);
@@ -209,15 +210,13 @@ namespace Quantum {
                     mario->IsDrilling = false;
 
                 } else if (mario->IsCrouchedInShell) {
-                    // Bounce off blue shell crouched player
-                    var bobombEnemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
+                    // Bounce off blue shell crouched player 
                     bobombEnemy->ChangeFacingRight(f, bobombEntity, ourPos.X > theirPos.X);
                     marioPhysicsObject->Velocity.X = 0;
                     return;
 
-                } else if (mario->IsDamageable) {
+                } else if (mario->IsDamageable && QuantumUtils.Decrement(ref bobombEnemy->IntangibilityFrames)) {
                     // Damage
-                    var bobombEnemy = f.Unsafe.GetPointer<Enemy>(bobombEntity);
                     mario->Powerdown(f, marioEntity, false, bobombEntity);
                     bobombEnemy->ChangeFacingRight(f, bobombEntity, damageDirection.X > 0);
                 }

@@ -45,7 +45,7 @@ namespace Quantum {
 
             IsActive = true;
             IsDead = false;
-            LeftHome = false;
+            IgnoreOffscreen = false;
             SetDelayedRespawn(0, 0);
             transform->Teleport(f, Spawnpoint);
 

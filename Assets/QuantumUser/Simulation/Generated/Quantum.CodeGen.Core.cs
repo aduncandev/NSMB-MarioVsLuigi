@@ -2075,30 +2075,33 @@ namespace Quantum {
     public const Int32 ALIGNMENT = 8;
     [FieldOffset(40)]
     public FPVector2 Spawnpoint;
-    [FieldOffset(16)]
-    public QBoolean IgnorePlayerWhenRespawning;
-    [FieldOffset(8)]
-    public QBoolean DisableRespawning;
-    [FieldOffset(32)]
-    public QBoolean StayAtHomeWhenOffscreen;
-    [FieldOffset(20)]
-    [ExcludeFromPrototype()]
-    public QBoolean IsActive;
     [FieldOffset(24)]
-    [ExcludeFromPrototype()]
-    public QBoolean IsDead;
+    public QBoolean IgnorePlayerWhenRespawning;
     [FieldOffset(12)]
-    [ExcludeFromPrototype()]
-    public QBoolean FacingRight;
+    public QBoolean DisableRespawning;
+    [FieldOffset(36)]
+    public QBoolean StayAtHomeWhenOffscreen;
     [FieldOffset(28)]
     [ExcludeFromPrototype()]
-    public QBoolean LeftHome;
-    [FieldOffset(4)]
+    public QBoolean IsActive;
+    [FieldOffset(32)]
+    [ExcludeFromPrototype()]
+    public QBoolean IsDead;
+    [FieldOffset(20)]
+    [ExcludeFromPrototype()]
+    public QBoolean IgnoreOffscreen;
+    [FieldOffset(16)]
+    [ExcludeFromPrototype()]
+    public QBoolean FacingRight;
+    [FieldOffset(8)]
     [ExcludeFromPrototype()]
     public Int32 RespawnTimer;
-    [FieldOffset(0)]
+    [FieldOffset(4)]
     [ExcludeFromPrototype()]
     public Int32 RespawnSparklesTimer;
+    [FieldOffset(0)]
+    [ExcludeFromPrototype()]
+    public Int32 IntangibilityFrames;
     public override readonly Int32 GetHashCode() {
       unchecked { 
         var hash = 11071;
@@ -2108,23 +2111,25 @@ namespace Quantum {
         hash = hash * 31 + StayAtHomeWhenOffscreen.GetHashCode();
         hash = hash * 31 + IsActive.GetHashCode();
         hash = hash * 31 + IsDead.GetHashCode();
+        hash = hash * 31 + IgnoreOffscreen.GetHashCode();
         hash = hash * 31 + FacingRight.GetHashCode();
-        hash = hash * 31 + LeftHome.GetHashCode();
         hash = hash * 31 + RespawnTimer.GetHashCode();
         hash = hash * 31 + RespawnSparklesTimer.GetHashCode();
+        hash = hash * 31 + IntangibilityFrames.GetHashCode();
         return hash;
       }
     }
     public static void Serialize(void* ptr, FrameSerializer serializer) {
         var p = (Enemy*)ptr;
+        serializer.Stream.Serialize(&p->IntangibilityFrames);
         serializer.Stream.Serialize(&p->RespawnSparklesTimer);
         serializer.Stream.Serialize(&p->RespawnTimer);
         QBoolean.Serialize(&p->DisableRespawning, serializer);
         QBoolean.Serialize(&p->FacingRight, serializer);
+        QBoolean.Serialize(&p->IgnoreOffscreen, serializer);
         QBoolean.Serialize(&p->IgnorePlayerWhenRespawning, serializer);
         QBoolean.Serialize(&p->IsActive, serializer);
         QBoolean.Serialize(&p->IsDead, serializer);
-        QBoolean.Serialize(&p->LeftHome, serializer);
         QBoolean.Serialize(&p->StayAtHomeWhenOffscreen, serializer);
         FPVector2.Serialize(&p->Spawnpoint, serializer);
     }
@@ -3515,7 +3520,6 @@ namespace Quantum {
     public const Int32 MaxStarSpawns = 64;
     public const Int32 EnemyMaxDistFromMario = 8;
     public const Int32 EnemyHomeBoxBuffer = 8;
-    public const Int32 EnemyHomeBoxLeaveWidth = 3;
     public const Int32 MaxPlayers = 10;
     public const Int32 DamageInvincibilityFrames = 120;
     /// <summary>8.5</summary>
