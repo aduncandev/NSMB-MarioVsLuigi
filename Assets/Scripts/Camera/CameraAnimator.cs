@@ -28,7 +28,8 @@ namespace NSMB.Cameras {
         [SerializeField] private AudioSource zoomSfx;
 
         //---Private Variables
-        private Vector3 truePosition;
+        private Vector3 truePosition, tweenStartPosition, tweenedTargetPosition;
+        float tweenTime;
         private VersusStageData stage;
         private float screenshakeTimer;
         private Vector2 previousPointer;
@@ -45,6 +46,7 @@ namespace NSMB.Cameras {
         public override void Start() {
             base.Start();
             QuantumCallback.Subscribe<CallbackUpdateView>(this, OnUpdateView);
+            QuantumEvent.Subscribe<EventMarioPlayerEnteredPipe>(this, OnMarioPlayerEnteredPipe);
             stage = (VersusStageData) QuantumUnityDB.GetGlobalAsset(FindFirstObjectByType<QuantumMapData>().GetAsset(false).UserAsset);
 
             Settings.Controls.Replay.Reset.performed += OnReset;
@@ -64,7 +66,8 @@ namespace NSMB.Cameras {
 
             switch (Mode) {
             case CameraMode.FollowPlayer:
-                UpdateCameraFollowPlayerMode(e);
+                if (tweenTime < 1.5f) UpdateCameraFollowPlayerTweening(e);
+                else UpdateCameraFollowPlayerMode(e);
                 break;
             case CameraMode.Freecam:
                 UpdateCameraFreecamMode(e);
@@ -83,6 +86,13 @@ namespace NSMB.Cameras {
             if (lmb || !mmb) {
                 previousPointer = ourCamera.ScreenToViewportPoint(Settings.Controls.UI.Point.ReadValue<Vector2>());
             }
+        }
+
+        private void UpdateCameraFollowPlayerTweening(CallbackUpdateView e)
+        {
+            tweenTime += Time.unscaledDeltaTime;
+            if (tweenTime < 0.5f) UpdateCameraFollowPlayerMode(e);
+            else ourCamera.transform.position = Vector3.Lerp(tweenStartPosition, tweenedTargetPosition, Mathf.Clamp01((tweenTime-0.5f)  / 1f));
         }
 
         private void UpdateCameraFollowPlayerMode(CallbackUpdateView e) {
@@ -312,6 +322,30 @@ namespace NSMB.Cameras {
                 screenshakeTimer = screenshake;
             }
             */
+        }
+
+        private void OnMarioPlayerEnteredPipe(EventMarioPlayerEnteredPipe e)
+        {
+            if (e.Exiting) return;
+            
+            QuantumGame game = e.Game;
+            Frame f = game.Frames.Predicted;
+            var currentPipe = f.Unsafe.GetPointer<EnterablePipe>(e.Pipe);
+            if (!currentPipe->TransitionOnlyPanning) return;
+            
+            float playerHeight = f.Unsafe.GetPointer<MarioPlayer>(Target)->CurrentPowerupState switch {
+                PowerupState.MegaMushroom => 3.5f,
+                > PowerupState.Mushroom => 1f,
+                _ => 0.5f,
+            };
+            
+            var otherPipeTransform = f.Unsafe.GetPointer<Transform2D>(currentPipe->OtherPipe);
+            tweenStartPosition = ourCamera.transform.position;
+            tweenedTargetPosition = otherPipeTransform->Position.ToUnityVector3() + e.Offset.ToUnityVector3() + new Vector3(0, playerHeight * 0.5f, -10);
+            float cameraMinY = stage.CameraMinPosition.Y.AsFloat + ourCamera.orthographicSize;
+            float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + Mathf.Max(7, ourCamera.orthographicSize * 2), stage.CameraMaxPosition.Y.AsFloat) - ourCamera.orthographicSize;
+            tweenedTargetPosition.y = Mathf.Clamp(tweenedTargetPosition.y, cameraMinY, cameraMaxY);
+            tweenTime = 0f;
         }
 
         public enum CameraMode {

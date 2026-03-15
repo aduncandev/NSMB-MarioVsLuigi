@@ -2,6 +2,7 @@ using Photon.Deterministic;
 using Quantum.Collections;
 using Quantum.Profiling;
 using System;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe class MarioPlayerSystem : SystemMainThreadEntityFilter<MarioPlayer, MarioPlayerSystem.Filter>, ISignalOnComponentRemoved<Projectile>,
@@ -1742,7 +1743,7 @@ namespace Quantum {
                     mario->PipeEntering = false;
                     mario->CurrentPipe = currentPipe->OtherPipe;
 
-                    f.Events.MarioPlayerEnteredPipe(filter.Entity, mario->CurrentPipe);
+                    f.Events.MarioPlayerEnteredPipe(filter.Entity, mario->CurrentPipe, true, 0, offset);
                 } else {
                     // End pipe animation
                     mario->CurrentPipe = EntityRef.None;

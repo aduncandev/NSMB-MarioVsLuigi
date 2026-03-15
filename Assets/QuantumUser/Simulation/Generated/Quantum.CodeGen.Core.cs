@@ -2141,6 +2141,8 @@ namespace Quantum {
     public QBoolean IsCeilingPipe;
     [FieldOffset(8)]
     public QBoolean IsMiniOnly;
+    [FieldOffset(12)]
+    public QBoolean TransitionOnlyPanning;
     public override readonly Int32 GetHashCode() {
       unchecked { 
         var hash = 47;
@@ -2148,6 +2150,7 @@ namespace Quantum {
         hash = hash * 31 + IsEnterable.GetHashCode();
         hash = hash * 31 + IsCeilingPipe.GetHashCode();
         hash = hash * 31 + IsMiniOnly.GetHashCode();
+        hash = hash * 31 + TransitionOnlyPanning.GetHashCode();
         return hash;
       }
     }
@@ -2156,6 +2159,7 @@ namespace Quantum {
         QBoolean.Serialize(&p->IsCeilingPipe, serializer);
         QBoolean.Serialize(&p->IsEnterable, serializer);
         QBoolean.Serialize(&p->IsMiniOnly, serializer);
+        QBoolean.Serialize(&p->TransitionOnlyPanning, serializer);
         EntityRef.Serialize(&p->OtherPipe, serializer);
     }
   }

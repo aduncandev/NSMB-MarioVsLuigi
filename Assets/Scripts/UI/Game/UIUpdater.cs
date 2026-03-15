@@ -426,6 +426,10 @@ namespace NSMB.UI.Game {
                     entityTrackIcons[mario] = CreateTrackIcon(Updater, PredictedFrame, mario.EntityRef, mario.transform);
                 }
             }
+            else if (e.NewState == GameState.Playing)
+            {
+                GlobalController.Instance.fader.FadeBehindUi = true;
+            }
         }
 
         private void OnGameEnded(EventGameEnded e) {
