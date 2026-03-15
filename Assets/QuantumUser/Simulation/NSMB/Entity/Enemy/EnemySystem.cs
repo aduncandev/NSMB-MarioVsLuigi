@@ -140,6 +140,12 @@ namespace Quantum {
 
                 enemy->FacingRight = shouldFaceRight;
 
+                // only cause the despawn fart cloud and call the event if the enemy is not at its home
+                QuantumUtils.WrappedDistance(f, transform->Position, enemy->Spawnpoint, out FP xEnemyDiffSpawnPoint);
+                if (FPMath.Abs(xEnemyDiffSpawnPoint) > FP._0_25 && FPMath.Abs(transform->Position.Y - enemy->Spawnpoint.Y) > FP._0_50) {
+                    f.Events.EnemyDespawnedOffscreen(entity, filter.Transform->Position);
+                }
+
                 transform->Teleport(f, enemy->Spawnpoint);
                 f.Signals.OnEnemyReturnedHome(entity);
             }

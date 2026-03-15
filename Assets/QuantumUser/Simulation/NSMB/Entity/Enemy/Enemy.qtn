@@ -31,10 +31,6 @@ enum EnemyKillReason : Byte {
 	InWall
 }
 
-event EnemyDespawned {
-	EntityRef Entity;
-}
-
 event EnemyKilled {
 	EntityRef Enemy;
 	EntityRef Killer;
