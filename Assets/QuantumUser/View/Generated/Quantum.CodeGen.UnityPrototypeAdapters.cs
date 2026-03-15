@@ -55,6 +55,7 @@ namespace Quantum.Prototypes.Unity {
     public QBoolean IsEnterable;
     public QBoolean IsCeilingPipe;
     public QBoolean IsMiniOnly;
+    public QBoolean TransitionOnlyPanning;
     partial void ConvertUser(Quantum.QuantumEntityPrototypeConverter converter, ref Quantum.Prototypes.EnterablePipePrototype prototype);
     public override Quantum.Prototypes.EnterablePipePrototype Convert(Quantum.QuantumEntityPrototypeConverter converter) {
       var result = new Quantum.Prototypes.EnterablePipePrototype();
@@ -62,6 +63,7 @@ namespace Quantum.Prototypes.Unity {
       converter.Convert(this.IsEnterable, out result.IsEnterable);
       converter.Convert(this.IsCeilingPipe, out result.IsCeilingPipe);
       converter.Convert(this.IsMiniOnly, out result.IsMiniOnly);
+      converter.Convert(this.TransitionOnlyPanning, out result.TransitionOnlyPanning);
       ConvertUser(converter, ref result);
       return result;
     }

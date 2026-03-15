@@ -7160,6 +7160,11 @@ PrefabInstance:
       propertyPath: Prototype.OtherPipe
       value: 
       objectReference: {fileID: 1755887393}
+    - target: {fileID: 758687465262641939, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
+        type: 3}
+      propertyPath: Prototype.TransitionOnlyPanning.Value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2939613095395977903, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -8779,6 +8784,11 @@ PrefabInstance:
     - target: {fileID: 758687465262641939, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
         type: 3}
       propertyPath: Prototype.IsCeilingPipe.Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 758687465262641939, guid: 8c9fafa7cc25b9b479f9305a40464a7d,
+        type: 3}
+      propertyPath: Prototype.TransitionOnlyPanning.Value
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2939613095395977903, guid: 8c9fafa7cc25b9b479f9305a40464a7d,

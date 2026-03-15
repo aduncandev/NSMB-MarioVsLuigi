@@ -373,6 +373,7 @@ namespace Quantum.Prototypes {
     public QBoolean IsEnterable;
     public QBoolean IsCeilingPipe;
     public QBoolean IsMiniOnly;
+    public QBoolean TransitionOnlyPanning;
     public override Boolean AddToEntity(FrameBase f, EntityRef entity, in PrototypeMaterializationContext context) {
         Quantum.EnterablePipe component = default;
         Materialize((Frame)f, ref component, in context);
@@ -383,6 +384,7 @@ namespace Quantum.Prototypes {
         result.IsEnterable = this.IsEnterable;
         result.IsCeilingPipe = this.IsCeilingPipe;
         result.IsMiniOnly = this.IsMiniOnly;
+        result.TransitionOnlyPanning = this.TransitionOnlyPanning;
     }
   }
   [System.SerializableAttribute()]

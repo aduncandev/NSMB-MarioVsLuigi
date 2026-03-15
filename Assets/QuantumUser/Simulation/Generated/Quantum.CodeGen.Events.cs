@@ -618,10 +618,13 @@ namespace Quantum {
         _f.AddEvent(ev);
         return ev;
       }
-      public EventMarioPlayerEnteredPipe MarioPlayerEnteredPipe(EntityRef Entity, EntityRef Pipe) {
+      public EventMarioPlayerEnteredPipe MarioPlayerEnteredPipe(EntityRef Entity, EntityRef Pipe, QBoolean Exiting, SByte HorizontalWarpDirection, FPVector2 Offset) {
         var ev = _f.Context.AcquireEvent<EventMarioPlayerEnteredPipe>(EventMarioPlayerEnteredPipe.ID);
         ev.Entity = Entity;
         ev.Pipe = Pipe;
+        ev.Exiting = Exiting;
+        ev.HorizontalWarpDirection = HorizontalWarpDirection;
+        ev.Offset = Offset;
         _f.AddEvent(ev);
         return ev;
       }
@@ -2494,6 +2497,9 @@ namespace Quantum {
     public new const Int32 ID = 67;
     public EntityRef Entity;
     public EntityRef Pipe;
+    public QBoolean Exiting;
+    public SByte HorizontalWarpDirection;
+    public FPVector2 Offset;
     protected EventMarioPlayerEnteredPipe(Int32 id, EventFlags flags) : 
         base(id, flags) {
     }
@@ -2513,6 +2519,9 @@ namespace Quantum {
         var hash = 401;
         hash = hash * 31 + Entity.GetHashCode();
         hash = hash * 31 + Pipe.GetHashCode();
+        hash = hash * 31 + Exiting.GetHashCode();
+        hash = hash * 31 + HorizontalWarpDirection.GetHashCode();
+        hash = hash * 31 + Offset.GetHashCode();
         return hash;
       }
     }
