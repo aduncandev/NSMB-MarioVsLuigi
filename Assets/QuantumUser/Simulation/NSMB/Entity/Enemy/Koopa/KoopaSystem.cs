@@ -30,6 +30,29 @@ namespace Quantum {
             f.Context.Interactions.Register<Koopa, IceBlock>(f, OnKoopaIceBlockInteraction);
         }
 
+        public EntityRef FindClosestPlayer(Frame f, ref Filter filter, VersusStageData stage) {
+            var allPlayers = f.Filter<MarioPlayer, Transform2D>();
+            allPlayers.UseCulling = false;
+            var koopaPosition = filter.Transform->Position;
+
+            FP closestDistance = FP.MaxValue;
+            EntityRef closestPlayer = EntityRef.None;
+            while (allPlayers.NextUnsafe(out EntityRef marioEntity, out MarioPlayer* mario, out Transform2D* marioTransform)) {
+                if (mario->IsDead) {
+                    continue;
+                }
+
+                FP newDistance = QuantumUtils.WrappedDistance(stage, koopaPosition, marioTransform->Position);
+
+                if (newDistance <= closestDistance) {
+                    closestPlayer = marioEntity;
+                    closestDistance = newDistance;
+                }
+            }
+            return closestPlayer;
+        }
+
+
         public override void Update(Frame f, ref Filter filter, VersusStageData stage) {
             var entity = filter.Entity;
             var enemy = filter.Enemy;
@@ -56,6 +79,17 @@ namespace Quantum {
                     enemy->FacingRight = false;
                     enemy->IgnoreOffscreen = false; // woke UP and returned home if offscreen
                     koopa->TurnaroundWaitFrames = 18;
+
+                    // turn to face closest player
+                    var shouldFaceRight = false;
+                    var closestMario = FindClosestPlayer(f, ref filter, stage);
+
+                    if (f.Unsafe.TryGetPointer(closestMario, out Transform2D* marioTransform)) {
+                        QuantumUtils.WrappedDistance(f, transform->Position, marioTransform->Position, out FP xDiff);
+                        shouldFaceRight = xDiff < 0;
+                    }
+
+                    enemy->ChangeFacingRight(f, entity, shouldFaceRight);
 
                     var holdable = filter.Holdable;
                     if (f.Exists(holdable->Holder)) {
