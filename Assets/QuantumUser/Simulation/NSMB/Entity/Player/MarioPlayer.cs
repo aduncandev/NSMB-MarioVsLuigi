@@ -496,6 +496,10 @@ namespace Quantum {
             IsSliding = false;
             IsDrilling = false;
             WallslideLeft = WallslideRight = false;
+
+            if (f.Unsafe.TryGetPointer(attacker, out Projectile* projectile)) {
+                attacker = projectile->Owner;
+            }
             LastAttacker = attacker;
 
             f.Signals.OnMarioPlayerDropObjective(entity, starsToDrop, attacker);
