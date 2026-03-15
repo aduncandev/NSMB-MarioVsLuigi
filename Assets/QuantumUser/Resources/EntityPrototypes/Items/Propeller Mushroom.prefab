@@ -208,6 +208,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphicsRoot: {fileID: 7382415506076328421}
+  moveBehindBlocksRoot: {fileID: 0}
   renderer: {fileID: 5475970293224446295}
   childAnimator: {fileID: 0}
   childAnimation: {fileID: 5475970293224446293}
