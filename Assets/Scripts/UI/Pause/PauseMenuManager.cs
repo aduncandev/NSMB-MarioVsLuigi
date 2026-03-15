@@ -211,7 +211,7 @@ namespace NSMB.UI.Pause {
             }
 
             isInConfirmationYesSelected = true;
-            yesConfirmText.text = "» " + originalYesText + " «";
+            yesConfirmText.text = "Â» " + originalYesText + " Â«";
             noConfirmText.text = originalNoText;
         }
 
@@ -222,11 +222,13 @@ namespace NSMB.UI.Pause {
 
             isInConfirmationYesSelected = false;
             yesConfirmText.text = originalYesText;
-            noConfirmText.text = "» " + originalNoText + " «";
+            noConfirmText.text = "Â» " + originalNoText + " Â«";
         }
 
         public unsafe void ClickConfirmYes() {
-            if (isInConfirmationForQuitting) {
+            if (isInConfirmationForQuitting)
+            {
+                GlobalController.Instance.fader.FadeBehindUi = false;
                 QuantumRunner.Default.Shutdown();
             } else {
                 var game = QuantumRunner.DefaultGame;
@@ -328,7 +330,7 @@ namespace NSMB.UI.Pause {
 
             for (int i = 0; i < options.Length; i++) {
                 PauseMenuOptionWrapper option = options[i];
-                option.text.text = (selected == i) ? ("» " + option.originalText + " «") : option.originalText;
+                option.text.text = (selected == i) ? ("Â» " + option.originalText + " Â«") : option.originalText;
                 //option.text.isRightToLeftText = GlobalController.Instance.translationManager.RightToLeft;
             }
         }

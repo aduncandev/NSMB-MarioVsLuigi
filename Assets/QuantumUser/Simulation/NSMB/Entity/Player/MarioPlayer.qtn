@@ -256,6 +256,9 @@ event MarioPlayerMegaEnd {
 event MarioPlayerEnteredPipe {
 	EntityRef Entity;
 	EntityRef Pipe;
+	bool Exiting;
+	sbyte HorizontalWarpDirection;
+	FPVector2 Offset;
 }
 
 event MarioPlayerStoppedSliding {

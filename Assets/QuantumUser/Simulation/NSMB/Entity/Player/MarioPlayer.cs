@@ -1,5 +1,6 @@
 using Photon.Deterministic;
 using System;
+using UnityEngine;
 
 namespace Quantum {
     public unsafe partial struct MarioPlayer {
@@ -550,6 +551,7 @@ namespace Quantum {
             PipeDirection = pipeComponent->IsCeilingPipe ? FPVector2.Up : FPVector2.Down;
 
             var pipeTransform = f.Unsafe.GetPointer<Transform2D>(pipe);
+            var otherPipeTransform = f.Unsafe.GetPointer<Transform2D>(pipeComponent->OtherPipe);
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(mario);
             marioTransform->Position.X = pipeTransform->Position.X;
 
@@ -567,7 +569,12 @@ namespace Quantum {
                 InvincibilityFrames += (ushort) (PipeFrames * 2);
             }
 
-            f.Events.MarioPlayerEnteredPipe(mario, CurrentPipe);
+            sbyte horizontalDirection;
+            if (pipeComponent->TransitionOnlyPanning)
+                horizontalDirection = 0;
+            else
+                horizontalDirection = (sbyte)(otherPipeTransform->Position.X < pipeTransform->Position.X ? -1 : 1);
+            f.Events.MarioPlayerEnteredPipe(mario, CurrentPipe, false, horizontalDirection, FPVector2.Zero);
         }
 
         private static void SetValue(ref BitSet21 bitset, int index, bool value) {

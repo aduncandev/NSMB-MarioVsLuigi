@@ -50,6 +50,7 @@ namespace NSMB.UI.MainMenu {
 
         public void OnEnable() {
             Settings.Controls.UI.Enable();
+            GlobalController.Instance.fader.FadeBehindUi = false;
         }
 
         public void OnDisable() {

@@ -11,6 +11,7 @@ using Quantum.Profiling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NSMB.UI;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Scripting;
@@ -1198,6 +1199,13 @@ namespace NSMB.Entities.Player {
             }
 
             PlaySound(SoundEffect.World_Pipe_Use);
+            if (!e.Exiting && e.HorizontalWarpDirection != 0)
+            {
+                GlobalController.Instance.fader.Fade(
+                    e.HorizontalWarpDirection == -1 ? AnimatedFader.FadeStyle.LeftSideBumps : AnimatedFader.FadeStyle.RightSideBumps,
+                    e.HorizontalWarpDirection == -1 ? AnimatedFader.FadeStyle.RightSideBumps : AnimatedFader.FadeStyle.LeftSideBumps
+                );
+            }
         }
 
         private void OnMarioPlayerStoppedSliding(EventMarioPlayerStoppedSliding e) {
