@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: propeller_up
+  m_Name: propeller_up_luigi
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -177,22 +177,6 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0.8191521, y: 0, z: 0, w: 0.57357633}
-        inSlope: {x: 0, y: 0, z: 0, w: 0}
-        outSlope: {x: 0, y: 0, z: 0, w: 0}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    path: mario_model_mg/mario_all_root/skl_root/spin/head
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
         value: {x: 0.9381069, y: -0.18597046, z: 0.28349274, w: 0.07072814}
         inSlope: {x: 0, y: 0, z: 0, w: 0}
         outSlope: {x: 0, y: 0, z: 0, w: 0}
@@ -284,6 +268,22 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: 0.8660255, y: 0, z: 0, w: 0.49999988}
+        inSlope: {x: 0, y: 0, z: 0, w: 0}
+        outSlope: {x: 0, y: 0, z: 0, w: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+        outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334, w: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: mario_model_mg/mario_all_root/skl_root/spin/head
   m_CompressedRotationCurves: []
   m_EulerCurves: []
   m_PositionCurves:
@@ -833,7 +833,8 @@ AnimationClip:
       m_RotationOrder: 4
     path: mario_model_mg/mario_all_root/skl_root/spin/head
   m_FloatCurves:
-  - curve:
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -852,7 +853,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -871,7 +874,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -890,7 +895,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -909,7 +916,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -928,7 +937,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -947,7 +958,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -966,6 +979,7 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
+    flags: 16
   m_PPtrCurves: []
   m_SampleRate: 60
   m_WrapMode: 0
@@ -982,6 +996,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2668340204
       attribute: 1
@@ -990,6 +1005,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 4095542320
       attribute: 1
@@ -998,6 +1014,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1903957558
       attribute: 1
@@ -1006,6 +1023,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 3144600018
       attribute: 1
@@ -1014,6 +1032,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1164574740
       attribute: 1
@@ -1022,6 +1041,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2772249065
       attribute: 1
@@ -1030,6 +1050,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 187527150
       attribute: 1
@@ -1038,6 +1059,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1512414871
       attribute: 1
@@ -1046,6 +1068,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 4237332240
       attribute: 1
@@ -1054,6 +1077,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1201090389
       attribute: 1
@@ -1062,6 +1086,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2850168916
       attribute: 1
@@ -1070,6 +1095,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2422553401
       attribute: 1
@@ -1078,6 +1104,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2480279690
       attribute: 1
@@ -1086,6 +1113,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 430016104
       attribute: 1
@@ -1094,6 +1122,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2401936826
       attribute: 1
@@ -1102,6 +1131,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2479112678
       attribute: 1
@@ -1110,6 +1140,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2850168916
       attribute: 2
@@ -1118,6 +1149,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 430016104
       attribute: 2
@@ -1126,6 +1158,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1164574740
       attribute: 2
@@ -1134,6 +1167,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 187527150
       attribute: 2
@@ -1142,6 +1176,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1512414871
       attribute: 2
@@ -1150,6 +1185,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 4237332240
       attribute: 2
@@ -1158,6 +1194,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 3055820754
       attribute: 2
@@ -1166,6 +1203,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2668340204
       attribute: 2
@@ -1174,6 +1212,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 4095542320
       attribute: 2
@@ -1182,6 +1221,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 3144600018
       attribute: 2
@@ -1190,14 +1230,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
-    - serializedVersion: 2
-      path: 2479112678
-      attribute: 2
-      script: {fileID: 0}
-      typeID: 4
-      customType: 0
-      isPPtrCurve: 0
-      isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1201090389
       attribute: 2
@@ -1206,6 +1239,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2772249065
       attribute: 2
@@ -1214,6 +1248,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1903957558
       attribute: 2
@@ -1222,6 +1257,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2401936826
       attribute: 2
@@ -1230,6 +1266,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2422553401
       attribute: 2
@@ -1238,6 +1275,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2480279690
       attribute: 2
@@ -1246,6 +1284,16 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 2479112678
+      attribute: 2
+      script: {fileID: 0}
+      typeID: 4
+      customType: 0
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 3055820754
       attribute: 3
@@ -1254,6 +1302,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2668340204
       attribute: 3
@@ -1262,6 +1311,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 4095542320
       attribute: 3
@@ -1270,6 +1320,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1903957558
       attribute: 3
@@ -1278,6 +1329,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 3144600018
       attribute: 3
@@ -1286,6 +1338,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1164574740
       attribute: 3
@@ -1294,6 +1347,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2772249065
       attribute: 3
@@ -1302,6 +1356,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 187527150
       attribute: 3
@@ -1310,6 +1365,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1512414871
       attribute: 3
@@ -1318,6 +1374,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 4237332240
       attribute: 3
@@ -1326,6 +1383,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 1201090389
       attribute: 3
@@ -1334,6 +1392,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2850168916
       attribute: 3
@@ -1342,6 +1401,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2422553401
       attribute: 3
@@ -1350,6 +1410,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2480279690
       attribute: 3
@@ -1358,6 +1419,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 430016104
       attribute: 3
@@ -1366,6 +1428,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2401936826
       attribute: 3
@@ -1374,6 +1437,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 2479112678
       attribute: 3
@@ -1382,6 +1446,7 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 0
       attribute: 10
@@ -1390,6 +1455,7 @@ AnimationClip:
       customType: 8
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 0
       attribute: 11
@@ -1398,6 +1464,7 @@ AnimationClip:
       customType: 8
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 0
       attribute: 12
@@ -1406,6 +1473,7 @@ AnimationClip:
       customType: 8
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 0
       attribute: 13
@@ -1414,6 +1482,7 @@ AnimationClip:
       customType: 8
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 0
       attribute: 7
@@ -1422,6 +1491,7 @@ AnimationClip:
       customType: 8
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 0
       attribute: 8
@@ -1430,6 +1500,7 @@ AnimationClip:
       customType: 8
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     - serializedVersion: 2
       path: 0
       attribute: 9
@@ -1438,6 +1509,7 @@ AnimationClip:
       customType: 8
       isPPtrCurve: 0
       isIntCurve: 0
+      isSerializeReferenceCurve: 0
     pptrCurveMapping: []
   m_AnimationClipSettings:
     serializedVersion: 2
@@ -1460,7 +1532,8 @@ AnimationClip:
     m_HeightFromFeet: 0
     m_Mirror: 0
   m_EditorCurves:
-  - curve:
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1479,7 +1552,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1498,7 +1573,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1517,7 +1594,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1536,7 +1615,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1555,7 +1636,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1574,7 +1657,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1593,7 +1678,9 @@ AnimationClip:
     path: 
     classID: 95
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1612,7 +1699,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1631,7 +1720,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1650,7 +1741,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1669,7 +1762,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1688,7 +1783,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1707,7 +1804,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1726,7 +1825,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1745,7 +1846,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1764,7 +1867,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1783,7 +1888,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1802,7 +1909,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1821,7 +1930,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1840,7 +1951,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1859,7 +1972,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1878,7 +1993,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1897,7 +2014,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1916,7 +2035,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1935,7 +2056,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1954,7 +2077,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1973,7 +2098,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -1992,7 +2119,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2011,7 +2140,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2030,7 +2161,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2049,7 +2182,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2068,7 +2203,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2087,7 +2224,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2106,7 +2245,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2125,7 +2266,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2144,7 +2287,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2163,7 +2308,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2182,7 +2329,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2201,7 +2350,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2220,7 +2371,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2239,7 +2392,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2258,7 +2413,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2277,7 +2434,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2296,7 +2455,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2315,7 +2476,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2334,7 +2497,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2353,7 +2518,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2372,7 +2539,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2391,7 +2560,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2410,7 +2581,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2429,7 +2602,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2448,7 +2623,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2467,7 +2644,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2486,7 +2665,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2505,7 +2686,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2524,7 +2707,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2543,7 +2728,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2562,7 +2749,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2581,7 +2770,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2600,7 +2791,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2619,7 +2812,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2638,7 +2833,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2657,7 +2854,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2676,7 +2875,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2695,7 +2896,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2714,7 +2917,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2733,7 +2938,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2752,7 +2959,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2771,7 +2980,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2790,7 +3001,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2809,7 +3022,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2828,7 +3043,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2847,7 +3064,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2866,7 +3085,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2885,7 +3106,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2904,7 +3127,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2923,7 +3148,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2942,7 +3169,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2961,7 +3190,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2980,7 +3211,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -2999,7 +3232,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3018,7 +3253,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3037,7 +3274,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3056,7 +3295,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3075,7 +3316,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3094,7 +3337,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3113,7 +3358,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3132,7 +3379,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3151,7 +3400,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3170,7 +3421,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3189,7 +3442,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3208,7 +3463,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3227,7 +3484,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3246,7 +3505,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3265,7 +3526,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3284,7 +3547,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3303,7 +3568,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3322,7 +3589,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3341,7 +3610,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3360,7 +3631,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3379,7 +3652,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3398,7 +3673,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3417,7 +3694,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3436,7 +3715,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/head
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3455,7 +3736,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/head
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3474,7 +3757,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/head
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3493,7 +3778,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/head
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3512,7 +3799,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/head
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3531,7 +3820,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/head
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3550,7 +3841,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3569,7 +3862,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3588,7 +3883,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3607,7 +3904,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3626,7 +3925,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3645,7 +3946,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3664,7 +3967,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3683,7 +3988,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3702,7 +4009,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3721,7 +4030,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3740,7 +4051,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3759,7 +4072,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3778,7 +4093,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3797,7 +4114,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3816,7 +4135,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3835,7 +4156,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3854,7 +4177,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3873,7 +4198,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3892,7 +4219,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3911,7 +4240,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3930,7 +4261,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3949,7 +4282,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3968,7 +4303,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -3987,7 +4324,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4006,7 +4345,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4025,7 +4366,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4044,7 +4387,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4063,7 +4408,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4082,7 +4429,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4101,7 +4450,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4120,7 +4471,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4139,7 +4492,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4158,7 +4513,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4177,7 +4534,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4196,7 +4555,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4215,7 +4576,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4234,7 +4597,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4253,7 +4618,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4272,7 +4639,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4291,83 +4660,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0.8191521
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalRotation.x
-    path: mario_model_mg/mario_all_root/skl_root/spin/head
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalRotation.y
-    path: mario_model_mg/mario_all_root/skl_root/spin/head
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalRotation.z
-    path: mario_model_mg/mario_all_root/skl_root/spin/head
-    classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0.57357633
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalRotation.w
-    path: mario_model_mg/mario_all_root/skl_root/spin/head
-    classID: 4
-    script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4386,7 +4681,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4405,7 +4702,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4424,7 +4723,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4443,7 +4744,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4462,7 +4765,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4481,7 +4786,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4500,7 +4807,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4519,7 +4828,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4538,7 +4849,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4557,7 +4870,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4576,7 +4891,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4595,7 +4912,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4614,7 +4933,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4633,7 +4954,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4652,7 +4975,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4671,7 +4996,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4690,7 +5017,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4709,7 +5038,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4728,7 +5059,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4747,7 +5080,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4766,7 +5101,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4785,7 +5122,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4804,7 +5143,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4823,8 +5164,94 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
+    flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.8660255
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalRotation.x
+    path: mario_model_mg/mario_all_root/skl_root/spin/head
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalRotation.y
+    path: mario_model_mg/mario_all_root/skl_root/spin/head
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalRotation.z
+    path: mario_model_mg/mario_all_root/skl_root/spin/head
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.49999988
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalRotation.w
+    path: mario_model_mg/mario_all_root/skl_root/spin/head
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
   m_EulerEditorCurves:
-  - curve:
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4843,7 +5270,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4862,7 +5291,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4881,7 +5312,9 @@ AnimationClip:
     path: mario_model_mg
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4900,7 +5333,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4919,7 +5354,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4938,7 +5375,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4957,7 +5396,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4976,7 +5417,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -4995,7 +5438,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5014,7 +5459,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5033,7 +5480,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5052,7 +5501,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5071,7 +5522,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5090,7 +5543,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5109,7 +5564,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5128,7 +5585,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5147,7 +5606,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5166,7 +5627,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_l1/leg_l2/ankle_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5185,7 +5648,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5204,7 +5669,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5223,7 +5690,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5242,7 +5711,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5261,7 +5732,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5280,7 +5753,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5299,7 +5774,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5318,7 +5795,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5337,7 +5816,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/leg_r1/leg_r2/ankle_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5356,7 +5837,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5375,7 +5858,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5394,7 +5879,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5413,7 +5900,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5432,7 +5921,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5451,7 +5942,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5470,7 +5963,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5489,7 +5984,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5508,7 +6005,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5527,7 +6026,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5546,7 +6047,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5565,7 +6068,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_l1/arm_l2/wrist_l1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5584,7 +6089,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5603,7 +6110,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5622,7 +6131,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5641,7 +6152,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5660,7 +6173,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5679,7 +6194,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5698,7 +6215,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5717,7 +6236,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5736,12 +6257,14 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/arm_r1/arm_r2/wrist_r1
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 110
+        value: 120
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -5755,7 +6278,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/head
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5774,7 +6299,9 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/head
     classID: 4
     script: {fileID: 0}
-  - curve:
+    flags: 16
+  - serializedVersion: 2
+    curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
@@ -5793,6 +6320,7 @@ AnimationClip:
     path: mario_model_mg/mario_all_root/skl_root/spin/head
     classID: 4
     script: {fileID: 0}
+    flags: 16
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events: []
