@@ -2348,8 +2348,8 @@ namespace Quantum {
                     }
                     if (marioB->IsCrouchedInShell) {
                         marioAPhysics->Velocity.X = marioBPhysics->Velocity.X * FP._0_50;
-                        marioB->FacingRight = !fromRight;
-                        marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
+                        marioB->FacingRight = fromRight;
+                        marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);
                     }
                     return; // do not allow Blue Shell to bump
                 }
@@ -2707,7 +2707,6 @@ namespace Quantum {
                 if (f.Unsafe.TryGetPointer(attacker, out Transform2D* attackerTransform)) {
                     var marioTransform = f.Unsafe.GetPointer<Transform2D>(entity);
                     QuantumUtils.UnwrapWorldLocations(f, marioTransform->Position, attackerTransform->Position, out FPVector2 ourPos, out FPVector2 theirPos);
-                    Debug.Log(attacker + " -> " + ourPos + " and " + theirPos);
                     mario->FacingRight = ourPos.X < theirPos.X;
                 }
             }

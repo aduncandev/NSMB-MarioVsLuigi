@@ -21,8 +21,7 @@ namespace NSMB.UI {
         [SerializeField] private Image shapeImage;
         [SerializeField] private Canvas canvas;
 
-        public bool FadeBehindUi
-        {
+        public bool FadeBehindUi {
             set => canvas.sortingOrder = value ? 0 : 31000;
         }
 

@@ -313,7 +313,7 @@ namespace Quantum {
                 FPVector2 raycastTranslation = new FPVector2(0, velocityY) + (directionVector * (Constants.PhysicsRaycastSkin * 2 + Constants.PhysicsSkin));
 
                 var mask = f.Context.ExcludeEntityAndPlayerMask;
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, shape, raycastTranslation, mask, QueryOptions.DetectOverlapsAtCastOrigin | QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
 
                 if (stage.IsWrappingLevel) {
                     FP center = position.X + shape->Centroid.X;
@@ -330,14 +330,17 @@ namespace Quantum {
                     }
 
                     FP hitboxPosClosestEdge = center + boxShape->Extents.X * closerEdge;
-                    if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + 2) {
+                    if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + FP._0_50) {
                         // Close enough- check over the level seam.
+                        FP wrapDirection = hitboxPosClosestEdge > stage.StageWorldMidpoint.X ? -1 : 1;
                         FPVector2 wrappedRaycastOrigin = raycastOrigin;
-                        wrappedRaycastOrigin.X += stage.TileDimensions.X * FP._0_50;
+                        wrappedRaycastOrigin.X += stage.TileDimensions.X * FP._0_50 * wrapDirection;
+                        UnityEngine.Debug.Log($"attempting wrapped horizontal hits {wrappedRaycastOrigin}, 0, {*shape}, {raycastTranslation}, {mask}");
 
-                        var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                        var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, shape, raycastTranslation, mask, QueryOptions.DetectOverlapsAtCastOrigin | QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
                         for (int i = 0; i < wrappedHits.Count; i++) {
                             physicsHits.Add(wrappedHits[i], f.Context);
+                            UnityEngine.Debug.Log("wrapped vertical hit " + wrappedHits[i].Entity);
                         }
                     }
                 }
@@ -547,7 +550,7 @@ namespace Quantum {
 
                 var mask = f.Context.ExcludeEntityAndPlayerMask;
 
-                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                var physicsHits = f.Physics2D.ShapeCastAll(raycastOrigin, 0, shape, raycastTranslation, mask, QueryOptions.DetectOverlapsAtCastOrigin | QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
 
                 if (stage.IsWrappingLevel) {
                     FP center = position.X + shape->Centroid.X;
@@ -564,14 +567,18 @@ namespace Quantum {
                     }
 
                     FP hitboxPosClosestEdge = center + boxShape->Extents.X * closerEdge;
-                    if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + 2) {
+                    if (FPMath.Abs(hitboxPosClosestEdge - bounds) <= FPMath.Abs(raycastTranslation.X) + FP._0_50) {
                         // Close enough- check over the level seam.
+                        FP wrapDirection = hitboxPosClosestEdge > stage.StageWorldMidpoint.X ? -1 : 1;
                         FPVector2 wrappedRaycastOrigin = raycastOrigin;
-                        wrappedRaycastOrigin.X += stage.TileDimensions.X * FP._0_50;
+                        wrappedRaycastOrigin.X += stage.TileDimensions.X * FP._0_50 * wrapDirection;
+                        UnityEngine.Debug.Log("attempting wrapped horizontal hits");
+                        Draw.Rectangle(wrappedRaycastOrigin.XY + shape->Centroid, shape->Box.Extents.XY * 2, 0);
 
-                        var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, shape, raycastTranslation, mask, QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
+                        var wrappedHits = f.Physics2D.ShapeCastAll(wrappedRaycastOrigin, 0, shape, raycastTranslation, mask, QueryOptions.DetectOverlapsAtCastOrigin | QueryOptions.HitKinematics | QueryOptions.HitTriggers | QueryOptions.ComputeDetailedInfo);
                         for (int i = 0; i < wrappedHits.Count; i++) {
                             physicsHits.Add(wrappedHits[i], f.Context);
+                            UnityEngine.Debug.Log("wrapped vertical hit " + wrappedHits[i].Entity);
                         }
                     }
                 }

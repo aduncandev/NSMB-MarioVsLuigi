@@ -129,19 +129,11 @@ namespace NSMB.Cameras {
             var targetTransformPrevious = fp.Unsafe.GetPointer<Transform2D>(Target);
             var targetTransformCurrent = f.Unsafe.GetPointer<Transform2D>(Target);
             var targetMario = f.Unsafe.GetPointer<MarioPlayer>(Target);
-
-            float playerHeight = targetMario->CurrentPowerupState switch {
-                PowerupState.MegaMushroom => 3.5f,
-                > PowerupState.Mushroom => 1f,
-                _ => 0.5f,
-            };
+            float playerHeight = GetPlayerHeight(targetMario);
 
             // Offset to always put the player in the center for extremely long aspect ratios
             float screenAspect = ourCamera.aspect;
             float orthoSize = ourCamera.orthographicSize;
-            if (Mathf.Abs((16f / 9f) - screenAspect) < 0.05f) {
-                screenAspect = 16f / 9f;
-            }
 
             Vector2 cameraFocus = Vector2.Lerp(targetTransformPrevious->Position.ToUnityVector2(), targetTransformCurrent->Position.ToUnityVector2(), game.InterpolationFactor);
             cameraFocus.y += playerHeight * 0.5f;
@@ -336,12 +328,7 @@ namespace NSMB.Cameras {
                 return;
             }
 
-            float playerHeight = f.Unsafe.GetPointer<MarioPlayer>(Target)->CurrentPowerupState switch {
-                PowerupState.MegaMushroom => 3.5f,
-                > PowerupState.Mushroom => 1f,
-                _ => 0.5f,
-            };
-            
+            float playerHeight = GetPlayerHeight(f.Unsafe.GetPointer<MarioPlayer>(Target));
             var otherPipeTransform = f.Unsafe.GetPointer<Transform2D>(currentPipe->OtherPipe);
             tweenStartPosition = ourCamera.transform.position;
             tweenedTargetPosition = otherPipeTransform->Position.ToUnityVector3() + e.Offset.ToUnityVector3() + new Vector3(0, playerHeight * 0.5f, -10);
@@ -349,6 +336,14 @@ namespace NSMB.Cameras {
             float cameraMaxY = Mathf.Max(stage.CameraMinPosition.Y.AsFloat + Mathf.Max(7, ourCamera.orthographicSize * 2), stage.CameraMaxPosition.Y.AsFloat) - ourCamera.orthographicSize;
             tweenedTargetPosition.y = Mathf.Clamp(tweenedTargetPosition.y, cameraMinY, cameraMaxY);
             tweenTime = 0f;
+        }
+
+        private static float GetPlayerHeight(MarioPlayer* mario) {
+            return mario->CurrentPowerupState switch {
+                PowerupState.MegaMushroom => 3.5f,
+                > PowerupState.Mushroom => 1f,
+                _ => 0.5f,
+            };
         }
 
         public enum CameraMode {
