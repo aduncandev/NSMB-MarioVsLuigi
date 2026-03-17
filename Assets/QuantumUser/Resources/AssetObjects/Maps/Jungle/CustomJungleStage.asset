@@ -393,9 +393,9 @@ MonoBehaviour:
         IsCeilingPipe:
           Value: 0
         IsMiniOnly:
-          Value: 0
-        TransitionOnlyPanning:
           Value: 1
+        TransitionOnlyPanning:
+          Value: 0
     - rid: 1189759297370718212
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:
@@ -959,9 +959,9 @@ MonoBehaviour:
         IsCeilingPipe:
           Value: 0
         IsMiniOnly:
-          Value: 0
-        TransitionOnlyPanning:
           Value: 1
+        TransitionOnlyPanning:
+          Value: 0
     - rid: 3288229553830363140
       type: {class: InteractablePrototype, ns: Quantum.Prototypes, asm: Quantum.Simulation}
       data:

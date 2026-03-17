@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEditor;
 using AssetObjectQuery = Quantum.AssetObjectQuery;
+using System.Reflection;
 
 [assembly: QuantumMapBakeAssembly]
 namespace NSMB.Quantum { 
@@ -100,47 +101,16 @@ namespace NSMB.Quantum {
             }
             LogInfo($"Baked level data with {uniqueTiles.Count} unique tiles");
 
-            // --- Bake Star Spawns
-            GameObject[] starSpawns = GameObject.FindGameObjectsWithTag("StarSpawn");
-            stage.BigStarSpawnpoints = starSpawns.Select(go => go.transform.position.ToFPVector2()).Take(Constants.MaxStarSpawns).ToArray();
-            if (starSpawns.Length <= Constants.MaxStarSpawns) {
-                LogInfo($"Automatically found big star spawns: {stage.BigStarSpawnpoints.Length}");
-            } else {
-                LogError($"The stage data has a limit of {Constants.MaxStarSpawns} star spawns! (Found {starSpawns.Length}). To change this, modify '#define MaxStarSpawns' in BigStar.qtn");
+            // --- Bake Entities
+            var bakingSteps = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(asm => asm.GetTypes())
+                .Where(t => typeof(IQuantumBakeStep).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+                .Select(t => (IQuantumBakeStep) Activator.CreateInstance(t))
+                .OrderBy(bs => bs.Order);
+
+            foreach (var step in bakingSteps) {
+                step.OnBake(data, stage);                
             }
-
-            // --- Bake Enemies(' spawnpoints)
-            QPrototypeEnemy[] enemies = GameObject.FindObjectsByType<QPrototypeEnemy>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (var enemy in enemies) {
-                enemy.Prototype.Spawnpoint = enemy.transform.position.ToFPVector2();
-                EditorUtility.SetDirty(enemy);
-            }
-            LogInfo($"Baked {enemies.Length} enemy(s)");
-
-            // --- Bake Donut Blocks(' spawnpoints)
-            QPrototypeDonutBlock[] donutBlocks = GameObject.FindObjectsByType<QPrototypeDonutBlock>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (var donutBlock in donutBlocks) {
-                donutBlock.Prototype.Origin = donutBlock.transform.position.ToFPVector2();
-            }
-            LogInfo($"Baked {donutBlocks.Length} donut block(s)");
-
-
-            /*
-            // --- Bake Breakable Objects
-            QPrototypeBreakableObject[] breakables = GameObject.FindObjectsByType<QPrototypeBreakableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (var breakable in breakables) {
-                var prototype = breakable.GetComponent<QuantumEntityPrototype>();
-                var shape = prototype.PhysicsCollider.Shape2D;
-                shape.PositionOffset = FPVector2.Up * (breakable.Prototype.OriginalHeight / 4);
-                shape.BoxExtents.Y = (breakable.Prototype.OriginalHeight / 4);
-
-                SpriteRenderer sRenderer = breakable.GetComponentInChildren<SpriteRenderer>();
-                sRenderer.size = new Vector2(sRenderer.size.x, breakable.Prototype.OriginalHeight.AsFloat);
-                EditorUtility.SetDirty(breakable);
-                EditorUtility.SetDirty(prototype);
-            }
-            LogInfo($"Baked {breakables.Length} breakable objects");
-            */
 
             EditorUtility.SetDirty(stage);
         }
