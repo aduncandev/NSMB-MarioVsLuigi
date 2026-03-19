@@ -2716,6 +2716,7 @@ namespace Quantum {
             switch (breakReason) {
             case IceBlockBreakReason.HitWall:
             case IceBlockBreakReason.Other:
+            other:
                 // Weak knockback, i-frames.
                 strength = KnockbackStrength.FireballBump;
                 damaged = mario->DoKnockback(f, entity, mario->FacingRight, 1, strength, brokenIceBlock);
@@ -2735,17 +2736,29 @@ namespace Quantum {
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
 
+            case IceBlockBreakReason.InvincibleMario:
+                // Damage, i-frames.
+                strength = KnockbackStrength.Groundpound;
+                if (mario->Powerdown(f, entity, false, brokenIceBlock)) {
+                    mario->DoKnockback(f, entity, mario->FacingRight, 0, KnockbackStrength.FireballBump, brokenIceBlock);
+                }
+                damaged = false; // No "bump" effect.
+                mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
+                break;
+
             case IceBlockBreakReason.Timer:
-                // Damage holder, if we can, and i-frames.
+                // Knockback holder, if we can, and i-frames.
                 var iceBlockHoldable = f.Unsafe.GetPointer<Holdable>(brokenIceBlock);
-                if (f.Unsafe.TryGetPointer(iceBlockHoldable->Holder, out MarioPlayer* holderMario)) {
+                if (f.Has<MarioPlayer>(iceBlockHoldable->Holder)) {
                     OnMarioMarioInteraction(f, entity, iceBlockHoldable->Holder);
                 }
                 mario->DamageInvincibilityFrames = Constants.DamageInvincibilityFrames;
                 break;
+
             default:
                 // Fall through.
-                break;
+                Log.DebugWarn($"Unhandled IceBlockBreakReason {breakReason} in {nameof(OnIceBlockBroken)}!");
+                goto other;
             }
 
             if (damaged) {

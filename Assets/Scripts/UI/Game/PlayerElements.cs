@@ -17,7 +17,7 @@ using UnityEngine.InputSystem;
 using static NSMB.Utilities.QuantumViewUtils;
 
 namespace NSMB.UI.Game {
-    public class PlayerElements : QuantumSceneViewComponent {
+    public unsafe class PlayerElements : QuantumSceneViewComponent {
 
         //---Static Variables
         public static HashSet<PlayerElements> AllPlayerElements = new();
@@ -73,6 +73,33 @@ namespace NSMB.UI.Game {
             Settings.Controls.UI.Submit.performed += OnSubmit;
             Settings.OnNametagVisibilityChanged += OnNametagVisibilityChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
+
+            if (Game.Session.IsReplay) {
+                StartSpectating();
+                
+                if (PlayerPrefs.HasKey("id")) {
+                    string userId = PlayerPrefs.GetString("id");
+                    for (int i = 0; i < f.MaxPlayerCount; i++) {
+                        RuntimePlayer player = f.GetPlayerData(i);
+                        if (player == null || player.UserId != userId) {
+                            continue;
+                        }
+
+                        foreach ((var entity, var mario) in f.Unsafe.GetComponentBlockIterator<MarioPlayer>()) {
+                            if (mario->PlayerRef != i) {
+                                continue;
+                            }
+
+                            // This is our player. Default to them.
+                            Entity = entity;
+                            cameraAnimator.Mode = CameraAnimator.CameraMode.FollowPlayer;
+                            UpdateSpectateUI();
+                            break;
+                        }
+                        break;
+                    }
+                }
+            }
         }
 
         public override void OnDeactivate() {

@@ -25,10 +25,12 @@ namespace NSMB.Utilities {
         }
 
         ~InvertedImageMask() {
-            if (newMaterial) {
-                Debug.LogError("InvertedImageMask destructor called without freeing newMaterial. This should never happen?");
-                Destroy(newMaterial);
-            }
+            try {
+                if (newMaterial) {
+                    Debug.LogError("InvertedImageMask destructor called without freeing newMaterial. This should never happen?");
+                    Destroy(newMaterial);
+                }
+            } catch { /* Fixes exiting play mode in editor while debugging */ }
         }
     }
 }

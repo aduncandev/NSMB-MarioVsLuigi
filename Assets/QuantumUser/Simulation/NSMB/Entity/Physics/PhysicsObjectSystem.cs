@@ -414,6 +414,9 @@ namespace Quantum {
                             continue;
                         }
                         if (hit.IsDynamic) {
+                            if (!f.Exists(hit.Entity) || f.DestroyPending(hit.Entity)) {
+                                continue;
+                            }
                             if (f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid)) {
                                 if (liquid->LiquidType != LiquidType.Water || !physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < Constants.PhysicsGroundMaxAngleCos) {
                                     // Colliding with water and we cant interact
@@ -650,6 +653,9 @@ namespace Quantum {
                             continue;
                         }
                         if (hit.IsDynamic) {
+                            if (!f.Exists(hit.Entity) || f.DestroyPending(hit.Entity)) {
+                                continue;
+                            }
                             if (f.Unsafe.TryGetPointer(hit.Entity, out Liquid* liquid)) {
                                 if (liquid->LiquidType != LiquidType.Water || !physicsObject->IsWaterSolid || FPVector2.Dot(hit.Normal, FPVector2.Up) < Constants.PhysicsGroundMaxAngleCos) {
                                     // Colliding with water and we cant interact
@@ -1094,7 +1100,7 @@ namespace Quantum {
                 Shape2D* hitShape = hit.GetShape(f);
 
                 // Hit something.
-                if (hitShape->Type == Shape2DType.Edge || hit.Entity == entity || (mario != null && hit.Entity == mario->HeldEntity)) {
+                if (hitShape->Type == Shape2DType.Edge || hit.Entity == entity || f.DestroyPending(hit.Entity) || (mario != null && hit.Entity == mario->HeldEntity)) {
                     continue;
                 }
 

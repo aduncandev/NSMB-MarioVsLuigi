@@ -91,13 +91,12 @@ namespace NSMB.Cameras {
             }
         }
 
-        private void UpdateCameraFollowPlayerTweening(CallbackUpdateView e)
-        {
+        private void UpdateCameraFollowPlayerTweening(CallbackUpdateView e) {
             tweenTime += Time.unscaledDeltaTime;
             if (tweenTime < 0.5f) {
                 UpdateCameraFollowPlayerMode(e);
             } else {
-                ourCamera.transform.position = Vector3.Lerp(tweenStartPosition, tweenedTargetPosition, Mathf.Clamp01((tweenTime-0.5f)  / 1f));
+                ourCamera.transform.position = Vector3.Lerp(tweenStartPosition, tweenedTargetPosition, Mathf.Clamp01((tweenTime - 0.5f) / 1f));
             }
         }
 

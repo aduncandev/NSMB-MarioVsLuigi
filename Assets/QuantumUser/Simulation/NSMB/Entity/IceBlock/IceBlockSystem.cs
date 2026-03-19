@@ -102,6 +102,10 @@ namespace Quantum {
         }
 
         public static void Destroy(Frame f, EntityRef iceBlockEntity, IceBlockBreakReason breakReason, EntityRef attacker) {
+            var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
+            if (f.Unsafe.TryGetPointer(iceBlock->Entity, out PhysicsObject* childPhysicsObject)) {
+                childPhysicsObject->IsFrozen = false;
+            }
             f.Signals.OnIceBlockBroken(iceBlockEntity, breakReason, attacker);
             f.Destroy(iceBlockEntity);
         }
@@ -112,7 +116,7 @@ namespace Quantum {
             var iceBlock = f.Unsafe.GetPointer<IceBlock>(iceBlockEntity);
 
             if (mario->IsStarmanInvincible || mario->CurrentPowerupState == PowerupState.MegaMushroom) {
-                Destroy(f, iceBlockEntity, IceBlockBreakReason.Other, marioEntity);
+                Destroy(f, iceBlockEntity, IceBlockBreakReason.InvincibleMario, marioEntity);
                 return true;
             }
 
