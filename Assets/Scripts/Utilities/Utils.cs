@@ -7,7 +7,7 @@ using System.Text;
 using UnityEngine;
 
 namespace NSMB.Utilities {
-    public class Utils {
+    public static class Utils {
 
         public static T IndexIntoOrDefault<T>(IList<T> list, int index, T def) {
             if (index < 0 || index >= list.Count) {
@@ -156,10 +156,10 @@ namespace NSMB.Utilities {
             return symbolStringBuilder.ToString();
         }
 
-        public static unsafe int? GetPlayerIndex(Frame f, PlayerRef player) {
+        public static unsafe int? GetPlayerSlotIndex(Frame f, PlayerRef player) {
             int ourIndex = 0;
             int totalPlayers = 0;
-            if (f.Global->GameState == GameState.PreGameRoom) {
+            if (f.Global->GameState is GameState.PreGameRoom or GameState.WaitingForPlayers) {
                 // use PlayerData here
                 PlayerData* ourPlayerData = QuantumUtils.GetPlayerData(f, player);
                 if (ourPlayerData == null) {
@@ -199,7 +199,7 @@ namespace NSMB.Utilities {
         }
 
         public static PlayerSlotInfo GetPlayerSlotInfo(Frame f, PlayerRef player) {
-            int? index = GetPlayerIndex(f, player);
+            int? index = GetPlayerSlotIndex(f, player);
             var slots = GlobalController.Instance.playerSlots;
             return index.HasValue && index < slots.Length ? slots[index.Value] : null;
         }
@@ -300,6 +300,11 @@ namespace NSMB.Utilities {
             return GlobalController.Instance.pingIndicators[index];
         }
 
+        /// <summary>
+        /// Taken from https://stackoverflow.com/a/4975942/19635374
+        /// </summary>
+        /// <param name="byteCount"></param>
+        /// <returns></returns>
         public static string BytesToString(long byteCount) {
             string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; // Longs run out around EB
             if (byteCount == 0) {
@@ -321,8 +326,12 @@ namespace NSMB.Utilities {
             return new(Mathf.Cos(vec.x), Mathf.Cos(vec.y), Mathf.Cos(vec.z));
         }
 
+        /// <summary>
+        /// Taken from https://stackoverflow.com/a/596243/19635374
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
         public static float Luminance(Color color) {
-            // https://stackoverflow.com/a/596243/19635374
             return 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
         }
     }

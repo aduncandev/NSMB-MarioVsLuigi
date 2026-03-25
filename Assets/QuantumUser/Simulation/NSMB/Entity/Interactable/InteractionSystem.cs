@@ -10,6 +10,9 @@ namespace Quantum {
         private HashSet<EntityRefPair> alreadyInteracted = new(16);
 
         public override void Update(Frame f) {
+            // Safety.
+            alreadyInteracted.Clear();
+
             foreach ((var entity, var initiator) in f.Unsafe.GetComponentBlockIterator<InteractionInitiator>()) {
                 if ((f.Unsafe.TryGetPointer(entity, out Interactable* interactable) && interactable->ColliderDisabled)
                     || (f.Unsafe.TryGetPointer(entity, out Enemy* enemy) && enemy->IsDead)

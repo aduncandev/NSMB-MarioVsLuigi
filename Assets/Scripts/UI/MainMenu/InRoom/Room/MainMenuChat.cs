@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Photon.Deterministic;
 
 namespace NSMB.UI.MainMenu.Submenus.InRoom {
 
@@ -32,8 +31,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             Settings.OnDisableChatChanged += OnDisableChatChanged;
             TranslationManager.OnLanguageChanged += OnLanguageChanged;
             PlayerListEntry.PlayerMuteStateChanged += OnPlayerMuteStateChanged;
-            PlayerListHandler.PlayerAdded += OnPlayerListEntryAddedOrRemoved;
-            PlayerListHandler.PlayerRemoved += OnPlayerListEntryAddedOrRemoved;
+            PlayerListHandler.PlayerAdded += OnPlayerListChanged;
+            PlayerListHandler.PlayerRemoved += OnPlayerListChanged;
             OnDisableChatChanged();
             messagePrefab.gameObject.SetActive(false);
 
@@ -49,8 +48,8 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             Settings.OnDisableChatChanged -= OnDisableChatChanged;
             TranslationManager.OnLanguageChanged -= OnLanguageChanged;
             PlayerListEntry.PlayerMuteStateChanged -= OnPlayerMuteStateChanged;
-            PlayerListHandler.PlayerAdded -= OnPlayerListEntryAddedOrRemoved;
-            PlayerListHandler.PlayerRemoved -= OnPlayerListEntryAddedOrRemoved;
+            PlayerListHandler.PlayerAdded -= OnPlayerListChanged;
+            PlayerListHandler.PlayerRemoved -= OnPlayerListChanged;
         }
 
         public void UpdatePlayerColors() {
@@ -210,7 +209,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
             ClearChat();
         }
 
-        private void OnPlayerListEntryAddedOrRemoved(int index) {
+        private void OnPlayerListChanged(int index) {
             UpdatePlayerColors();
         }
 
