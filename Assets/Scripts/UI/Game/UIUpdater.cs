@@ -434,9 +434,7 @@ namespace NSMB.UI.Game {
                 foreach (var mario in MarioPlayerAnimator.AllMarioPlayers) {
                     entityTrackIcons[mario] = CreateTrackIcon(Updater, PredictedFrame, mario.EntityRef, mario.transform);
                 }
-            }
-            else if (e.NewState == GameState.Playing)
-            {
+            } else if (e.NewState == GameState.Playing) {
                 GlobalController.Instance.fader.FadeBehindUi = true;
             }
         }
