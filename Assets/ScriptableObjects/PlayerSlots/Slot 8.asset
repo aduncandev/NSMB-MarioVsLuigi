@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77be103429cab49458a9fa9a18f8e3de, type: 3}
   m_Name: Slot 8
   m_EditorClassIdentifier: Assembly-CSharp::NSMB.UI.Game.PlayerSlotInfo
-  Color: {r: 0.5660378, g: 0.3312112, b: 0, a: 1}
+  Color: {r: 0.41877726, g: 0.26900145, b: 0.8773585, a: 1}
   Sprite: {fileID: 180310867, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
   Icon: <sprite name=playernumber_8>

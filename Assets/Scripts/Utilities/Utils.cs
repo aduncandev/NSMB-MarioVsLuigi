@@ -158,7 +158,6 @@ namespace NSMB.Utilities {
 
         public static unsafe int? GetPlayerSlotIndex(Frame f, PlayerRef player) {
             int ourIndex = 0;
-            int totalPlayers = 0;
             if (f.Global->GameState is GameState.PreGameRoom or GameState.WaitingForPlayers) {
                 // use PlayerData here
                 PlayerData* ourPlayerData = QuantumUtils.GetPlayerData(f, player);
@@ -171,7 +170,6 @@ namespace NSMB.Utilities {
                         continue;
                     }
 
-                    totalPlayers++;
                     if (otherPlayerData->JoinTick < ourPlayerData->JoinTick) {
                         ourIndex++;
                     }
@@ -179,23 +177,16 @@ namespace NSMB.Utilities {
             } else {
                 // use PlayerInformation here
                 ourIndex = -1;
-                totalPlayers = f.Global->RealPlayers;
                 var playerInfos = f.Global->PlayerInfo;
-                for (int i = 0; i < totalPlayers; i++) {
+                for (int i = 0; i < f.Global->RealPlayers; i++) {
                     if (playerInfos[i].PlayerRef == player) {
                         ourIndex = i;
                         break;
                     }
                 }
-
-                if (ourIndex == -1) {
-                    // Spectator
-                    return null;
-                }
             }
 
-            // Mathf.Max makes it so 2 players uses indices 0 and 3, for red and green.
-            return Mathf.CeilToInt(((float) ourIndex / Mathf.Max(totalPlayers + 1, 4)) * GlobalController.Instance.playerSlots.Length);
+            return ourIndex < 0 ? null : ourIndex;
         }
 
         public static PlayerSlotInfo GetPlayerSlotInfo(Frame f, PlayerRef player) {

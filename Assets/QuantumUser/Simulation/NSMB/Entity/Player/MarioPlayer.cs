@@ -570,10 +570,12 @@ namespace Quantum {
             }
 
             sbyte horizontalDirection;
-            if (pipeComponent->TransitionOnlyPanning)
+            if (pipeComponent->TransitionOnlyPanning) {
                 horizontalDirection = 0;
-            else
-                horizontalDirection = (sbyte)(otherPipeTransform->Position.X < pipeTransform->Position.X ? -1 : 1);
+            } else {
+                horizontalDirection = (sbyte) (otherPipeTransform->Position.X < pipeTransform->Position.X ? -1 : 1);
+            }
+
             f.Events.MarioPlayerEnteredPipe(mario, CurrentPipe, false, horizontalDirection, FPVector2.Zero);
         }
 

@@ -606,7 +606,7 @@ namespace Quantum {
                     for (FP y = bottom; y <= top; y += FP._0_50) {
                         FPVector2 worldPos = new FPVector2(x + FP._0_25, y + FP._0_25);
                         StageTileInstance tile = stage.GetTileWorld(f, worldPos);
-
+                        
                         if (!tile.GetWorldPolygons(f, stage, vertexBuffer, shapeVertexCountBuffer, out StageTile stageTile, worldPos)) {
                             continue;
                         }

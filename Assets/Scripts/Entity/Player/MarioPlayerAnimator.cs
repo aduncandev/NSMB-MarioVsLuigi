@@ -1199,8 +1199,7 @@ namespace NSMB.Entities.Player {
             }
 
             PlaySound(SoundEffect.World_Pipe_Use);
-            if (!e.Exiting && e.HorizontalWarpDirection != 0)
-            {
+            if (!e.Exiting && e.HorizontalWarpDirection != 0) {
                 GlobalController.Instance.fader.Fade(
                     e.HorizontalWarpDirection == -1 ? AnimatedFader.FadeStyle.LeftSideBumps : AnimatedFader.FadeStyle.RightSideBumps,
                     e.HorizontalWarpDirection == -1 ? AnimatedFader.FadeStyle.RightSideBumps : AnimatedFader.FadeStyle.LeftSideBumps
