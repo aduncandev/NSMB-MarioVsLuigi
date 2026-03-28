@@ -8,5 +8,7 @@
         public AssetRef<CharacterAsset> Character;
         public AssetRef<PaletteSet> Palette;
 
+        public bool IsGloballyMuted;
+
     }
 }

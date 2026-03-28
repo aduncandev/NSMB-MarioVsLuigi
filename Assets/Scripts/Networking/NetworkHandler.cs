@@ -38,7 +38,7 @@ namespace NSMB.Networking {
         public static string Region => Client?.CurrentRegion ?? Instance.lastRegion;
 
         //---Serialized Variables
-        [SerializeField] private TextAsset buildIdentifierAsset;
+        [SerializeField] private BuildIdentifier buildIdentifierAsset;
 
         //---Private Variables
         private RealtimeClient realtimeClient;
@@ -148,17 +148,11 @@ namespace NSMB.Networking {
 
             try {
                 string buildIdentifier = "";
-                if (Instance.buildIdentifierAsset) {
-                    foreach (var line in Instance.buildIdentifierAsset.text.Split('\n', StringSplitOptions.RemoveEmptyEntries)) {
-                        var trimmedLine = line.Trim();
-                        if (trimmedLine.Length == 0
-                            || trimmedLine.StartsWith('#')) {
-                            continue;
-                        }
-
-                        buildIdentifier = "-" + trimmedLine;
-                        break;
-                    }
+                if (Instance.buildIdentifierAsset && !string.IsNullOrWhiteSpace(Instance.buildIdentifierAsset.Identifier)) {
+                    Debug.Log($"[Network] Build Identifier: {Instance.buildIdentifierAsset.Identifier}");
+                    buildIdentifier = "-" + Instance.buildIdentifierAsset.Identifier;
+                } else {
+                    Debug.Log("[Network] Build Identifier: <none>");
                 }
 
                 await Client.ConnectUsingSettingsAsync(new AppSettings {

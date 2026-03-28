@@ -19602,8 +19602,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b206f0897e0840545bca58962f5ec592, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildIdentifierAsset: {fileID: 4900000, guid: 9547f238d531bef47a15e7b61abf719a,
-    type: 3}
+  buildIdentifierAsset: {fileID: 11400000, guid: e1a07c9193f8b7744ad8a10f25525086,
+    type: 2}
 --- !u!114 &2477416830814354373
 MonoBehaviour:
   m_ObjectHideFlags: 0

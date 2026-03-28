@@ -1,7 +1,0 @@
-# The value below separates the game's servers into groups.
-# Players can only see rooms and join others that have executables built with the same ID.
-# Change this if you're making a mod and don't want it to connect to the main game!
-#
-# The first non-blank, non-comment (#) line will be the identifier.
-
-vanilla

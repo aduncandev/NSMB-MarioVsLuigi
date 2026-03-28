@@ -138,7 +138,7 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
                 msg.UpdateVisibleState();
             }
 
-            sendBtn.interactable = chatbox.interactable = !Settings.Instance.GeneralDisableChat;
+            sendBtn.interactable = chatbox.interactable = !Settings.Instance.GeneralDisableChat && !IsLocallyMuted();
 
             if (!chatbox.interactable) {
                 chatbox.text = "";
@@ -154,10 +154,33 @@ namespace NSMB.UI.MainMenu.Submenus.InRoom {
         }
 
         private void OnLanguageChanged(TranslationManager tm) {
-            string key = Settings.Instance.GeneralDisableChat ? "ui.inroom.chat.disabled" : "ui.inroom.chat.prompt";
+            string key;
+            if (Settings.Instance.GeneralDisableChat) {
+                key = "ui.inroom.chat.disabled";
+            } else if (IsLocallyMuted()) {
+                key = "ui.inroom.chat.muted";
+            } else {
+                key = "ui.inroom.chat.prompt";
+            }
 
             chatPrompt.text = tm.GetTranslation(key);
             chatPrompt.horizontalAlignment = tm.RightToLeft ? HorizontalAlignmentOptions.Right : HorizontalAlignmentOptions.Left;
+        }
+
+        private bool IsLocallyMuted() {
+            var game = QuantumRunner.DefaultGame;
+            if (game == null) {
+                return false;
+            }
+
+            Frame f = game.Frames.Predicted;
+            foreach (var player in game.GetLocalPlayers()) {
+                RuntimePlayer runtimePlayer = f.GetPlayerData(player);
+                if (runtimePlayer != null && runtimePlayer.IsGloballyMuted) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void OnTextboxChanged() {
