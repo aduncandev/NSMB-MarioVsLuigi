@@ -27,7 +27,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.6, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2939613095395977903}
@@ -81,7 +81,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2027879749, guid: 70672da71d9d71a4daaf5f3fc58531e6, type: 3}
+  m_Sprite: {fileID: -2556557629098419468, guid: 88ec78ac4484c29459651e7992891bea,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -411,6 +412,8 @@ MonoBehaviour:
     IsCeilingPipe:
       Value: 0
     IsMiniOnly:
+      Value: 0
+    TransitionOnlyPanning:
       Value: 0
 --- !u!114 &2333072886424663942
 MonoBehaviour:
