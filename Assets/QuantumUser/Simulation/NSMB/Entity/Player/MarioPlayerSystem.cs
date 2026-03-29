@@ -344,12 +344,10 @@ namespace Quantum {
                 // only allow Blue Shell sliding if and only if
                 // Mario has the Blue Shell PowerUP, is touching the ground, is "run" (which means sprint is down),
                 // not holding, above or equal to the Blue Shell's speed, has velocity in the right direction (i.e positive and facing right)
-                // and his holding right if he's move right, and holding left if he's moving left
                 mario->IsInShell |= mario->CurrentPowerupState == PowerupState.BlueShell && physicsObject->IsTouchingGround
                                     && run && !mario->HeldEntity.IsValid
                                     && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * physics.WalkBlueShellMultiplier[physics.ShellNormalStage]
-                                    && (physicsObject->Velocity.X > 0) == mario->FacingRight
-                                    && (mario->FacingRight && inputs.Right.IsDown || !mario->FacingRight && inputs.Left.IsDown);
+                                    && (physicsObject->Velocity.X > 0) == mario->FacingRight;
             }
 
             // ignore when blue shell, allowing Mario to both "crouch" while sliding
@@ -2343,16 +2341,32 @@ namespace Quantum {
                 if ((marioA->IsCrouchedInShell || marioB->IsCrouchedInShell) && (FPMath.Abs(marioAPhysics->Velocity.X) > 0 || FPMath.Abs(marioBPhysics->Velocity.X) > 0)) {
                     var marioAPhysicsInfo = f.FindAsset(marioA->PhysicsAsset);
                     var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
-                    // push the other Mario back
+                    // push the other Mario back only if grounded otherwise do knockback
                     if (marioA->IsCrouchedInShell) {
-                        marioBPhysics->Velocity.X = marioAPhysics->Velocity.X * FP._0_50;
-                        marioA->FacingRight = !fromRight;
-                        marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
+                        if (marioAPhysics->IsTouchingGround && !marioBAbove) {
+                            marioBPhysics->Velocity.X = marioAPhysics->Velocity.X * FP._0_50;
+                            marioA->FacingRight = !fromRight;
+                            marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
+                        } else if (dropStars) {
+                            KnockbackStrength strength = KnockbackStrength.Groundpound;
+                            bool didKnockback = marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, strength, marioAEntity);
+                            if (didKnockback) {
+                                f.Events.PlayKnockbackEffect(marioBEntity, marioAEntity, strength, avgPosition);
+                            }
+                        }
                     }
                     if (marioB->IsCrouchedInShell) {
-                        marioAPhysics->Velocity.X = marioBPhysics->Velocity.X * FP._0_50;
-                        marioB->FacingRight = fromRight;
-                        marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);
+                        if (marioBPhysics->IsTouchingGround && !marioAAbove) {
+                            marioAPhysics->Velocity.X = marioBPhysics->Velocity.X * FP._0_50;
+                            marioB->FacingRight = fromRight;
+                            marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);
+                        } else if (dropStars) {
+                            KnockbackStrength strength = KnockbackStrength.Groundpound;
+                            bool didKnockback = marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, strength, marioBEntity);
+                            if (didKnockback) {
+                                f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, strength, avgPosition);
+                            }
+                        }
                     }
                     return; // do not allow Blue Shell to bump
                 }
@@ -2376,6 +2390,7 @@ namespace Quantum {
                 }
             }
 
+            // this runs if iframes are 0 or below, MarioA is in knockback, not in get UP and MarioA is not in knockback or MarioA is not grounded
             if ((marioA->DamageInvincibilityFrames <= 0 || marioA->CurrentKnockback != KnockbackStrength.None || marioA->KnockbackGetupFrames > 0) && (!marioA->IsInKnockback || marioAPhysics->IsTouchingGround)
                 && (marioB->DamageInvincibilityFrames <= 0 || marioB->CurrentKnockback != KnockbackStrength.None || marioB->KnockbackGetupFrames > 0) && (!marioB->IsInKnockback || marioBPhysics->IsTouchingGround)) {
 
@@ -2383,18 +2398,6 @@ namespace Quantum {
                 if (!marioA->IsInShell && !marioB->IsInShell) {
                     var marioAPhysicsInfo = f.FindAsset(marioA->PhysicsAsset);
                     var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
-                    // Blue Shell is weird, when crouching and Xspeed > 0 then do "hip drop knockback".
-                    //! this can potentially be OP, playtests are needed...
-                    /*if (marioA->IsCrouchedInShell && FPMath.Abs(marioAPhysics->Velocity.X) > 0 && !marioAPhysics->IsTouchingGround && !marioB->IsCrouchedInShell) {
-                        // teammates do softer knockback
-                        KnockbackStrength strength = dropStars ? KnockbackStrength.Normal : KnockbackStrength.Groundpound;
-                        marioB->DoKnockback(f, marioBEntity, fromRight, dropStars ? 1 : 0, strength, marioAEntity);
-                    }
-                    if (marioB->IsCrouchedInShell && FPMath.Abs(marioBPhysics->Velocity.X) > 0 && !marioBPhysics->IsTouchingGround && !marioA->IsCrouchedInShell) {
-                        // teammates do softer knockback
-                        KnockbackStrength strength = dropStars ? KnockbackStrength.Normal : KnockbackStrength.Groundpound;
-                        marioB->DoKnockback(f, marioBEntity, fromRight, dropStars ? 1 : 0, strength, marioAEntity);
-                    }*/
 
                     if (FPMath.Abs(marioAPhysics->Velocity.X) > marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.WalkSpeedStage]
                         || FPMath.Abs(marioBPhysics->Velocity.X) > marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.WalkSpeedStage]) {
@@ -2533,9 +2536,11 @@ namespace Quantum {
                 // Blue Shell has very strong knockback!!
                 // deal different knockback if it's a teammate
                 KnockbackStrength strength = dropStars ? KnockbackStrength.Groundpound : KnockbackStrength.Normal;
-                defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? 1 : 0, strength, attacker);
+                bool didKnockback = defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? 1 : 0, strength, attacker);
                 attackerMario->DoEntityBounce = false; // no bounce
-                f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition);
+                if (didKnockback) {
+                    f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition);
+                }
             } else if (defenderMario->CurrentPowerupState == PowerupState.HammerSuit && defenderPhysicsObject->IsTouchingGround && defenderMario->IsCrouching && !groundpounded) {
                 // Bounce
                 var attackerPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(attacker);
