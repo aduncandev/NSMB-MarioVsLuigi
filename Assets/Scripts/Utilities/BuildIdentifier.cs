@@ -18,6 +18,8 @@ namespace NSMB.Utilities {
             UnityEditor.EditorGUILayout.Space();
 
             ((BuildIdentifier) target).Identifier = UnityEditor.EditorGUILayout.TextField("Identifier", ((BuildIdentifier) target).Identifier);
+
+            UnityEditor.EditorUtility.SetDirty(target);
         }
     }
 #endif

@@ -217,6 +217,5 @@
   "discord.public": "在公众房间内",
   "discord.private": "在私人房间内",
   "discord.online": "上线游玩",
-  "discord.offline": "下线游玩",
-  "gamemode.coinrunners.description": ""
+  "discord.offline": "下线游玩"
 }

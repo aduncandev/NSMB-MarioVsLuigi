@@ -2303,10 +2303,10 @@ namespace Quantum {
                         return;
                     }
                 } else if (marioBShell) {
-                    var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
-
                     // only marioB is spinning in blue shell
                     if (!marioAAbove) {
+                        var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
+
                         // Hit them, powerdown them
                         marioA->FacingRight = fromRight;
                         if (dropStars) {
@@ -2496,6 +2496,7 @@ namespace Quantum {
 
             defenderMario->IsGroundpounding = false;
             defenderPhysicsObject->Velocity.X = defenderPhysics.WalkMaxVelocity[defenderPhysics.RunSpeedStage] * defenderPhysics.WalkBlueShellMultiplier[defenderPhysics.WalkSpeedStage] * (goLeft ? -1 : 1);
+            defenderPhysicsObject->Velocity.Y = FPMath.Min(0, defenderPhysicsObject->Velocity.Y);
 
             var attackerMario = f.Unsafe.GetPointer<MarioPlayer>(attacker);
             attackerMario->DoEntityBounce = true;

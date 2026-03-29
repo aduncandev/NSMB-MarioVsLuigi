@@ -91,14 +91,14 @@ namespace NSMB {
 
             //todo: this jitters to hell
 #if UNITY_STANDALONE
+            var keyboard = Keyboard.current;
+
 #if !UNITY_EDITOR
             if (Screen.fullScreenMode == FullScreenMode.Windowed && keyboard.leftShiftKey.isPressed && (windowWidth != newWindowWidth || windowHeight != newWindowHeight)) {
                 newWindowHeight = (int) (newWindowWidth * (9f / 16f));
                 Screen.SetResolution(newWindowWidth, newWindowHeight, FullScreenMode.Windowed);
             }
 #endif
-
-            var keyboard = Keyboard.current;
 
             if (keyboard[Key.F6].wasPressedThisFrame && !string.IsNullOrEmpty(Application.consoleLogPath)) {
                 System.Diagnostics.Process.Start(Path.GetDirectoryName(Application.consoleLogPath));

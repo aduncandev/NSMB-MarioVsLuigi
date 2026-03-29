@@ -334,6 +334,7 @@ namespace Quantum {
 
                         powerupTransform->Position = koopaTransform->Position;
                         coinItem->Initialize(f, newPowerup, 15, PowerupSpawnReason.BlueKoopa);
+                        coinItem->IgnorePlayerFrames = 15;
                         powerupPhysicsObject->DisableCollision = false;
 
                         koopaEnemy->IsActive = false;

@@ -87,6 +87,7 @@ ossdekasaihassei <color=#AAAAAA>(ja-jp)</color>
 Pedro Lunar <color=#AAAAAA>(es-la)</color>
 pixelated <color=#AAAAAA>(he-il)</color>
 RmgeodashFR <color=#AAAAAA>(cy-gb)</color>
+rm1300 <color=#AAAAAA>(cs-cz)</color>
 SadeceZinzap <color=#AAAAAA>(tr-tr)</color>
 SlavaWOW <color=#AAAAAA>(ru-ru)</color>
 SLG64 <color=#AAAAAA>(es-la)</color>

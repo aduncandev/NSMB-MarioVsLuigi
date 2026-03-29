@@ -136,6 +136,7 @@ Windows, Linux, and Mac Builds: https://github.com/ipodtouch0218/NSMB-MarioVsLui
 * Pedro Lunar *(es-la)*
 * pixelated *(he-il)*
 * RmgeodashFR *(cy-gb)*
+* rm1300 *(cs-cz)*
 * SadeceZinzap *(tr-tr)*
 * SlavaWOW *(ru-ru)*
 * SLG64 *(es-la)*
