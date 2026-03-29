@@ -347,7 +347,7 @@ namespace Quantum {
                 mario->IsInShell |= mario->CurrentPowerupState == PowerupState.BlueShell && physicsObject->IsTouchingGround
                                     && run && !mario->HeldEntity.IsValid
                                     && FPMath.Abs(physicsObject->Velocity.X) >= physics.WalkMaxVelocity[physics.RunSpeedStage] * physics.WalkBlueShellMultiplier[physics.ShellNormalStage]
-                                    && (physicsObject->Velocity.X > 0) == mario->FacingRight);
+                                    && (physicsObject->Velocity.X > 0) == mario->FacingRight;
             }
 
             // ignore when blue shell, allowing Mario to both "crouch" while sliding
