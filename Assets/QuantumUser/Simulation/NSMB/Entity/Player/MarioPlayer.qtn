@@ -212,6 +212,8 @@ event MarioPlayerPropellerSpin {
 synced event MarioPlayerDied {
 	EntityRef Entity;
 	bool IsLava;
+	int OldObjectiveCount;
+	EntityRef Attacker;
 }
 
 event MarioPlayerDeathUp {
@@ -221,6 +223,8 @@ event MarioPlayerDeathUp {
 
 synced event MarioPlayerTookDamage {
 	EntityRef Entity;
+	int OldObjectiveCount;
+	EntityRef Attacker;
 }
 
 event MarioPlayerPreRespawned {
@@ -288,4 +292,20 @@ event PlayKnockbackEffect {
 	EntityRef Attacker;
 	KnockbackStrength Strength;
 	nothashed FPVector2? AttackerPosition;
+}
+
+// these events are for external replay tools
+
+event MarioPlayerTookKnockback {
+	EntityRef Entity;
+	EntityRef Attacker;
+	int StarsToDrop;
+	int OldObjectiveCount;
+	KnockbackStrength Strength;
+	ProjectileEffectType ProjectileEffect;
+	bool WasBlueShell;
+}
+
+event MarioPlayerKnockbackOver {
+	EntityRef Entity;
 }

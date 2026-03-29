@@ -41,4 +41,6 @@ public enum ProjectileEffectType {
     Fire,
     Freeze,
     KillEnemiesAndSoftKnockbackPlayers,
+
+    None = 0xFF
 }

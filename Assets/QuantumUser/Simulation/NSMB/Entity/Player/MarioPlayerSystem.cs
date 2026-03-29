@@ -1101,7 +1101,7 @@ namespace Quantum {
                 } else {
                     // In getup frames
                     if (QuantumUtils.Decrement(ref mario->KnockbackGetupFrames)) {
-                        mario->ResetKnockback();
+                        mario->ResetKnockback(f, entity);
                     }
                 }
 
@@ -1864,7 +1864,7 @@ namespace Quantum {
 
             mario->IsStuckInBlock = true;
             if (mario->CurrentKnockback != KnockbackStrength.None) {
-                mario->ResetKnockback();
+                mario->ResetKnockback(f, filter.Entity);
             }
             mario->IsGroundpounding = false;
             mario->IsPropellerFlying = false;
@@ -2030,7 +2030,7 @@ namespace Quantum {
             return true;
         }
 
-        public static void SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab, bool fromBlock) {
+        public static EntityRef SpawnItem(Frame f, EntityRef marioEntity, MarioPlayer* mario, AssetRef<EntityPrototype> prefab, bool fromBlock) {
             var gamemode = f.FindAsset(f.Global->Rules.Gamemode);
             if (!prefab.IsValid) {
                 prefab = gamemode.GetRandomItem(f, mario, fromBlock).Prefab;
@@ -2040,6 +2040,7 @@ namespace Quantum {
             if (f.Unsafe.TryGetPointer(newEntity, out CoinItem* coinItem)) {
                 coinItem->InitializePlayerSpawn(f, newEntity, marioEntity);
             }
+            return newEntity;
         }
 
         public void SpawnReserveItem(Frame f, ref Filter filter) {
@@ -2113,7 +2114,7 @@ namespace Quantum {
                         damaged = mario->Powerdown(f, marioEntity, false, projectileEntity);
                     }
                     if (!damaged) {
-                        didKnockback = mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectileEntity);
+                        didKnockback = mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectile->Owner, projectileEffectType: projectileAsset.Effect);
                         damaged = true;
                     }
                     break;
@@ -2126,7 +2127,7 @@ namespace Quantum {
                     }
                     
                     if (!damaged) {
-                        didKnockback = mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectileEntity);
+                        didKnockback = mario->DoKnockback(f, marioEntity, !projectile->FacingRight, dropStars ? 1 : 0, KnockbackStrength.FireballBump, projectileEntity, projectileEffectType: projectileAsset.Effect);
                         damaged = true;
                     }
                     break;
@@ -2297,7 +2298,7 @@ namespace Quantum {
                         if (dropStars) {
                             marioB->Powerdown(f, marioBEntity, false, marioAEntity);
                         }
-                        marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.Normal, marioAEntity, bypassDamageInvincibility: true);
+                        marioB->DoKnockback(f, marioBEntity, !fromRight, 0, KnockbackStrength.Normal, marioAEntity, bypassDamageInvincibility: true, wasBlueShell: true);
                         marioA->FacingRight = !marioA->FacingRight;
                         marioA->ShellSpeedStage = marioAPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioAEntity);
@@ -2313,7 +2314,7 @@ namespace Quantum {
                         if (dropStars) {
                             marioA->Powerdown(f, marioAEntity, false, marioBEntity);
                         }
-                        marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.Normal, marioBEntity, bypassDamageInvincibility: true);
+                        marioA->DoKnockback(f, marioAEntity, fromRight, 0, KnockbackStrength.Normal, marioBEntity, bypassDamageInvincibility: true, wasBlueShell: true);
                         marioB->FacingRight = !marioB->FacingRight;
                         marioB->ShellSpeedStage = marioBPhysicsInfo.ShellNormalStage;
                         f.Events.PlayBumpSound(marioBEntity);

@@ -1020,11 +1020,11 @@ namespace NSMB.Entities.Player {
             number.GetComponentInChildren<NumberParticle>().Initialize(
                 Utils.GetSymbolString(e.Coins.ToString(), Utils.numberSymbols),
                 Utils.GetPlayerColor(VerifiedFrame, mario->PlayerRef),
-                e.ItemSpawned
+                e.ItemSpawned != EntityRef.None
             );
 
             PlaySound(SoundEffect.World_Coin_Collect);
-            if (e.ItemSpawned) {
+            if (e.ItemSpawned != EntityRef.None) {
                 PlaySound(SoundEffect.Player_Sound_PowerupReserveUse);
             }
 

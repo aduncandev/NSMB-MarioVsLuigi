@@ -66,12 +66,15 @@ namespace Quantum {
                     newStar->IsStationary = true;
                     newStarPhysicsObject->DisableCollision = true;
                     spawnedStar = true;
+                    f.Events.BigCollectableSpawned(index, position, false);
                     break;
+                } else {
+                    f.Events.BigCollectableSpawned(index, position, true);
                 }
-            }
 
-            if (!spawnedStar) {
-                f.Global->BigStarSpawnTimer = 30;
+                if (!spawnedStar) {
+                    f.Global->BigStarSpawnTimer = 30;
+                }
             }
         }
 
@@ -168,7 +171,7 @@ namespace Quantum {
             f.Signals.OnMarioPlayerCollectedStar(marioEntity);
             GameLogicSystem.CheckForGameEnd(f);
 
-            f.Events.MarioPlayerCollectedStar(marioEntity, f.Unsafe.GetPointer<Transform2D>(starEntity)->Position);
+            f.Events.MarioPlayerCollectedStar(marioEntity, f.Unsafe.GetPointer<Transform2D>(starEntity)->Position, starEntity);
             f.Events.CollectableDespawned(starEntity, f.Unsafe.GetPointer<Transform2D>(starEntity)->Position, true);
             f.Destroy(starEntity);
         }
