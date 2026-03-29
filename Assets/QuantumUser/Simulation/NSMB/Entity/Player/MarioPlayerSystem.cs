@@ -2539,7 +2539,7 @@ namespace Quantum {
                     defenderMario->DoKnockback(f, defender, !fromRight, 0, KnockbackStrength.Groundpound, attacker);
                 }
                 attackerMario->DoEntityBounce = false;
-            } else if (attackerMario->IsCrouchedInShell) {
+            } else if (attackerMario->IsCrouchedInShell && !groundpounded) {
                 // Blue Shell has very strong knockback!!
                 // deal different knockback if it's a teammate
                 KnockbackStrength strength = dropStars ? KnockbackStrength.Groundpound : KnockbackStrength.Normal;
