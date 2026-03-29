@@ -2344,24 +2344,30 @@ namespace Quantum {
                     var marioAPhysicsInfo = f.FindAsset(marioA->PhysicsAsset);
                     var marioBPhysicsInfo = f.FindAsset(marioB->PhysicsAsset);
                     // push the other Mario back
-                    if (marioAPhysics->IsTouchingGround) {
-                        marioBPhysics->Velocity.X = marioAPhysics->Velocity.X * FP._0_50;
-                        marioA->FacingRight = !fromRight;
-                        marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
-                    } else if (dropStars) {
-                        KnockbackStrength strength = KnockbackStrength.Groundpound;
-                        marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, strength, marioAEntity);
-                        f.Events.PlayKnockbackEffect(marioBEntity, marioAEntity, strength, avgPosition);
+                    if (marioA->IsCrouchedInShell) {
+                        if (marioAPhysics->IsTouchingGround && FPMath.Abs(marioAPhysics->Velocity.X) > 0) {
+                            marioBPhysics->Velocity.X = marioAPhysics->Velocity.X * FP._0_50;
+                            marioA->FacingRight = !fromRight;
+                            marioAPhysics->Velocity.X = marioAPhysicsInfo.WalkMaxVelocity[marioAPhysicsInfo.RunSpeedStage] * (fromRight ? -1 : 1);
+                        } else if (dropStars) {
+                            KnockbackStrength strength = KnockbackStrength.Groundpound;
+                            bool didKnockback = marioB->DoKnockback(f, marioBEntity, !fromRight, dropStars ? 1 : 0, strength, marioAEntity);
+                            if (didKnockback) {
+                                f.Events.PlayKnockbackEffect(marioBEntity, marioAEntity, strength, avgPosition);
+                            }
+                        }
                     }
                     if (marioB->IsCrouchedInShell) {
-                        if (marioBPhysics->IsTouchingGround) {
+                        if (marioBPhysics->IsTouchingGround && FPMath.Abs(marioBPhysics->Velocity.X) > 0) {
                             marioAPhysics->Velocity.X = marioBPhysics->Velocity.X * FP._0_50;
                             marioB->FacingRight = fromRight;
                             marioBPhysics->Velocity.X = marioBPhysicsInfo.WalkMaxVelocity[marioBPhysicsInfo.RunSpeedStage] * (fromRight ? 1 : -1);
                         } else if (dropStars) {
                             KnockbackStrength strength = KnockbackStrength.Groundpound;
-                            marioA->DoKnockback(f, marioAEntity, !fromRight, dropStars ? 1 : 0, strength, marioBEntity);
-                            f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, strength, avgPosition);
+                            bool didKnockback = marioA->DoKnockback(f, marioAEntity, fromRight, dropStars ? 1 : 0, strength, marioBEntity);
+                            if (didKnockback) {
+                                f.Events.PlayKnockbackEffect(marioAEntity, marioBEntity, strength, avgPosition);
+                            }
                         }
                     }
                     return; // do not allow Blue Shell to bump
@@ -2543,9 +2549,11 @@ namespace Quantum {
                 // Blue Shell has very strong knockback!!
                 // deal different knockback if it's a teammate
                 KnockbackStrength strength = dropStars ? KnockbackStrength.Groundpound : KnockbackStrength.Normal;
-                defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? 1 : 0, strength, attacker);
+                bool didKnockback = defenderMario->DoKnockback(f, defender, !fromRight, dropStars ? 1 : 0, strength, attacker);
                 attackerMario->DoEntityBounce = false; // no bounce
-                f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition);
+                if (didKnockback) {
+                    f.Events.PlayKnockbackEffect(defender, attacker, strength, avgPosition);
+                }
             } else if (defenderMario->CurrentPowerupState == PowerupState.HammerSuit && defenderPhysicsObject->IsTouchingGround && defenderMario->IsCrouching && !groundpounded) {
                 // Bounce
                 var attackerPhysicsObject = f.Unsafe.GetPointer<PhysicsObject>(attacker);
