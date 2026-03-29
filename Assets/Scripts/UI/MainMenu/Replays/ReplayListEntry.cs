@@ -247,6 +247,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     button.interactable = false;
                 }
             } else if (IsTemporary) {
+                /*
                 int? deletion = manager.GetReplaysUntilDeletion(this);
                 if (deletion.HasValue && deletion == 1) {
                     finalWarningText = tm.GetTranslation("ui.extras.replays.temporary.next");
@@ -258,6 +259,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     finalWarningText = tm.GetTranslation("ui.extras.replays.temporary.nodelete");
                     warningText.color = warningColor;
                 }
+                */
+                finalWarningText = tm.GetTranslation("ui.extras.replays.temporary.nodelete");
+                warningText.color = warningColor;
             } else if (IsFavorited) {
                 finalWarningText = tm.GetTranslation("ui.extras.replays.favorited");
                 warningText.color = favoriteColor;

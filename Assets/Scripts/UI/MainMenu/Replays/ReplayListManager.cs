@@ -316,7 +316,8 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
                 List<BinaryReplayFile> newReplays = new();
                 foreach (var filepath in Directory.EnumerateFiles(ReplayDirectory, "*.mvlreplay", SearchOption.AllDirectories)) {
-                    if (newReplays.Any(brf => brf.FilePath == filepath)) {
+                    if (newReplays.Any(brf => brf.FilePath == filepath)
+                        || replays.Any(brf => brf.ReplayFile.FilePath == filepath)) {
                         continue;
                     }
 
@@ -324,7 +325,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     if (parseResult == ReplayParseResult.Success) {
                         newReplays.Add(replay);
                     } else {
-                        Debug.Log("parsing " + filepath + " failed: " + parseResult);
+                        Debug.Log($"[Replay] Parsing '{filepath}' failed with reason '{parseResult}'");
                     }
                 }
 
@@ -359,7 +360,10 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                     noReplaysText.text = GlobalController.Instance.translationManager.GetTranslation(Settings.Instance.GeneralReplaysEnabled ? "ui.extras.replays.none" : "ui.extras.replays.disabled");
                 }
                 loadingIcon.SetActive(false);
-            } catch (Exception e) { Debug.Log(e); throw; }
+            } catch (Exception e) {
+                Debug.Log(e);
+                throw;
+            }
         }
 
         public void OnSortDropdownChanged() {
@@ -651,6 +655,7 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
             UpdateInformation(Selected);
         }
 
+        /*
         public int? GetReplaysUntilDeletion(ReplayListEntry replay) {
             int max = Settings.Instance.generalMaxTempReplays;
             int index = temporaryReplays.IndexOf(r => r == replay);
@@ -660,13 +665,14 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
 
             return Mathf.Max(1, max - index);
         }
+        */
 
         public IList<string> GetTemporaryReplaysToDelete() {
             if (Settings.Instance.generalMaxTempReplays <= 0) {
                 return Array.Empty<string>();
             }
 
-            return Directory.EnumerateFiles(TempDirectory, "*.mvlreplay")
+            var x = Directory.EnumerateFiles(TempDirectory, "*.mvlreplay")
                 .OrderBy(path => {
                     try {
                         return File.GetLastWriteTime(path);
@@ -676,6 +682,9 @@ namespace NSMB.UI.MainMenu.Submenus.Replays {
                 })
                 .Skip(Settings.Instance.generalMaxTempReplays)
                 .ToList();
+
+            Debug.Log("replays to delete: " + string.Join(", ", x));
+            return x;
         }
 
         public class ReplayDateComparer : IComparer<ReplayListEntry> {

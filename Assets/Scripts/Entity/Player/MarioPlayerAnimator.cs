@@ -689,11 +689,11 @@ namespace NSMB.Entities.Player {
         }
 
         public void Footstep() {
-            if (IsReplayFastForwarding) {
+            Frame f = PredictedFrame;
+            if (IsReplayFastForwarding || !f.Exists(EntityRef)) {
                 return;
             }
 
-            Frame f = PredictedFrame;
             var mario = f.Unsafe.GetPointer<MarioPlayer>(EntityRef);
             var marioTransform = f.Unsafe.GetPointer<Transform2D>(EntityRef);
             var physicsObject = f.Unsafe.GetPointer<PhysicsObject>(EntityRef);
