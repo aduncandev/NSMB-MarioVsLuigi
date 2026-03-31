@@ -15,7 +15,7 @@ namespace NSMB.UI.Translation {
 
         //---Properties
         public string CurrentLocale { get; private set; }
-        public bool RightToLeft => GetTranslation("rtl").Equals("true", StringComparison.InvariantCultureIgnoreCase);
+        public bool RightToLeft => IsLocaleRTL(CurrentLocale);
 
         //---Serialized Variables
         [SerializeField] private string fallbackLocale = "en-us";
@@ -131,6 +131,11 @@ namespace NSMB.UI.Translation {
             return false;
         }
 
+        public bool IsLocaleRTL(string locale) {
+            TryGetTranslationForLocale(locale, "rtl", out string result);
+            return (result ?? "").Equals("true", StringComparison.InvariantCultureIgnoreCase);
+        }
+
         public ICollection<string> GetAllLocales() {
             return allTranslations.Keys;
         }
@@ -145,7 +150,7 @@ namespace NSMB.UI.Translation {
                     source.Priority = -1;
                     RegisterTranslationSource(locale, source);
                 } catch (Exception e) {
-                    Debug.LogWarning($"[Translation] Failed to load translatoin from TextAsset {textAsset.name}. Is it malformed?");
+                    Debug.LogWarning($"[Translation] Failed to load translation from TextAsset {textAsset.name}. Is it malformed?");
                     Debug.LogWarning(e);
                 }
             }
